@@ -27,6 +27,9 @@ export function ServicesList({
               <CardDescription className="mt-2">
                 Servico operacional vinculado ao tenant autenticado.
               </CardDescription>
+              <p className="mt-4 text-sm font-semibold text-white">
+                Duracao: {service.durationInMinutes} min
+              </p>
               <p className="mt-4 text-sm text-text-soft">
                 Criado em{" "}
                 {formatDateTimeInTenantTimezone(
@@ -37,7 +40,7 @@ export function ServicesList({
             </div>
 
             <Badge variant="info" className="justify-center md:justify-start">
-              Integrado
+              {service.durationInMinutes} min
             </Badge>
           </div>
         </Card>

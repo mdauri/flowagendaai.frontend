@@ -13,6 +13,7 @@ interface ServiceCreateFormProps {
 
 const initialForm = {
   name: "",
+  durationInMinutes: "",
 };
 
 export function ServiceCreateForm({
@@ -24,14 +25,23 @@ export function ServiceCreateForm({
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const nameId = useId();
+  const durationInMinutesId = useId();
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setErrorMessage(null);
     setSuccessMessage(null);
 
+    const parsedDurationInMinutes = Number(form.durationInMinutes);
+
+    if (!Number.isInteger(parsedDurationInMinutes) || parsedDurationInMinutes <= 0) {
+      setErrorMessage("Informe uma duracao valida em minutos maior que zero.");
+      return;
+    }
+
     try {
       await onSubmit({
         name: form.name,
+        durationInMinutes: parsedDurationInMinutes,
       });
       setForm(initialForm);
       setSuccessMessage("Servico criado e adicionado na listagem atual.");
@@ -73,6 +83,31 @@ export function ServiceCreateForm({
             required
             disabled={isSubmitting}
           />
+        </label>
+
+        <label className="grid gap-2" htmlFor={durationInMinutesId}>
+          <span className="text-sm font-semibold text-white">Duracao em minutos</span>
+          <Input
+            id={durationInMinutesId}
+            name="durationInMinutes"
+            type="number"
+            min={1}
+            step={1}
+            inputSize="md"
+            value={form.durationInMinutes}
+            onChange={(event) => {
+              setForm((current) => ({
+                ...current,
+                durationInMinutes: event.target.value,
+              }));
+            }}
+            placeholder="Ex.: 60"
+            required
+            disabled={isSubmitting}
+          />
+          <p className="text-sm leading-6 text-text-soft">
+            Campo obrigatorio. Use minutos inteiros maiores que zero.
+          </p>
         </label>
 
         {errorMessage ? (

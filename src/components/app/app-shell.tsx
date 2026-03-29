@@ -57,6 +57,32 @@ export function AppShell({ user, tenant, onLogout, children }: AppShellProps) {
             >
               Servicos
             </NavLink>
+            <NavLink
+              to="/app/availability"
+              className={({ isActive }) =>
+                cn(
+                  "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
+                  isActive
+                    ? "border-primary bg-primary text-black"
+                    : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white"
+                )
+              }
+            >
+              Disponibilidade
+            </NavLink>
+            <NavLink
+              to="/app/slots"
+              className={({ isActive }) =>
+                cn(
+                  "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
+                  isActive
+                    ? "border-primary bg-primary text-black"
+                    : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white"
+                )
+              }
+            >
+              Slots
+            </NavLink>
           </nav>
         </div>
         <div className="flex flex-wrap items-center gap-3">

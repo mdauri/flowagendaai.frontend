@@ -64,6 +64,14 @@ a {
 }
 
 button,
-input {
+input,
+select {
   font: inherit;
+}
+
+select,
+select option,
+select optgroup {
+  background-color: var(--color-surface-2);
+  color: var(--color-text);
 }
