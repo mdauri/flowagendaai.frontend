@@ -1,5 +1,13 @@
 import { httpClient } from "@/lib/http-client";
-import type { CurrentUserResponse, LoginRequest, LoginResponse } from "@/types/auth";
+import type {
+  CurrentUserResponse,
+  ForgotRequest,
+  ForgotResponse,
+  LoginRequest,
+  LoginResponse,
+  ResetPasswordRequest,
+  ResetPasswordResponse,
+} from "@/types/auth";
 
 export const authService = {
   login(payload: LoginRequest) {
@@ -11,5 +19,19 @@ export const authService = {
   },
   me() {
     return httpClient<CurrentUserResponse>("/auth/me");
+  },
+  forgot(payload: ForgotRequest) {
+    return httpClient<ForgotResponse>("/auth/forgot", {
+      method: "POST",
+      body: JSON.stringify(payload),
+      skipAuth: true,
+    });
+  },
+  resetPassword(payload: ResetPasswordRequest) {
+    return httpClient<ResetPasswordResponse>("/auth/reset-password", {
+      method: "POST",
+      body: JSON.stringify(payload),
+      skipAuth: true,
+    });
   },
 };

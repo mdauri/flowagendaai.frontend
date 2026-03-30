@@ -4,12 +4,14 @@ import { Card, CardDescription, CardTitle } from "@/components/flow/card";
 interface SlotSearchActionsProps {
   canSearch: boolean;
   isSearching: boolean;
+  disabled?: boolean;
   onSearch: () => void;
 }
 
 export function SlotSearchActions({
   canSearch,
   isSearching,
+  disabled = false,
   onSearch,
 }: SlotSearchActionsProps) {
   return (
@@ -26,8 +28,8 @@ export function SlotSearchActions({
           type="button"
           size="md"
           onClick={onSearch}
-          disabled={!canSearch || isSearching}
-          aria-disabled={!canSearch || isSearching}
+          disabled={!canSearch || isSearching || disabled}
+          aria-disabled={!canSearch || isSearching || disabled}
         >
           {isSearching ? "Buscando horarios..." : "Buscar horarios"}
         </Button>

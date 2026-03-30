@@ -23,6 +23,23 @@ export interface LoginResponse {
   tenant: AuthTenant;
 }
 
+export interface ForgotRequest {
+  email: string;
+}
+
+export interface ForgotResponse {
+  message: string;
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  newPassword: string;
+}
+
+export interface ResetPasswordResponse {
+  message: string;
+}
+
 export interface CurrentUserResponse {
   user: AuthUser;
   tenant: AuthTenant;

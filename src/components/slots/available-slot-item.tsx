@@ -7,6 +7,7 @@ interface AvailableSlotItemProps {
   slot: AvailableSlot;
   tenantTimezone: string;
   selected: boolean;
+  disabled?: boolean;
   onSelect: (slot: AvailableSlot) => void;
 }
 
@@ -14,6 +15,7 @@ export function AvailableSlotItem({
   slot,
   tenantTimezone,
   selected,
+  disabled = false,
   onSelect,
 }: AvailableSlotItemProps) {
   return (
@@ -23,6 +25,7 @@ export function AvailableSlotItem({
       size="md"
       className="h-auto w-full justify-between gap-4 px-5 py-4 text-left"
       aria-pressed={selected}
+      disabled={disabled}
       onClick={() => {
         onSelect(slot);
       }}

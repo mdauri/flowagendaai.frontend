@@ -5,6 +5,8 @@ export interface ApiErrorResponse {
   details?: unknown;
 }
 
+export const BOOKING_CONFLICT_ERROR_CODE = "BOOKING_CONFLICT";
+
 export class ApiError extends Error {
   constructor(
     public readonly status: number,
@@ -16,4 +18,12 @@ export class ApiError extends Error {
     super(message);
     this.name = "ApiError";
   }
+}
+
+export function isBookingConflictApiError(error: unknown): error is ApiError {
+  return (
+    error instanceof ApiError &&
+    error.status === 409 &&
+    error.code === BOOKING_CONFLICT_ERROR_CODE
+  );
 }

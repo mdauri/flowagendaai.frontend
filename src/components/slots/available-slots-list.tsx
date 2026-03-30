@@ -6,6 +6,7 @@ interface AvailableSlotsListProps {
   slots: AvailableSlot[];
   tenantTimezone: string;
   selectedSlotStart: string | null;
+  disabled?: boolean;
   onSelect: (slot: AvailableSlot) => void;
 }
 
@@ -13,6 +14,7 @@ export function AvailableSlotsList({
   slots,
   tenantTimezone,
   selectedSlotStart,
+  disabled = false,
   onSelect,
 }: AvailableSlotsListProps) {
   return (
@@ -41,6 +43,7 @@ export function AvailableSlotsList({
             slot={slot}
             tenantTimezone={tenantTimezone}
             selected={selectedSlotStart === slot.start}
+            disabled={disabled}
             onSelect={onSelect}
           />
         ))}

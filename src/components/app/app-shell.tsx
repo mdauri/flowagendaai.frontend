@@ -1,18 +1,24 @@
 import type { PropsWithChildren } from "react";
 import { NavLink } from "react-router-dom";
-import { Button } from "@/components/flow/button";
 import { Card } from "@/components/flow/card";
-import { Badge } from "@/components/flow/badge";
+import { UserIdentityHeaderCard } from "@/components/app/user-identity-header-card";
 import { cn } from "@/lib/cn";
 import type { AuthTenant, AuthUser } from "@/types/auth";
 
 interface AppShellProps extends PropsWithChildren {
   user: AuthUser;
   tenant: AuthTenant;
+  isUserIdentityLoading?: boolean;
   onLogout: () => void;
 }
 
-export function AppShell({ user, tenant, onLogout, children }: AppShellProps) {
+export function AppShell({
+  user,
+  tenant,
+  isUserIdentityLoading = false,
+  onLogout,
+  children,
+}: AppShellProps) {
   return (
     <div className="min-h-screen px-6 py-6 md:px-10 lg:px-16">
       <header className="mx-auto grid max-w-7xl gap-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-start">
@@ -31,6 +37,19 @@ export function AppShell({ user, tenant, onLogout, children }: AppShellProps) {
             aria-label="Navegacao principal da operacao"
             className="mt-5 flex flex-wrap gap-3"
           >
+            <NavLink
+              to="/app/dashboard"
+              className={({ isActive }) =>
+                cn(
+                  "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
+                  isActive
+                    ? "border-primary bg-primary text-black"
+                    : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white"
+                )
+              }
+            >
+              Dashboard
+            </NavLink>
             <NavLink
               to="/app/professionals"
               className={({ isActive }) =>
@@ -85,11 +104,12 @@ export function AppShell({ user, tenant, onLogout, children }: AppShellProps) {
             </NavLink>
           </nav>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <Badge variant="subtle">{user.role}</Badge>
-          <Button variant="secondary" size="md" onClick={onLogout}>
-            Sair
-          </Button>
+        <div className="min-w-0 xl:max-w-[360px]">
+          <UserIdentityHeaderCard
+            name={user.name}
+            isLoading={isUserIdentityLoading}
+            onLogout={onLogout}
+          />
         </div>
       </header>
 

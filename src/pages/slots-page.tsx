@@ -2,6 +2,10 @@ import { useMemo, useState } from "react";
 import { Card } from "@/components/flow/card";
 import { SectionHeading } from "@/components/flow/section-heading";
 import { AvailableSlotsList } from "@/components/slots/available-slots-list";
+import {
+  BookingConfirmationPanel,
+  type BookingConfirmationPanelState,
+} from "@/components/slots/booking-confirmation-panel";
 import { SlotSearchActions } from "@/components/slots/slot-search-actions";
 import { SlotSearchFilters } from "@/components/slots/slot-search-filters";
 import { SlotsEmptyState } from "@/components/slots/slots-empty-state";
@@ -9,10 +13,15 @@ import { SlotsErrorState } from "@/components/slots/slots-error-state";
 import { TenantTimezoneInfo } from "@/components/slots/tenant-timezone-info";
 import { PageState } from "@/components/shared/page-state";
 import { useAuth } from "@/hooks/use-auth";
-import { useAvailableSlotsQuery } from "@/hooks/use-available-slots-query";
+import {
+  getAvailableSlotsQueryKey,
+  useAvailableSlotsQuery,
+} from "@/hooks/use-available-slots-query";
+import { useCreateBookingMutation } from "@/hooks/use-create-booking-mutation";
 import { useProfessionalsQuery } from "@/hooks/use-professionals-query";
 import { useServicesQuery } from "@/hooks/use-services-query";
-import { ApiError } from "@/types/api";
+import { ApiError, isBookingConflictApiError } from "@/types/api";
+import type { CreateBookingResponse } from "@/types/booking";
 import type { AvailableSlot, ListAvailableSlotsInput } from "@/types/slot";
 
 const initialFilters: ListAvailableSlotsInput = {
@@ -68,6 +77,7 @@ export function SlotsPage() {
   const [filters, setFilters] = useState<ListAvailableSlotsInput>(initialFilters);
   const [submittedFilters, setSubmittedFilters] = useState<ListAvailableSlotsInput | null>(null);
   const [selectedSlotStart, setSelectedSlotStart] = useState<string | null>(null);
+  const [confirmedBooking, setConfirmedBooking] = useState<CreateBookingResponse | null>(null);
   const availableSlotsQuery = useAvailableSlotsQuery(submittedFilters);
 
   const professionals = professionalsQuery.data?.professionals ?? [];
@@ -78,6 +88,30 @@ export function SlotsPage() {
   const isBootstrapLoading = professionalsQuery.isLoading || servicesQuery.isLoading;
   const isBootstrapError = professionalsQuery.isError || servicesQuery.isError;
   const slots = availableSlotsQuery.data?.slots ?? [];
+  const slotsQueryKey = useMemo(() => getAvailableSlotsQueryKey(submittedFilters), [submittedFilters]);
+  const selectedSlot = useMemo(
+    () => slots.find((slot) => slot.start === selectedSlotStart) ?? null,
+    [selectedSlotStart, slots]
+  );
+  const selectedProfessionalName = useMemo(
+    () => professionals.find((professional) => professional.id === filters.professionalId)?.name,
+    [filters.professionalId, professionals]
+  );
+  const selectedServiceName = useMemo(
+    () => services.find((service) => service.id === filters.serviceId)?.name,
+    [filters.serviceId, services]
+  );
+  const createBookingMutation = useCreateBookingMutation({
+    slotsQueryKey,
+    onConflict: () => {
+      setSelectedSlotStart(null);
+    },
+    onSuccess: (booking) => {
+      setConfirmedBooking(booking);
+      setSelectedSlotStart(null);
+    },
+  });
+  const isBookingPending = createBookingMutation.isPending;
 
   const bootstrapErrorMessage = useMemo(() => {
     if (professionalsQuery.isError) {
@@ -92,11 +126,13 @@ export function SlotsPage() {
   }, [professionalsQuery.isError, servicesQuery.isError]);
 
   function handleSearch() {
-    if (!hasCompleteFilters) {
+    if (!hasCompleteFilters || isBookingPending) {
       return;
     }
 
     setSelectedSlotStart(null);
+    setConfirmedBooking(null);
+    createBookingMutation.reset();
 
     if (isSameSearch(submittedFilters, filters)) {
       void availableSlotsQuery.refetch();
@@ -111,8 +147,80 @@ export function SlotsPage() {
   }
 
   function handleSelectSlot(slot: AvailableSlot) {
+    if (isBookingPending) {
+      return;
+    }
+
+    if (confirmedBooking) {
+      setConfirmedBooking(null);
+      createBookingMutation.reset();
+    }
+
     setSelectedSlotStart(slot.start);
   }
+
+  function handleConfirmBooking() {
+    if (!submittedFilters || !selectedSlot || isBookingPending) {
+      return;
+    }
+
+    setConfirmedBooking(null);
+    createBookingMutation.mutate({
+      professionalId: submittedFilters.professionalId,
+      serviceId: submittedFilters.serviceId,
+      start: selectedSlot.start,
+    });
+  }
+
+  function handleRetryBooking() {
+    handleConfirmBooking();
+  }
+
+  function handleRefreshSlots() {
+    if (isBookingPending) {
+      return;
+    }
+
+    setSelectedSlotStart(null);
+    createBookingMutation.reset();
+    void availableSlotsQuery.refetch();
+  }
+
+  function handleResetBookingSuccess() {
+    setConfirmedBooking(null);
+    createBookingMutation.reset();
+  }
+
+  const bookingPanelState: BookingConfirmationPanelState = (() => {
+    if (confirmedBooking) {
+      return "success";
+    }
+
+    if (createBookingMutation.isPending) {
+      return "pending";
+    }
+
+    if (createBookingMutation.isError) {
+      const error = createBookingMutation.error;
+
+      if (isBookingConflictApiError(error)) {
+        return "conflict";
+      }
+
+      return "error";
+    }
+
+    return "idle";
+  })();
+
+  const showBookingPanel =
+    submittedFilters !== null &&
+    !isBootstrapLoading &&
+    !isBootstrapError &&
+    !availableSlotsQuery.isLoading &&
+    !availableSlotsQuery.isFetching &&
+    !availableSlotsQuery.isError &&
+    (slots.length > 0 || confirmedBooking !== null || createBookingMutation.isError);
 
   return (
     <>
@@ -137,6 +245,7 @@ export function SlotsPage() {
           <SlotSearchActions
             canSearch={hasCompleteFilters}
             isSearching={availableSlotsQuery.isLoading || availableSlotsQuery.isFetching}
+            disabled={isBookingPending}
             onSearch={handleSearch}
           />
         </div>
@@ -191,19 +300,30 @@ export function SlotsPage() {
         !availableSlotsQuery.isError &&
         slots.length === 0 ? <SlotsEmptyState /> : null}
 
-        {!isBootstrapLoading &&
-        !isBootstrapError &&
-        submittedFilters !== null &&
-        !availableSlotsQuery.isLoading &&
-        !availableSlotsQuery.isFetching &&
-        !availableSlotsQuery.isError &&
-        slots.length > 0 ? (
-          <AvailableSlotsList
-            slots={slots}
-            tenantTimezone={activeTenantTimezone}
-            selectedSlotStart={selectedSlotStart}
-            onSelect={handleSelectSlot}
-          />
+        {showBookingPanel ? (
+          <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem] xl:items-start">
+            <AvailableSlotsList
+              slots={slots}
+              tenantTimezone={activeTenantTimezone}
+              selectedSlotStart={selectedSlotStart}
+              disabled={isBookingPending || confirmedBooking !== null}
+              onSelect={handleSelectSlot}
+            />
+
+            <BookingConfirmationPanel
+              state={bookingPanelState}
+              selectedSlot={selectedSlot}
+              confirmedBooking={confirmedBooking}
+              tenantTimezone={activeTenantTimezone}
+              professionalName={selectedProfessionalName}
+              serviceName={selectedServiceName}
+              canConfirm={Boolean(selectedSlot) && !isBookingPending}
+              onConfirm={handleConfirmBooking}
+              onRetry={handleRetryBooking}
+              onRefreshSlots={handleRefreshSlots}
+              onResetSuccess={handleResetBookingSuccess}
+            />
+          </div>
         ) : null}
       </div>
     </>

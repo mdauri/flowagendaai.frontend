@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/flow/button";
 import { Card, CardDescription, CardTitle } from "@/components/flow/card";
 import { Input } from "@/components/flow/input";
@@ -32,10 +32,15 @@ export function LoginForm() {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    await loginMutation.mutateAsync({
-      email,
-      password,
-    });
+
+    try {
+      await loginMutation.mutateAsync({
+        email,
+        password,
+      });
+    } catch {
+      // The mutation state already drives the visible feedback for invalid login.
+    }
   };
 
   const feedback = (() => {
@@ -59,7 +64,8 @@ export function LoginForm() {
 
     return {
       title: "Erro ao entrar",
-      description: "Tente novamente em instantes. Se o problema continuar, revise a configuracao da API.",
+      description:
+        "Tente novamente em instantes. Se o problema continuar, revise a configuracao da API.",
     };
   })();
 
@@ -80,7 +86,10 @@ export function LoginForm() {
 
       <form className="mt-6 space-y-5" onSubmit={handleSubmit} noValidate>
         <div>
-          <label className="mb-2 block text-sm font-semibold text-white" htmlFor="email">
+          <label
+            className="mb-2 block text-sm font-semibold text-white"
+            htmlFor="email"
+          >
             Email
           </label>
           <Input
@@ -98,7 +107,10 @@ export function LoginForm() {
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-semibold text-white" htmlFor="password">
+          <label
+            className="mb-2 block text-sm font-semibold text-white"
+            htmlFor="password"
+          >
             Senha
           </label>
           <Input
@@ -113,8 +125,16 @@ export function LoginForm() {
             required
           />
         </div>
-
-        <Button className="w-full" type="submit" disabled={loginMutation.isPending}>
+        <div className="flex justify-end -mt-2  text-secondary">
+          <Link to={"/forgot-password"} className="text-sm font-semibold">
+            Esqueci minha senha
+          </Link>
+        </div>
+        <Button
+          className="w-full"
+          type="submit"
+          disabled={loginMutation.isPending}
+        >
           {loginMutation.isPending ? "Entrando..." : "Entrar"}
         </Button>
       </form>

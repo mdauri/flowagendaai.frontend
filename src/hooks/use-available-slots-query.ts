@@ -2,9 +2,13 @@ import { useQuery } from "@tanstack/react-query";
 import { slotsService } from "@/services/slots-service";
 import type { ListAvailableSlotsInput } from "@/types/slot";
 
+export function getAvailableSlotsQueryKey(input: ListAvailableSlotsInput | null) {
+  return ["available-slots", input?.professionalId, input?.serviceId, input?.date] as const;
+}
+
 export function useAvailableSlotsQuery(input: ListAvailableSlotsInput | null) {
   return useQuery({
-    queryKey: ["available-slots", input?.professionalId, input?.serviceId, input?.date],
+    queryKey: getAvailableSlotsQueryKey(input),
     queryFn: () => {
       if (!input) {
         throw new Error("Consulta de slots sem filtros completos.");
