@@ -13,7 +13,8 @@ export class ApiError extends Error {
     public readonly code: string,
     message: string,
     public readonly requestId: string,
-    public readonly details?: unknown
+    public readonly details?: unknown,
+    public readonly retryAfterSeconds?: number
   ) {
     super(message);
     this.name = "ApiError";

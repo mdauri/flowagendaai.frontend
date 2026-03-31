@@ -33,12 +33,16 @@ export async function httpClient<T>(path: string, options: RequestOptions = {}):
       payload = null;
     }
 
+    const retryAfterHeader = response.headers.get("Retry-After");
+    const retryAfterSeconds = retryAfterHeader ? Number(retryAfterHeader) || undefined : undefined;
+
     throw new ApiError(
       response.status,
       payload?.code ?? "HTTP_ERROR",
       payload?.message ?? "Nao foi possivel concluir a requisicao.",
       payload?.requestId ?? "unknown",
-      payload?.details
+      payload?.details,
+      retryAfterSeconds
     );
   }
 

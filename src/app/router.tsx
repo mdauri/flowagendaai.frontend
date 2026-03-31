@@ -4,6 +4,7 @@ import { AvailabilityPage } from "@/pages/availability-page";
 import { DashboardPage } from "@/pages/dashboard-page";
 import { LoginPage } from "@/pages/login-page";
 import { ProfessionalsPage } from "@/pages/professionals-page";
+import { PublicBookingPage } from "@/pages/public-booking-page";
 import { ResetPasswordPage } from "@/pages/reset-password-page";
 import { ServicesPage } from "@/pages/services-page";
 import { SlotsPage } from "@/pages/slots-page";
@@ -17,6 +18,8 @@ export function AppRouter() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/p/:slug" element={<PublicBookingPage />} />
+
         <Route
           path="/app"
           element={
