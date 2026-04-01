@@ -2,6 +2,7 @@ import { useId, useState, type FormEvent } from "react";
 import { Button } from "@/components/flow/button";
 import { Card, CardDescription, CardTitle } from "@/components/flow/card";
 import { Input } from "@/components/flow/input";
+import { Textarea } from "@/components/flow/textarea";
 import { FeedbackBanner } from "@/components/shared/feedback-banner";
 import { ApiError } from "@/types/api";
 import type { CreateServiceInput } from "@/types/service";
@@ -13,6 +14,7 @@ interface ServiceCreateFormProps {
 
 const initialForm = {
   name: "",
+  description: "",
   durationInMinutes: "",
 };
 
@@ -23,9 +25,12 @@ export function ServiceCreateForm({
   const [form, setForm] = useState(initialForm);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [charCount, setCharCount] = useState(0);
 
   const nameId = useId();
+  const descriptionId = useId();
   const durationInMinutesId = useId();
+  
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setErrorMessage(null);
@@ -41,9 +46,11 @@ export function ServiceCreateForm({
     try {
       await onSubmit({
         name: form.name,
+        description: form.description.trim() === "" ? null : form.description,
         durationInMinutes: parsedDurationInMinutes,
       });
       setForm(initialForm);
+      setCharCount(0);
       setSuccessMessage("Servico criado e adicionado na listagem atual.");
     } catch (error) {
       setErrorMessage(
@@ -83,6 +90,39 @@ export function ServiceCreateForm({
             required
             disabled={isSubmitting}
           />
+        </label>
+
+        <label className="grid gap-2" htmlFor={descriptionId}>
+          <span className="text-sm font-semibold text-white">Descricao (opcional)</span>
+          <Textarea
+            id={descriptionId}
+            name="description"
+            value={form.description}
+            onChange={(event) => {
+              const value = event.target.value;
+              setForm((current) => ({
+                ...current,
+                description: value,
+              }));
+              setCharCount(value.length);
+            }}
+            placeholder="Descreva o que esta incluso no servico, prerequisitos, ou outras informacoes relevantes."
+            maxLength={1000}
+            rows={4}
+            disabled={isSubmitting}
+          />
+          <div className="flex items-center justify-between">
+            <p className="text-sm leading-6 text-text-soft">
+              Informe detalhes do servico para ajudar os clientes a entender o que estao agendando.
+            </p>
+            <span
+              className={`text-sm font-medium ${
+                charCount >= 900 ? "text-warning" : "text-text-soft"
+              }`}
+            >
+              {charCount}/1000
+            </span>
+          </div>
         </label>
 
         <label className="grid gap-2" htmlFor={durationInMinutesId}>
@@ -126,7 +166,7 @@ export function ServiceCreateForm({
         ) : null}
 
         <div className="flex flex-col gap-3 pt-2 sm:flex-row">
-          <Button type="submit" size="md" disabled={isSubmitting}>
+          <Button type="submit" size="md" disabled={isSubmitting || charCount > 1000}>
             {isSubmitting ? "Salvando..." : "Criar servico"}
           </Button>
           <Button
@@ -138,6 +178,7 @@ export function ServiceCreateForm({
               setForm(initialForm);
               setErrorMessage(null);
               setSuccessMessage(null);
+              setCharCount(0);
             }}
           >
             Limpar

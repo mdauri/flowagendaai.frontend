@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { colors, typography } from "@/design-system";
 import { DateTime } from "luxon";
 import { useSearchParams, useParams } from "react-router-dom";
 import { Button } from "@/components/flow/button";
@@ -345,16 +346,23 @@ export function PublicBookingPage() {
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
 
   return (
-    <div className="min-h-screen bg-[#05060d] pb-32 text-white">
-      <div className="mx-auto flex max-w-2xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
+    <div 
+      className="min-h-screen pb-32 text-white transition-colors duration-500"
+      style={{
+        backgroundColor: colors.background.base,
+        fontFamily: typography.family.sans,
+      }}
+    >
+      <div className="mx-auto flex max-w-2xl flex-col gap-6 px-4 py-6 transition-all duration-300 sm:px-6 lg:px-8">
         <PublicBookingHeader professional={professional} />
-        <div className="space-y-4">
+        <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
           <div className="flex items-center justify-between">
             {canGoBack ? (
               <button
                 type="button"
                 onClick={handleBack}
-                className="text-sm font-semibold text-white/70 transition-colors hover:text-white"
+                className="text-sm font-semibold transition-all hover:-translate-y-0.5"
+                style={{ color: colors.text.soft }}
               >
                 Voltar
               </button>
@@ -472,8 +480,18 @@ export function PublicBookingPage() {
         </div>
       </div>
       {bookingButtons && (
-        <div className="fixed bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-[#05060d] px-4 pb-6 pt-5 sm:static sm:bg-transparent sm:px-6">
-          <Button className="w-full" onClick={handlePrimaryAction} disabled={primaryDisabled} size="md">
+        <div 
+          className="fixed bottom-0 left-0 right-0 z-20 px-4 pb-6 pt-10 sm:static sm:bg-transparent sm:px-6 sm:py-0"
+          style={{ 
+            backgroundImage: `linear-gradient(to top, ${colors.background.base} 60%, transparent 100%)` 
+          }}
+        >
+          <Button 
+            className="w-full" 
+            onClick={handlePrimaryAction} 
+            disabled={primaryDisabled} 
+            size="md"
+          >
             {primaryButtonLabel}
           </Button>
         </div>

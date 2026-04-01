@@ -1,7 +1,9 @@
 import { Button } from "@/components/flow/button";
+import { Card } from "@/components/flow/card";
 import { FeedbackBanner } from "@/components/shared/feedback-banner";
 import type { PublicServiceItem } from "@/types/public-booking";
 import { cn } from "@/lib/cn";
+import { colors, semanticTokens } from "@/design-system";
 
 interface ServiceCardProps {
   service: PublicServiceItem;
@@ -13,20 +15,46 @@ function ServiceCard({ service, selected, onSelect }: ServiceCardProps) {
   return (
     <button
       type="button"
-      className={cn(
-        "flex w-full flex-col rounded-3xl border p-4 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500",
-        selected
-          ? "border-primary-500 bg-primary-500/10"
-          : "border-white/10 bg-white/5 hover:border-white/30"
-      )}
+      className="flex w-full flex-col text-left outline-none transition-all focus-visible:outline-none focus-visible:[box-shadow:var(--control-focus-ring)]"
+      style={{
+        "--control-focus-ring": semanticTokens.interaction.focus.ring
+      } as React.CSSProperties}
       onClick={() => onSelect(service)}
       aria-pressed={selected}
     >
-      <div className="flex items-center justify-between gap-2">
-        <span className="font-semibold text-white">{service.name}</span>
-        {selected && <span className="text-2xl text-primary-500" aria-hidden>✓</span>}
-      </div>
-      <p className="mt-2 text-sm text-white/70">{service.durationInMinutes} minutos</p>
+      <Card
+        variant="glass"
+        className="w-full transition-all"
+        style={{
+          borderColor: selected ? colors.brand.primary : semanticTokens.border.subtle,
+          boxShadow: selected ? `0 0 0 1px ${colors.brand.primary}` : undefined,
+          backgroundColor: selected ? semanticTokens.surface.glassHover : semanticTokens.surface.glass
+        }}
+      >
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-base font-semibold" style={{ color: colors.text.primary }}>
+            {service.name}
+          </span>
+          {selected && (
+            <span className="flex h-5 w-5 items-center justify-center rounded-full text-xs" style={{ backgroundColor: colors.brand.primary, color: colors.text.dark }} aria-hidden>
+              ✓
+            </span>
+          )}
+        </div>
+        <p className="mt-1.5 text-sm font-medium" style={{ color: colors.text.soft }}>
+          {service.durationInMinutes} minutos
+        </p>
+        {service.description && (
+          <p
+            className="mt-2 text-sm"
+            style={{ color: colors.text.soft, whiteSpace: "pre-wrap" }}
+          >
+            {service.description.length > 150
+              ? `${service.description.substring(0, 150)}...`
+              : service.description}
+          </p>
+        )}
+      </Card>
     </button>
   );
 }

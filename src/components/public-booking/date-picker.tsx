@@ -1,5 +1,6 @@
 import { DateTime } from "luxon";
 import { cn } from "@/lib/cn";
+import { colors, radius, semanticTokens } from "@/design-system";
 
 interface MonthNavigatorProps {
   month: DateTime;
@@ -15,7 +16,15 @@ export function MonthNavigator({ month, minDate, maxDate, onPrevMonth, onNextMon
   const nextDisabled = month.startOf("month") >= maxDate.startOf("month");
 
   return (
-    <div className="flex items-center justify-between rounded-3xl border border-white/10 bg-white/5 px-4 py-3">
+    <div 
+      className="flex items-center justify-between border px-4 py-2"
+      style={{
+        borderRadius: radius.xl,
+        backgroundColor: semanticTokens.surface.glass,
+        borderColor: semanticTokens.border.subtle,
+        backdropFilter: `blur(${semanticTokens.blur.panel})`
+      }}
+    >
       <button
         type="button"
         onClick={onPrevMonth}
@@ -88,19 +97,23 @@ export function CalendarGrid({
               onClick={() => !disabled && onSelectDate(day)}
               disabled={disabled}
               className={cn(
-                "relative flex h-11 w-11 items-center justify-center rounded-2xl border text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500",
-                isSelected
-                  ? "border-primary-500 bg-primary-500 text-white"
-                  : "border-transparent bg-white/5 text-white",
-                !isCurrentMonth && "text-white/40",
-                disabled && "cursor-not-allowed opacity-40",
-                isToday && !isSelected ? "border-white/40" : ""
+                "relative flex h-10 w-10 items-center justify-center text-sm transition-all focus-visible:outline-none focus-visible:[box-shadow:var(--control-focus-ring)]",
+                disabled ? "cursor-not-allowed opacity-50" : "active:scale-95"
               )}
+              style={{
+                borderRadius: radius.xl,
+                backgroundColor: isSelected ? colors.brand.primary : "transparent",
+                color: isSelected ? colors.text.dark : (disabled ? colors.text.muted : colors.text.primary),
+                fontWeight: isSelected ? "bold" : "medium",
+                "--control-focus-ring": semanticTokens.interaction.focus.ring,
+                borderColor: isToday && !isSelected ? semanticTokens.border.subtle : "transparent",
+                borderWidth: 1,
+              } as React.CSSProperties}
               aria-pressed={isSelected}
             >
-              <span>{day.day}</span>
-              {hasSlots && !disabled ? (
-                <span className="absolute bottom-1 h-1.5 w-1.5 rounded-full bg-primary-500" aria-hidden />
+              <span className="relative z-10">{day.day}</span>
+              {hasSlots && !disabled && !isSelected ? (
+                <span className="absolute bottom-1 h-1 w-1 rounded-full" style={{ backgroundColor: colors.brand.primary }} aria-hidden />
               ) : null}
             </button>
           );

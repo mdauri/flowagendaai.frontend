@@ -1,6 +1,7 @@
 export interface Service {
   id: string;
   name: string;
+  description?: string | null;
   durationInMinutes: number;
   createdAt: string;
   updatedAt: string;
@@ -12,6 +13,7 @@ export interface ListServicesResponse {
 
 export interface CreateServiceInput {
   name: string;
+  description?: string | null;
   durationInMinutes: number;
 }
 

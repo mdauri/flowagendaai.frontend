@@ -1,7 +1,8 @@
-import { Card } from "@/components/flow/card";
+import { Card, CardTitle, CardDescription } from "@/components/flow/card";
 import { Input } from "@/components/flow/input";
 import { formatBrazilianPhone } from "@/utils/phone";
 import { DateTime } from "luxon";
+import { colors, radius, semanticTokens, typography } from "@/design-system";
 import type { PublicServiceItem } from "@/types/public-booking";
 
 interface CustomerDataFormProps {
@@ -29,7 +30,7 @@ export function CustomerDataForm({
   return (
     <div className="space-y-6">
       <div>
-        <label className="mb-2 block text-sm font-semibold text-white">
+        <label className="mb-2 block text-sm font-medium" style={{ color: colors.text.soft }}>
           Nome completo *
         </label>
         <Input
@@ -39,13 +40,13 @@ export function CustomerDataForm({
           inputSize="lg"
         />
         {errors?.name ? (
-          <p className="mt-1 text-xs text-danger-500" role="alert">
+          <p className="mt-1 text-xs" style={{ color: semanticTokens.feedback.danger.text }} role="alert">
             {errors.name}
           </p>
         ) : null}
       </div>
       <div>
-        <label className="mb-2 block text-sm font-semibold text-white">WhatsApp *</label>
+        <label className="mb-2 block text-sm font-medium" style={{ color: colors.text.soft }}>WhatsApp *</label>
         <Input
           value={phone || "+55 "}
           onChange={(event) => onPhoneChange(formatBrazilianPhone(event.target.value))}
@@ -53,23 +54,35 @@ export function CustomerDataForm({
           inputSize="lg"
         />
         {errors?.phone ? (
-          <p className="mt-1 text-xs text-danger-500" role="alert">
+          <p className="mt-1 text-xs" style={{ color: semanticTokens.feedback.danger.text }} role="alert">
             {errors.phone}
           </p>
         ) : null}
       </div>
       <div>
-        <label htmlFor="customer-notes" className="mb-2 block text-sm font-semibold text-white">Observação (opcional)</label>
+        <label htmlFor="customer-notes" className="mb-2 block text-sm font-medium" style={{ color: colors.text.soft }}>Observação (opcional)</label>
         <textarea
           id="customer-notes"
           value={notes}
           onChange={(event) => onNotesChange(event.target.value)}
-          className="w-full rounded-3xl border border-white/10 bg-white/5 p-4 text-sm text-white outline-none focus-visible:border-primary-500 focus-visible:ring-2 focus-visible:ring-primary-500"
+          className="w-full text-sm outline-none transition-all focus-visible:[border-color:var(--control-focus-border)] focus-visible:[box-shadow:var(--control-focus-ring)] placeholder:text-white/30"
           rows={4}
           maxLength={200}
           placeholder="Conte para o profissional sobre seu estilo, alergias, etc."
+          style={{
+             borderRadius: radius.xl,
+             backgroundColor: semanticTokens.surface.glass,
+             borderColor: semanticTokens.border.subtle,
+             borderWidth: 1,
+             padding: "1rem",
+             color: colors.text.primary,
+             fontFamily: typography.family.sans,
+             backdropFilter: `blur(${semanticTokens.blur.panel})`,
+             "--control-focus-border": semanticTokens.interaction.focus.border,
+             "--control-focus-ring": semanticTokens.interaction.focus.ring
+          } as React.CSSProperties}
         />
-        <div className="mt-1 text-xs text-white/60 text-right" aria-live="polite">
+        <div className="mt-1 text-xs text-right" style={{ color: colors.text.muted }} aria-live="polite">
           {notes.length}/200
         </div>
       </div>
@@ -100,19 +113,46 @@ export function SummaryCard({
   const endDate = DateTime.fromISO(slotEnd, { zone: "utc" }).setZone(timezone);
 
   return (
-    <Card variant="glass" padding="lg" className="space-y-2">
-      <p className="text-sm text-white/60">Resumo do agendamento</p>
-      <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-        <p className="text-base font-semibold text-white">{service.name}</p>
-        <p className="text-sm text-white/60">{service.durationInMinutes} minutos</p>
-        <p className="mt-3 text-sm text-white/80">
-          {date.setLocale("pt-BR").toFormat("cccc, d 'de' LLLL")}
-        </p>
-        <p className="text-sm text-white/70">
-          {startDate.toFormat("HH:mm")} – {endDate.toFormat("HH:mm")}
-        </p>
-        <p className="text-sm text-white/70">Com: {professionalName}</p>
-        <p className="text-sm text-white/70">WhatsApp: {customerPhone}</p>
+    <Card variant="surface" padding="lg" className="space-y-4">
+      <CardDescription>Resumo do agendamento</CardDescription>
+      <div
+        className="rounded-2xl border p-5"
+        style={{ borderColor: semanticTokens.border.subtle, backgroundColor: semanticTokens.surface.glassSubtle }}
+      >
+        <CardTitle className="text-lg">{service.name}</CardTitle>
+        <p className="mt-1 text-sm font-medium" style={{ color: colors.text.muted }}>{service.durationInMinutes} minutos</p>
+
+        {service.description && (
+          <p
+            className="mt-2 text-sm"
+            style={{ color: colors.text.soft, whiteSpace: "pre-wrap" }}
+          >
+            {service.description}
+          </p>
+        )}
+
+        <div className="mt-4 pt-4 border-t" style={{ borderColor: semanticTokens.border.default }}>
+          <p className="font-semibold" style={{ color: colors.text.primary }}>
+            {date.setLocale("pt-BR").toFormat("cccc, d 'de' LLLL")}
+          </p>
+          <p className="mt-1 flex items-baseline gap-2">
+            <span className="text-xl font-bold" style={{ color: colors.brand.primary }}>
+              {startDate.toFormat("HH:mm")}
+            </span>
+            <span className="text-sm font-medium" style={{ color: colors.text.soft }}>
+              – {endDate.toFormat("HH:mm")}
+            </span>
+          </p>
+        </div>
+
+        <div className="mt-4 space-y-1">
+          <p className="text-sm font-medium" style={{ color: colors.text.soft }}>
+            Com: <span style={{ color: colors.text.primary }}>{professionalName}</span>
+          </p>
+          <p className="text-sm font-medium" style={{ color: colors.text.soft }}>
+            WhatsApp: <span style={{ color: colors.text.primary }}>{customerPhone}</span>
+          </p>
+        </div>
       </div>
     </Card>
   );

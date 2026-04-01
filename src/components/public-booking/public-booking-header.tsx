@@ -1,28 +1,43 @@
 import type { PublicProfessional } from "@/types/public-booking";
+import { Card, CardTitle } from "@/components/flow/card";
+import { colors } from "@/design-system";
 
 export function PublicBookingHeader({ professional }: { professional: PublicProfessional }) {
   return (
-    <section className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-[#171923] via-[#1f1f3d] to-[#2a2a5a] p-6 text-white shadow-[0_25px_60px_rgba(15,23,42,0.6)]">
-      <div className="flex items-center gap-4">
-        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white/10 text-xl font-black text-white/80">
-          {professional.name.charAt(0)}
+    <Card variant="premium" padding="lg" className="relative overflow-hidden w-full">
+      <div className="relative z-10 flex items-center gap-4">
+        <div 
+          className="flex h-16 w-16 items-center justify-center rounded-full text-2xl font-black shadow-inner ring-1 ring-white/5"
+          style={{ backgroundColor: colors.background.glass, color: colors.text.primary }}
+        >
+          {professional.name.charAt(0).toUpperCase()}
         </div>
         <div>
-          <p className="text-xs uppercase tracking-[0.4em] text-white/60">Agendamento Público</p>
-          <h1 className="mt-1 text-3xl font-black leading-tight">{professional.name}</h1>
-          <p className="text-sm text-white/70">@{professional.slug}</p>
+          <p className="text-[10px] uppercase font-bold tracking-widest" style={{ color: colors.text.muted }}>
+            Agendamento Público
+          </p>
+          <CardTitle className="mt-1 leading-tight">{professional.name}</CardTitle>
+          <p className="text-sm font-medium mt-0.5" style={{ color: colors.text.soft }}>
+            @{professional.slug}
+          </p>
         </div>
       </div>
-      <div className="mt-6 grid gap-3 sm:grid-cols-2">
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm uppercase tracking-wide text-white/70">
-          <span className="block text-xs text-white/40">Timezone</span>
-          <span className="text-base font-semibold text-white">{professional.tenantTimezone}</span>
+      <div className="relative z-10 mt-6 grid gap-3 sm:grid-cols-2">
+        <div 
+          className="flex flex-col rounded-2xl border p-4 text-sm tracking-wide"
+          style={{ backgroundColor: colors.background.glassSubtle, borderColor: "rgba(255,255,255,0.05)" }}
+        >
+          <span className="block text-[10px] uppercase font-bold" style={{ color: colors.text.muted }}>Fuso Horário</span>
+          <span className="mt-1 text-sm font-semibold capitalize" style={{ color: colors.text.primary }}>{professional.tenantTimezone}</span>
         </div>
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm uppercase tracking-wide text-white/70">
-          <span className="block text-xs text-white/40">Link</span>
-          <span className="text-base font-semibold text-white">{`/p/${professional.slug}`}</span>
+        <div 
+          className="flex flex-col rounded-2xl border p-4 text-sm tracking-wide"
+          style={{ backgroundColor: colors.background.glassSubtle, borderColor: "rgba(255,255,255,0.05)" }}
+        >
+          <span className="block text-[10px] uppercase font-bold" style={{ color: colors.text.muted }}>Link Público</span>
+          <span className="mt-1 text-sm font-semibold truncate" style={{ color: colors.text.primary }}>{`/p/${professional.slug}`}</span>
         </div>
       </div>
-    </section>
+    </Card>
   );
 }

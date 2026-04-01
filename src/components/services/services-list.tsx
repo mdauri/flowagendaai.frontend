@@ -22,8 +22,18 @@ export function ServicesList({
           className="border-white/10"
         >
           <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-            <div>
+            <div className="flex-1">
               <CardTitle>{service.name}</CardTitle>
+
+              {service.description && (
+                <p
+                  className="mt-2 text-sm text-text-soft"
+                  style={{ whiteSpace: "pre-wrap" }}
+                >
+                  {service.description}
+                </p>
+              )}
+
               <CardDescription className="mt-2">
                 Servico operacional vinculado ao tenant autenticado.
               </CardDescription>

@@ -9,6 +9,7 @@ export interface PublicProfessional {
 export interface PublicServiceItem {
   id: string;
   name: string;
+  description?: string | null;
   durationInMinutes: number;
 }
 

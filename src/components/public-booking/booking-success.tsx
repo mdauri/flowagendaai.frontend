@@ -1,6 +1,8 @@
 import { Button } from "@/components/flow/button";
+import { Card, CardTitle, CardDescription } from "@/components/flow/card";
 import { generatePublicBookingICS } from "@/lib/ics";
 import { DateTime } from "luxon";
+import { colors, semanticTokens } from "@/design-system";
 import type { CreatePublicBookingResponse } from "@/types/public-booking";
 import { useState } from "react";
 
@@ -48,34 +50,47 @@ export function BookingSuccess({ booking, timezone, shareUrl, onNewBooking }: Bo
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col items-center gap-2 rounded-3xl border border-success-500/40 p-6 text-center">
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-success-500/20 text-3xl text-success-500">✓</div>
-        <h2 className="text-2xl font-black text-white">Agendamento confirmado!</h2>
-        <p className="text-sm text-white/70">Recebemos a confirmação do seu horário.</p>
+      <div 
+         className="flex flex-col items-center gap-4 rounded-[2rem] border p-8 text-center"
+         style={{
+            backgroundColor: semanticTokens.feedback.success.background,
+            borderColor: semanticTokens.feedback.success.border
+         }}
+      >
+        <div 
+           className="flex h-16 w-16 items-center justify-center rounded-full text-3xl shadow-sm"
+           style={{ backgroundColor: "rgba(16, 185, 129, 0.2)", color: semanticTokens.feedback.success.text }}
+        >✓</div>
+        <div>
+           <h2 className="text-2xl font-black" style={{ color: colors.text.primary }}>Agendamento confirmado!</h2>
+           <p className="mt-2 text-sm font-medium" style={{ color: semanticTokens.feedback.success.text }}>Recebemos a confirmação do seu horário.</p>
+        </div>
       </div>
-      <div className="space-y-1 rounded-3xl border border-white/10 bg-white/5 p-5">
-        <p className="text-sm text-white/60">Serviço</p>
-        <p className="text-lg font-semibold text-white">{booking.serviceName}</p>
-        <p className="text-sm text-white/70">{booking.professionalName}</p>
-        <p className="text-sm text-white/70">
-          {startDate.setLocale("pt-BR").toFormat("cccc, d 'de' LLLL")}
-        </p>
-        <p className="text-sm text-white/70">
-          {startDate.toFormat("HH:mm")} – {endDate.toFormat("HH:mm")}
-        </p>
-        <p className="text-sm text-white/70">WhatsApp: {booking.customerPhone}</p>
-      </div>
-      <div className="flex flex-col gap-3 sm:flex-row">
+      
+      <Card variant="surface" padding="lg" className="space-y-4">
+        <CardDescription>Serviço</CardDescription>
+        <CardTitle className="text-xl">{booking.serviceName}</CardTitle>
+        <div className="mt-4 pt-4 border-t space-y-1.5 text-sm font-medium flex flex-col" style={{ color: colors.text.soft, borderColor: semanticTokens.border.default }}>
+          <p>Com: <span style={{ color: colors.text.primary }}>{booking.professionalName}</span></p>
+          <p>{startDate.setLocale("pt-BR").toFormat("cccc, d 'de' LLLL")}</p>
+          <p>{startDate.toFormat("HH:mm")} – {endDate.toFormat("HH:mm")}</p>
+          <p>WhatsApp: <span style={{ color: colors.text.primary }}>{booking.customerPhone}</span></p>
+        </div>
+      </Card>
+      
+      <div className="flex flex-col gap-3 sm:flex-row pt-2">
         <Button className="w-full" variant="secondary" onClick={handleAddToCalendar} size="md">
-          Adicionar ao calendário
+           Adicionar ao calendário
         </Button>
         <Button className="w-full" variant="primary" onClick={onNewBooking} size="md">
-          Fazer novo agendamento
+          Novo agendamento
         </Button>
       </div>
-      <Button className="w-full" variant="ghost" onClick={handleShare} size="md">
-        {copied ? "Link copiado" : "Compartilhar"}
-      </Button>
+      <div className="flex justify-center">
+        <Button className="w-full" variant="ghost" onClick={handleShare} size="md">
+          {copied ? "Link copiado" : "Compartilhar"}
+        </Button>
+      </div>
     </div>
   );
 }
