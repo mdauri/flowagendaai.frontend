@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AppPage } from "@/pages/app-page";
 import { AvailabilityPage } from "@/pages/availability-page";
+import { CatalogPage } from "@/pages/catalog-page";
 import { DashboardPage } from "@/pages/dashboard-page";
 import { LoginPage } from "@/pages/login-page";
 import { ProfessionalsPage } from "@/pages/professionals-page";
@@ -19,6 +20,7 @@ export function AppRouter() {
         <Route path="/forgot-password" element={<ForgotPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/p/:slug" element={<PublicBookingPage />} />
+        <Route path="/c/:slug/catalog" element={<CatalogPage />} />
 
         <Route
           path="/app"

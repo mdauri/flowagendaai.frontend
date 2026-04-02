@@ -12,4 +12,8 @@ export const typography = {
     eyebrow: "0.22em",
     tight: "-0.025em",
   },
+  leading: {
+    tight: "1.2",
+    relaxed: "1.5",
+  },
 } as const;

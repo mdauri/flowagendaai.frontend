@@ -4,6 +4,8 @@ import { Card, CardDescription, CardTitle } from "@/components/flow/card";
 import { Input } from "@/components/flow/input";
 import { Textarea } from "@/components/flow/textarea";
 import { FeedbackBanner } from "@/components/shared/feedback-banner";
+import { ServiceImageUpload } from "@/components/services/service-image-upload";
+import { PriceInput } from "@/components/services/price-input";
 import { ApiError } from "@/types/api";
 import type { CreateServiceInput } from "@/types/service";
 
@@ -16,6 +18,7 @@ const initialForm = {
   name: "",
   description: "",
   durationInMinutes: "",
+  price: "",
 };
 
 export function ServiceCreateForm({
@@ -26,20 +29,28 @@ export function ServiceCreateForm({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [charCount, setCharCount] = useState(0);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   const nameId = useId();
   const descriptionId = useId();
   const durationInMinutesId = useId();
-  
+  const priceId = useId();
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setErrorMessage(null);
     setSuccessMessage(null);
 
     const parsedDurationInMinutes = Number(form.durationInMinutes);
+    const parsedPrice = parseFloat(form.price.replace(",", "."));
 
     if (!Number.isInteger(parsedDurationInMinutes) || parsedDurationInMinutes <= 0) {
       setErrorMessage("Informe uma duracao valida em minutos maior que zero.");
+      return;
+    }
+
+    if (isNaN(parsedPrice) || parsedPrice <= 0) {
+      setErrorMessage("Informe um preco valido maior que zero.");
       return;
     }
 
@@ -48,9 +59,12 @@ export function ServiceCreateForm({
         name: form.name,
         description: form.description.trim() === "" ? null : form.description,
         durationInMinutes: parsedDurationInMinutes,
+        price: parsedPrice,
+        imageUrl: imageUrl ?? null,
       });
       setForm(initialForm);
       setCharCount(0);
+      setImageUrl(null);
       setSuccessMessage("Servico criado e adicionado na listagem atual.");
     } catch (error) {
       setErrorMessage(
@@ -60,6 +74,14 @@ export function ServiceCreateForm({
       );
     }
   }
+
+  const handleImageUploadComplete = (uploadedImageUrl: string) => {
+    setImageUrl(uploadedImageUrl || null);
+  };
+
+  const handleImageUploadError = () => {
+    // Image upload error is handled within the component
+  };
 
   return (
     <Card variant="premium" padding="lg" className="h-full">
@@ -73,6 +95,17 @@ export function ServiceCreateForm({
       </div>
 
       <form className="mt-8 grid gap-5" onSubmit={handleSubmit}>
+        {/* Image Upload */}
+        <div className="grid gap-2">
+          <span className="text-sm font-semibold text-white">Imagem do servico (opcional)</span>
+          <ServiceImageUpload
+            serviceId="new"
+            currentImageUrl={imageUrl}
+            onUploadComplete={handleImageUploadComplete}
+            onUploadError={handleImageUploadError}
+          />
+        </div>
+
         <label className="grid gap-2" htmlFor={nameId}>
           <span className="text-sm font-semibold text-white">Nome do servico</span>
           <Input
@@ -89,6 +122,22 @@ export function ServiceCreateForm({
             placeholder="Ex.: Corte tradicional"
             required
             disabled={isSubmitting}
+          />
+        </label>
+
+        <label className="grid gap-2" htmlFor={priceId}>
+          <span className="text-sm font-semibold text-white">Preco</span>
+          <PriceInput
+            value={form.price ? parseFloat(form.price.replace(",", ".")) : null}
+            onChange={(value) => {
+              setForm((current) => ({
+                ...current,
+                price: value !== null ? value.toString() : "",
+              }));
+            }}
+            disabled={isSubmitting}
+            required
+            placeholder="R$ 0,00"
           />
         </label>
 
@@ -179,6 +228,7 @@ export function ServiceCreateForm({
               setErrorMessage(null);
               setSuccessMessage(null);
               setCharCount(0);
+              setImageUrl(null);
             }}
           >
             Limpar
