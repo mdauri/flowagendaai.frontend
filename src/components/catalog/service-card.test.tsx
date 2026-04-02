@@ -14,27 +14,27 @@ const mockService = {
 
 describe("ServiceCard", () => {
   it("should render service name", () => {
-    render(<ServiceCard service={mockService} professionalSlug="test" onBook={vi.fn()} />);
+    render(<ServiceCard service={mockService} tenantSlug="test" onBook={vi.fn()} />);
     expect(screen.getByText("Corte Feminino")).toBeInTheDocument();
   });
 
   it("should render formatted price", () => {
-    render(<ServiceCard service={mockService} professionalSlug="test" onBook={vi.fn()} />);
+    render(<ServiceCard service={mockService} tenantSlug="test" onBook={vi.fn()} />);
     expect(screen.getByText("R$ 80,00")).toBeInTheDocument();
   });
 
   it("should render duration", () => {
-    render(<ServiceCard service={mockService} professionalSlug="test" onBook={vi.fn()} />);
+    render(<ServiceCard service={mockService} tenantSlug="test" onBook={vi.fn()} />);
     expect(screen.getByText("1h")).toBeInTheDocument();
   });
 
   it("should render description", () => {
-    render(<ServiceCard service={mockService} professionalSlug="test" onBook={vi.fn()} />);
+    render(<ServiceCard service={mockService} tenantSlug="test" onBook={vi.fn()} />);
     expect(screen.getByText("Corte + escova + finalização")).toBeInTheDocument();
   });
 
   it("should render booking button", () => {
-    render(<ServiceCard service={mockService} professionalSlug="test" onBook={vi.fn()} />);
+    render(<ServiceCard service={mockService} tenantSlug="test" onBook={vi.fn()} />);
     expect(screen.getByRole("button", { name: /agendar/i })).toBeInTheDocument();
   });
 
@@ -42,7 +42,7 @@ describe("ServiceCard", () => {
     const onBook = vi.fn();
     const user = userEvent.setup();
 
-    render(<ServiceCard service={mockService} professionalSlug="test" onBook={onBook} />);
+    render(<ServiceCard service={mockService} tenantSlug="test" onBook={onBook} />);
 
     await user.click(screen.getByRole("button", { name: /agendar/i }));
 
@@ -50,7 +50,7 @@ describe("ServiceCard", () => {
   });
 
   it("should show fallback when no image", () => {
-    render(<ServiceCard service={mockService} professionalSlug="test" onBook={vi.fn()} />);
+    render(<ServiceCard service={mockService} tenantSlug="test" onBook={vi.fn()} />);
     // Should show initials "CF" for "Corte Feminino"
     expect(screen.getByText("CF")).toBeInTheDocument();
   });
@@ -68,7 +68,7 @@ describe("ServiceCard", () => {
       const { container, unmount } = render(
         <ServiceCard
           service={{ ...mockService, durationInMinutes: minutes }}
-          professionalSlug="test"
+          tenantSlug="test"
           onBook={vi.fn()}
         />
       );
@@ -78,7 +78,7 @@ describe("ServiceCard", () => {
   });
 
   it("should have proper ARIA labels", () => {
-    render(<ServiceCard service={mockService} professionalSlug="test" onBook={vi.fn()} />);
+    render(<ServiceCard service={mockService} tenantSlug="test" onBook={vi.fn()} />);
 
     const button = screen.getByRole("button", { name: "Agendar Corte Feminino" });
     expect(button).toBeInTheDocument();

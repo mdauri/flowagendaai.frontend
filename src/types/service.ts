@@ -46,12 +46,11 @@ export interface DeleteServiceResponse {
 }
 
 // Public Catalog types
-export interface PublicCatalogProfessional {
+export interface PublicCatalogTenant {
   id: string;
   name: string;
-  slug: string;
-  tenantId: string;
-  tenantName?: string | null;
+  slug: string | null;
+  timezone: string;
   logoUrl?: string | null;
 }
 
@@ -65,6 +64,16 @@ export interface PublicCatalogService {
 }
 
 export interface PublicCatalogResponse {
-  professional: PublicCatalogProfessional;
+  tenant: PublicCatalogTenant;
   services: PublicCatalogService[];
+}
+
+export interface ProfessionalsByServiceResponse {
+  serviceId: string;
+  serviceName: string;
+  professionals: {
+    id: string;
+    name: string;
+    slug: string;
+  }[];
 }

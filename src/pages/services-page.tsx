@@ -17,8 +17,8 @@ export function ServicesPage() {
   const servicesQuery = useServicesQuery();
   const createServiceMutation = useCreateServiceMutation();
 
-  async function handleCreateService(input: CreateServiceInput) {
-    await createServiceMutation.mutateAsync(input);
+  function handleCreateService(input: CreateServiceInput) {
+    return createServiceMutation.mutateAsync(input);
   }
 
   const services = servicesQuery.data?.services ?? [];

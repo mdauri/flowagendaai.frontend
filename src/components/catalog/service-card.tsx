@@ -7,11 +7,11 @@ import type { PublicCatalogService } from "@/types/service";
 
 interface ServiceCardProps {
   service: PublicCatalogService;
-  professionalSlug: string;
+  tenantSlug: string;
   onBook: (serviceId: string) => void;
 }
 
-export function ServiceCard({ service, professionalSlug, onBook }: ServiceCardProps) {
+export function ServiceCard({ service, tenantSlug, onBook }: ServiceCardProps) {
   const hasImage = Boolean(service.imageUrl);
   
   const formatPrice = (price: number) => {

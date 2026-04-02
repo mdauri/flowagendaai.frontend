@@ -9,6 +9,7 @@ import { PublicBookingPage } from "@/pages/public-booking-page";
 import { ResetPasswordPage } from "@/pages/reset-password-page";
 import { ServicesPage } from "@/pages/services-page";
 import { SlotsPage } from "@/pages/slots-page";
+import { ProfessionalServiceManager } from "@/components/professional-service-manager";
 import { ProtectedRoute } from "@/components/app/protected-route";
 import { ForgotPage } from "../pages/forgot-password-page";
 
@@ -34,6 +35,14 @@ export function AppRouter() {
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="professionals" element={<ProfessionalsPage />} />
           <Route path="services" element={<ServicesPage />} />
+          <Route
+            path="services/:id/professionals"
+            element={
+              <ProtectedRoute>
+                <ProfessionalServiceManager />
+              </ProtectedRoute>
+            }
+          />
           <Route path="availability" element={<AvailabilityPage />} />
           <Route path="slots" element={<SlotsPage />} />
           <Route path="*" element={<Navigate to="dashboard" replace />} />

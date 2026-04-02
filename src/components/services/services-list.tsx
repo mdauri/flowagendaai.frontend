@@ -1,4 +1,7 @@
+import { useNavigate } from "react-router-dom";
+import { Users } from "lucide-react";
 import { Badge } from "@/components/flow/badge";
+import { Button } from "@/components/flow/button";
 import { Card, CardDescription, CardTitle } from "@/components/flow/card";
 import { formatDateTimeInTenantTimezone } from "@/lib/date-time";
 import type { Service } from "@/types/service";
@@ -12,6 +15,8 @@ export function ServicesList({
   services,
   tenantTimezone,
 }: ServicesListProps) {
+  const navigate = useNavigate();
+
   return (
     <div className="grid gap-4">
       {services.map((service) => (
@@ -49,9 +54,20 @@ export function ServicesList({
               </p>
             </div>
 
-            <Badge variant="info" className="justify-center md:justify-start">
-              {service.durationInMinutes} min
-            </Badge>
+            <div className="flex flex-col items-end gap-2">
+              <Badge variant="info" className="justify-center md:justify-start">
+                {service.durationInMinutes} min
+              </Badge>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => navigate(`/app/services/${service.id}/professionals`)}
+                className="mt-2"
+              >
+                <Users className="h-4 w-4 mr-2" />
+                Profissionais
+              </Button>
+            </div>
           </div>
         </Card>
       ))}

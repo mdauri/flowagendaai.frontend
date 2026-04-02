@@ -20,7 +20,10 @@ export const servicesService = {
     });
   },
 
-  async update(id: string, input: UpdateServiceInput): Promise<UpdateServiceResponse> {
+  async update(
+    id: string,
+    input: UpdateServiceInput,
+  ): Promise<UpdateServiceResponse> {
     return httpClient<UpdateServiceResponse>(`/services/${id}`, {
       method: "PUT",
       body: JSON.stringify(input),
@@ -33,17 +36,37 @@ export const servicesService = {
     });
   },
 
-  async requestUploadUrl(serviceId: string): Promise<{ uploadUrl: string; imageUrl: string }> {
-    return httpClient<{ uploadUrl: string; imageUrl: string }>(`/services/${serviceId}/image/upload-url`, {
-      method: "POST",
-    });
+  async requestUploadUrl(
+    serviceId: string,
+    payload: { filename: string; contentType: string },
+  ): Promise<{ uploadUrl: string; imageUrl: string }> {
+    return httpClient<{ uploadUrl: string; imageUrl: string }>(
+      `/services/${serviceId}/image/upload-url`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      },
+    );
   },
 
-  async confirmUpload(serviceId: string, imageUrl: string): Promise<UpdateServiceResponse> {
-    return httpClient<UpdateServiceResponse>(`/services/${serviceId}/image/confirm`, {
-      method: "POST",
-      body: JSON.stringify({ imageUrl }),
-    });
+  async confirmUpload(
+    serviceId: string,
+    imageUrl: string,
+    thumbnailUrl?: string,
+  ): Promise<UpdateServiceResponse> {
+    console.log("imageUrl", imageUrl);
+    console.log("thumbnailUrl", thumbnailUrl);
+
+    return httpClient<UpdateServiceResponse>(
+      `/services/${serviceId}/image/confirm`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          imageUrl,
+          thumbnailUrl: thumbnailUrl ?? imageUrl,
+        }),
+      },
+    );
   },
 
   async deleteImage(serviceId: string): Promise<UpdateServiceResponse> {
@@ -52,4 +75,3 @@ export const servicesService = {
     });
   },
 };
-

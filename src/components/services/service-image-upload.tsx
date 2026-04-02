@@ -1,4 +1,10 @@
-import { useCallback, useRef, useState, type DragEvent, type ChangeEvent } from "react";
+import {
+  useCallback,
+  useRef,
+  useState,
+  type DragEvent,
+  type ChangeEvent,
+} from "react";
 import { Upload, X, Image as ImageIcon } from "lucide-react";
 import { Button } from "@/components/flow/button";
 import { Card, CardDescription } from "@/components/flow/card";
@@ -25,7 +31,9 @@ export function ServiceImageUpload({
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(currentImageUrl ?? null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(
+    currentImageUrl ?? null,
+  );
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -39,56 +47,73 @@ export function ServiceImageUpload({
     return null;
   };
 
-  const uploadFile = useCallback(async (file: File) => {
-    const validationError = validateFile(file);
-    if (validationError) {
-      setErrorMessage(validationError);
-      onUploadError?.(new Error(validationError));
-      return;
-    }
+  const uploadFile = useCallback(
+    async (file: File) => {
+      const validationError = validateFile(file);
+      if (validationError) {
+        setErrorMessage(validationError);
+        onUploadError?.(new Error(validationError));
+        return;
+      }
 
-    setErrorMessage(null);
-    setIsUploading(true);
-    setUploadProgress(10);
+      setErrorMessage(null);
+      setIsUploading(true);
+      setUploadProgress(10);
 
-    try {
-      // Step 1: Request presigned URL
-      setUploadProgress(20);
-      const { uploadUrl, imageUrl } = await servicesService.requestUploadUrl(serviceId);
+      try {
+        // Step 1: Request presigned URL
+        setUploadProgress(20);
+        const { uploadUrl, imageUrl } = await servicesService.requestUploadUrl(
+          serviceId,
+          {
+            filename: file.name,
+            contentType: file.type,
+          },
+        );
 
-      // Step 2: Upload directly to S3
-      setUploadProgress(40);
-      await fetch(uploadUrl, {
-        method: "PUT",
-        body: file,
-        headers: {
-          "Content-Type": file.type,
-        },
-      });
+        console.log(uploadUrl);
 
-      // Step 3: Confirm upload
-      setUploadProgress(80);
-      await servicesService.confirmUpload(serviceId, imageUrl);
+        // Step 2: Upload directly to S3
+        setUploadProgress(40);
+        await fetch(uploadUrl, {
+          method: "PUT",
+          body: file,
+          headers: {
+            "Content-Type": file.type,
+          },
+        });
 
-      // Step 4: Update preview
-      setUploadProgress(100);
-      setPreviewUrl(imageUrl);
-      onUploadComplete(imageUrl);
+        // Step 3: Confirm upload
+        setUploadProgress(80);
 
-      // Reset progress after delay
-      setTimeout(() => {
-        setUploadProgress(0);
+        console.log("serviceId: ", serviceId, " imageUrl: ", imageUrl);
+
+        await servicesService.confirmUpload(serviceId, imageUrl);
+
+        // Step 4: Update preview
+        setUploadProgress(100);
+        setPreviewUrl(imageUrl);
+        onUploadComplete(imageUrl);
+
+        // Reset progress after delay
+        setTimeout(() => {
+          setUploadProgress(0);
+          setIsUploading(false);
+        }, 500);
+      } catch (error) {
+        console.error("Upload failed:", error);
+        const message =
+          error instanceof ApiError
+            ? error.message
+            : "Falha ao fazer upload. Tente novamente.";
+        setErrorMessage(message);
+        onUploadError?.(error instanceof Error ? error : new Error(message));
         setIsUploading(false);
-      }, 500);
-    } catch (error) {
-      console.error("Upload failed:", error);
-      const message = error instanceof ApiError ? error.message : "Falha ao fazer upload. Tente novamente.";
-      setErrorMessage(message);
-      onUploadError?.(error instanceof Error ? error : new Error(message));
-      setIsUploading(false);
-      setUploadProgress(0);
-    }
-  }, [serviceId, onUploadComplete, onUploadError]);
+        setUploadProgress(0);
+      }
+    },
+    [serviceId, onUploadComplete, onUploadError],
+  );
 
   const handleDragEnter = useCallback((e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -107,25 +132,31 @@ export function ServiceImageUpload({
     e.stopPropagation();
   }, []);
 
-  const handleDrop = useCallback((e: DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
+  const handleDrop = useCallback(
+    (e: DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsDragging(false);
 
-    const files = e.dataTransfer.files;
-    if (files.length > 0) {
-      uploadFile(files[0]);
-    }
-  }, [uploadFile]);
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        uploadFile(files[0]);
+      }
+    },
+    [uploadFile],
+  );
 
-  const handleFileSelect = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      uploadFile(files[0]);
-    }
-    // Reset input value to allow selecting the same file again
-    e.target.value = "";
-  }, [uploadFile]);
+  const handleFileSelect = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const files = e.target.files;
+      if (files && files.length > 0) {
+        uploadFile(files[0]);
+      }
+      // Reset input value to allow selecting the same file again
+      e.target.value = "";
+    },
+    [uploadFile],
+  );
 
   const handleRemoveImage = async () => {
     try {
@@ -135,7 +166,9 @@ export function ServiceImageUpload({
     } catch (error) {
       console.error("Failed to remove image:", error);
       setErrorMessage("Não foi possível remover a imagem.");
-      onUploadError?.(error instanceof Error ? error : new Error("Falha ao remover imagem"));
+      onUploadError?.(
+        error instanceof Error ? error : new Error("Falha ao remover imagem"),
+      );
     }
   };
 
@@ -148,14 +181,22 @@ export function ServiceImageUpload({
       {/* Preview or Upload Area */}
       <div
         className={`relative flex aspect-square w-full cursor-pointer items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed transition-all ${
-          isDragging ? "border-[var(--border-drag)] bg-[var(--bg-drag)]" : "border-[var(--border-default)]"
+          isDragging
+            ? "border-[var(--border-drag)] bg-[var(--bg-drag)]"
+            : "border-[var(--border-default)]"
         }`}
-        style={{
-          "--border-default": isDragging ? colors.brand.primary : colors.text.muted,
-          "--bg-drag": "rgba(255, 138, 61, 0.05)",
-          "--border-drag": colors.brand.primary,
-          backgroundColor: previewUrl ? colors.background.surface2 : undefined,
-        } as React.CSSProperties}
+        style={
+          {
+            "--border-default": isDragging
+              ? colors.brand.primary
+              : colors.text.muted,
+            "--bg-drag": "rgba(255, 138, 61, 0.05)",
+            "--border-drag": colors.brand.primary,
+            backgroundColor: previewUrl
+              ? colors.background.surface2
+              : undefined,
+          } as React.CSSProperties
+        }
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
         onDragOver={handleDragOver}
@@ -163,7 +204,11 @@ export function ServiceImageUpload({
         onClick={handleClick}
         role="button"
         tabIndex={0}
-        aria-label={previewUrl ? "Clique para trocar a imagem" : "Clique ou arraste para fazer upload"}
+        aria-label={
+          previewUrl
+            ? "Clique para trocar a imagem"
+            : "Clique ou arraste para fazer upload"
+        }
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
@@ -216,7 +261,9 @@ export function ServiceImageUpload({
                   fontFamily: typography.family.sans,
                 }}
               >
-                {isDragging ? "Solte a imagem aqui" : "Arraste e solte ou clique para upload"}
+                {isDragging
+                  ? "Solte a imagem aqui"
+                  : "Arraste e solte ou clique para upload"}
               </p>
               <p
                 className="text-xs"
@@ -262,8 +309,8 @@ export function ServiceImageUpload({
                 {uploadProgress < 40
                   ? "Enviando arquivo..."
                   : uploadProgress < 80
-                  ? "Processando imagem..."
-                  : "Concluindo..."}
+                    ? "Processando imagem..."
+                    : "Concluindo..."}
               </p>
             </div>
           </div>
