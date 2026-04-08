@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Check } from "lucide-react";
 import type { ProfessionalItemProps } from "@/types/professional-service";
 import { getAvatarColor, getInitials } from "@/lib/avatar-color";
@@ -14,6 +15,12 @@ export function ProfessionalItem({
   const hasNoServices = professional.services.length === 0;
   const avatarColor = getAvatarColor(professional.id);
   const initials = getInitials(professional.name);
+  const preferredImageUrl = professional.thumbnailUrl ?? professional.imageUrl ?? null;
+  const [hasImageError, setHasImageError] = useState(false);
+
+  useEffect(() => {
+    setHasImageError(false);
+  }, [preferredImageUrl]);
 
   return (
     <div
@@ -33,13 +40,14 @@ export function ProfessionalItem({
       <div
         className="h-12 w-12 rounded-full flex items-center justify-center text-lg font-bold text-white shrink-0"
         style={{ backgroundColor: avatarColor }}
-        aria-hidden="true"
       >
-        {professional.photoUrl ? (
+        {preferredImageUrl && !hasImageError ? (
           <img
-            src={professional.photoUrl}
-            alt={professional.name}
+            src={preferredImageUrl}
+            alt={`Foto de ${professional.name}`}
             className="h-full w-full rounded-full object-cover"
+            loading="lazy"
+            onError={() => setHasImageError(true)}
           />
         ) : (
           initials

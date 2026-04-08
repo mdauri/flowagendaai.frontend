@@ -8,7 +8,6 @@ export interface ProfessionalWithServices extends Professional {
   services: Service[];
   serviceCount: number;
   role?: string | null;
-  photoUrl?: string | null;
 }
 
 /**
