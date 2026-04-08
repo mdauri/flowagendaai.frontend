@@ -93,6 +93,8 @@ export interface BulkActionBarProps {
   onAssociateSelected: () => void;
   onRemoveSelected: () => void;
   onClearSelection: () => void;
+  disableAssociate?: boolean;
+  disableRemove?: boolean;
 }
 
 /**

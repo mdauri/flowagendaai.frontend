@@ -6,6 +6,7 @@ export interface Service {
   durationInMinutes: number;
   price: number;
   imageUrl?: string | null;
+  thumbnailUrl?: string | null;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -41,8 +42,17 @@ export interface UpdateServiceResponse {
   service: Service;
 }
 
-export interface DeleteServiceResponse {
-  success: boolean;
+export type DeleteServiceResponse = void;
+
+export interface ServiceImageUploadUrlResponse {
+  uploadUrl: string;
+  objectKey: string;
+  imageUrl: string;
+}
+
+export interface ServiceImageConfirmResponse {
+  imageUrl: string;
+  thumbnailUrl: string;
 }
 
 // Public Catalog types
@@ -61,6 +71,7 @@ export interface PublicCatalogService {
   durationInMinutes: number;
   price: number;
   imageUrl?: string | null;
+  thumbnailUrl?: string | null;
 }
 
 export interface PublicCatalogResponse {

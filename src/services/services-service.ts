@@ -4,6 +4,8 @@ import type {
   CreateServiceResponse,
   DeleteServiceResponse,
   ListServicesResponse,
+  ServiceImageConfirmResponse,
+  ServiceImageUploadUrlResponse,
   UpdateServiceInput,
   UpdateServiceResponse,
 } from "@/types/service";
@@ -31,7 +33,7 @@ export const servicesService = {
   },
 
   async delete(id: string): Promise<DeleteServiceResponse> {
-    return httpClient<DeleteServiceResponse>(`/services/${id}`, {
+    return httpClient<void>(`/services/${id}`, {
       method: "DELETE",
     });
   },
@@ -39,8 +41,8 @@ export const servicesService = {
   async requestUploadUrl(
     serviceId: string,
     payload: { filename: string; contentType: string },
-  ): Promise<{ uploadUrl: string; imageUrl: string }> {
-    return httpClient<{ uploadUrl: string; imageUrl: string }>(
+  ): Promise<ServiceImageUploadUrlResponse> {
+    return httpClient<ServiceImageUploadUrlResponse>(
       `/services/${serviceId}/image/upload-url`,
       {
         method: "POST",
@@ -51,26 +53,21 @@ export const servicesService = {
 
   async confirmUpload(
     serviceId: string,
-    imageUrl: string,
-    thumbnailUrl?: string,
-  ): Promise<UpdateServiceResponse> {
-    console.log("imageUrl", imageUrl);
-    console.log("thumbnailUrl", thumbnailUrl);
-
-    return httpClient<UpdateServiceResponse>(
+    objectKey: string,
+  ): Promise<ServiceImageConfirmResponse> {
+    return httpClient<ServiceImageConfirmResponse>(
       `/services/${serviceId}/image/confirm`,
       {
         method: "POST",
         body: JSON.stringify({
-          imageUrl,
-          thumbnailUrl: thumbnailUrl ?? imageUrl,
+          objectKey,
         }),
       },
     );
   },
 
-  async deleteImage(serviceId: string): Promise<UpdateServiceResponse> {
-    return httpClient<UpdateServiceResponse>(`/services/${serviceId}/image`, {
+  async deleteImage(serviceId: string): Promise<void> {
+    return httpClient<void>(`/services/${serviceId}/image`, {
       method: "DELETE",
     });
   },

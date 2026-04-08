@@ -26,6 +26,7 @@ import type {
 } from "@/types/public-booking";
 
 const BRAZILIAN_PHONE_REGEX = /^\+55\s\(\d{2}\)\s\d{5}-\d{4}$/;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const stepTitles: Record<PublicBookingStep, string> = {
   service: "Escolha o serviço",
   date: "Escolha a data",
@@ -64,6 +65,7 @@ export function PublicBookingPage() {
   const [selectedSlot, setSelectedSlot] = useState<PublicSlot | null>(null);
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("+55 ");
+  const [customerEmail, setCustomerEmail] = useState("");
   const [customerNotes, setCustomerNotes] = useState("");
   const [bookingResult, setBookingResult] = useState<CreatePublicBookingResponse | null>(null);
   const [bookingNotification, setBookingNotification] = useState<BookingNotification | null>(null);
@@ -150,7 +152,9 @@ export function PublicBookingPage() {
 
   const isNameValid = customerName.trim().length >= 3;
   const isPhoneValid = BRAZILIAN_PHONE_REGEX.test(customerPhone);
-  const formIsValid = isNameValid && isPhoneValid;
+  const isEmailValid =
+    customerEmail.trim().length === 0 || EMAIL_REGEX.test(customerEmail.trim().toLowerCase());
+  const formIsValid = isNameValid && isPhoneValid && isEmailValid;
 
   const inSlotStep = currentStep === "slot";
   const showSlotsSection = inSlotStep || currentStep === "customer";
@@ -186,6 +190,7 @@ export function PublicBookingPage() {
     setSelectedSlot(null);
     setCustomerName("");
     setCustomerPhone("+55 ");
+    setCustomerEmail("");
     setCustomerNotes("");
     setBookingResult(null);
     setBookingNotification(null);
@@ -232,6 +237,7 @@ export function PublicBookingPage() {
           start: selectedSlot.start,
           customerName: customerName.trim(),
           customerPhone: customerPhone.trim(),
+          customerEmail: customerEmail.trim(),
         },
         {
           onSuccess: (booking) => {
@@ -442,13 +448,16 @@ export function PublicBookingPage() {
               <CustomerDataForm
                 name={customerName}
                 phone={customerPhone}
+                email={customerEmail}
                 notes={customerNotes}
                 onNameChange={setCustomerName}
                 onPhoneChange={setCustomerPhone}
+                onEmailChange={setCustomerEmail}
                 onNotesChange={setCustomerNotes}
                 errors={{
                   name: !isNameValid ? "Informe seu nome" : undefined,
                   phone: customerPhone && !isPhoneValid ? "Telefone inválido" : undefined,
+                  email: customerEmail && !isEmailValid ? "Informe um e-mail valido" : undefined,
                 }}
               />
               <SummaryCard

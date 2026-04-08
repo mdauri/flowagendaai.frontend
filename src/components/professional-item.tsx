@@ -25,13 +25,13 @@ export function ProfessionalItem({
       <Checkbox
         checked={isSelected}
         onCheckedChange={onToggle}
-        className="h-5 w-5 flex-shrink-0"
+        className="h-5 w-5 shrink-0"
         aria-label={`Select ${professional.name}`}
       />
 
       {/* Avatar */}
       <div
-        className="h-12 w-12 rounded-full flex items-center justify-center text-lg font-bold text-white flex-shrink-0"
+        className="h-12 w-12 rounded-full flex items-center justify-center text-lg font-bold text-white shrink-0"
         style={{ backgroundColor: avatarColor }}
         aria-hidden="true"
       >
@@ -63,7 +63,7 @@ export function ProfessionalItem({
       </div>
 
       {/* Status Badge */}
-      <div className="flex items-center gap-2 flex-shrink-0">
+      <div className="flex items-center gap-2 shrink-0">
         {hasNoServices ? (
           <div className="px-3 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/30">
             No services

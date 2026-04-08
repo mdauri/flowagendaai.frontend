@@ -33,6 +33,7 @@ export interface CreatePublicBookingInput {
   start: string;
   customerName: string;
   customerPhone: string;
+  customerEmail?: string;
 }
 
 export interface CreatePublicBookingResponse {
@@ -43,6 +44,7 @@ export interface CreatePublicBookingResponse {
   end: string;
   customerName: string;
   customerPhone: string;
+  customerEmail?: string | null;
   professionalName: string;
   serviceName: string;
 }

@@ -1,7 +1,9 @@
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ChevronLeft, AlertCircle, Save, XCircle } from "lucide-react";
+import { FeedbackBanner } from "@/components/shared/feedback-banner";
 import { useProfessionalsWithServicesQuery } from "@/hooks/use-professionals-with-services-query";
+import { useServicesQuery } from "@/hooks/use-services-query";
 import { useBulkAssociateMutation } from "@/hooks/use-bulk-associate-mutation";
 import { useBulkDissociateMutation } from "@/hooks/use-bulk-dissociate-mutation";
 import type { ProfessionalFilterStatus, ProfessionalWithServices } from "@/types/professional-service";
@@ -22,11 +24,19 @@ export function ProfessionalServiceManager() {
 
   // React Query
   const { data, isLoading, error, refetch } = useProfessionalsWithServicesQuery();
+  const servicesQuery = useServicesQuery();
   const bulkAssociate = useBulkAssociateMutation();
   const bulkDissociate = useBulkDissociateMutation();
 
   const hasPendingChanges = selectedProfessionalIds.size > 0;
   const isSaving = bulkAssociate.isPending || bulkDissociate.isPending;
+
+  const service = useMemo(() => {
+    const services = servicesQuery.data?.services ?? [];
+    return services.find((s) => s.id === serviceId) ?? null;
+  }, [servicesQuery.data?.services, serviceId]);
+
+  const isServiceInactive = Boolean(service && !service.isActive);
 
   // Filtered professionals
   const filteredProfessionals = useMemo(() => {
@@ -64,6 +74,9 @@ export function ProfessionalServiceManager() {
   };
 
   const handleAssociateSelected = async () => {
+    if (isServiceInactive) {
+      return;
+    }
     await bulkAssociate.mutateAsync({
       professionalIds: Array.from(selectedProfessionalIds),
       serviceId: serviceId!,
@@ -136,6 +149,13 @@ export function ProfessionalServiceManager() {
         </div>
       </div>
 
+      {isServiceInactive ? (
+        <FeedbackBanner
+          title="Servico inativo"
+          description="Ative o servico para associar profissionais."
+        />
+      ) : null}
+
       {/* Bulk Action Bar */}
       {selectedProfessionalIds.size > 0 && (
         <BulkActionBar
@@ -143,6 +163,7 @@ export function ProfessionalServiceManager() {
           onAssociateSelected={handleAssociateSelected}
           onRemoveSelected={handleRemoveSelected}
           onClearSelection={handleClearSelection}
+          disableAssociate={isServiceInactive}
         />
       )}
 
@@ -183,7 +204,7 @@ export function ProfessionalServiceManager() {
               variant="primary"
               size="md"
               onClick={handleAssociateSelected}
-              disabled={!hasPendingChanges || isSaving}
+              disabled={!hasPendingChanges || isSaving || isServiceInactive}
               className="disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Save className="h-5 w-5 mr-2" />

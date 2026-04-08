@@ -8,22 +8,27 @@ import type { PublicServiceItem } from "@/types/public-booking";
 interface CustomerDataFormProps {
   name: string;
   phone: string;
+  email: string;
   notes: string;
   onNameChange: (value: string) => void;
   onPhoneChange: (value: string) => void;
+  onEmailChange: (value: string) => void;
   onNotesChange: (value: string) => void;
   errors?: {
     name?: string;
     phone?: string;
+    email?: string;
   };
 }
 
 export function CustomerDataForm({
   name,
   phone,
+  email,
   notes,
   onNameChange,
   onPhoneChange,
+  onEmailChange,
   onNotesChange,
   errors,
 }: CustomerDataFormProps) {
@@ -56,6 +61,23 @@ export function CustomerDataForm({
         {errors?.phone ? (
           <p className="mt-1 text-xs" style={{ color: semanticTokens.feedback.danger.text }} role="alert">
             {errors.phone}
+          </p>
+        ) : null}
+      </div>
+      <div>
+        <label className="mb-2 block text-sm font-medium" style={{ color: colors.text.soft }}>
+          E-mail para notificacoes (opcional)
+        </label>
+        <Input
+          value={email}
+          onChange={(event) => onEmailChange(event.target.value)}
+          placeholder="voce@exemplo.com"
+          inputSize="lg"
+          type="email"
+        />
+        {errors?.email ? (
+          <p className="mt-1 text-xs" style={{ color: semanticTokens.feedback.danger.text }} role="alert">
+            {errors.email}
           </p>
         ) : null}
       </div>

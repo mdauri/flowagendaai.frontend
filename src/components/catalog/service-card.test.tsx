@@ -10,6 +10,7 @@ const mockService = {
   price: 80,
   durationInMinutes: 60,
   imageUrl: null,
+  thumbnailUrl: null,
 };
 
 describe("ServiceCard", () => {
@@ -82,5 +83,24 @@ describe("ServiceCard", () => {
 
     const button = screen.getByRole("button", { name: "Agendar Corte Feminino" });
     expect(button).toBeInTheDocument();
+  });
+
+  it("should prefer thumbnail when available", () => {
+    render(
+      <ServiceCard
+        service={{
+          ...mockService,
+          imageUrl: "https://cdn.example.com/original.webp",
+          thumbnailUrl: "https://cdn.example.com/thumb.webp",
+        }}
+        tenantSlug="test"
+        onBook={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByRole("img", { name: "Corte Feminino" })).toHaveAttribute(
+      "src",
+      "https://cdn.example.com/thumb.webp",
+    );
   });
 });

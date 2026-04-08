@@ -12,7 +12,8 @@ interface ServiceCardProps {
 }
 
 export function ServiceCard({ service, tenantSlug, onBook }: ServiceCardProps) {
-  const hasImage = Boolean(service.imageUrl);
+  const imageSrc = service.thumbnailUrl ?? service.imageUrl ?? undefined;
+  const hasImage = Boolean(imageSrc);
   
   const formatPrice = (price: number) => {
     return price.toLocaleString("pt-BR", {
@@ -59,7 +60,7 @@ export function ServiceCard({ service, tenantSlug, onBook }: ServiceCardProps) {
       }}>
         {hasImage ? (
           <img
-            src={service.imageUrl ?? undefined}
+            src={imageSrc}
             alt={service.name}
             className="h-full w-full object-cover"
             loading="lazy"

@@ -7,6 +7,8 @@ export function BulkActionBar({
   onAssociateSelected,
   onRemoveSelected,
   onClearSelection,
+  disableAssociate = false,
+  disableRemove = false,
 }: BulkActionBarProps) {
   if (selectedCount === 0) {
     return null;
@@ -41,6 +43,7 @@ export function BulkActionBar({
           size="sm"
           onClick={onAssociateSelected}
           className="h-10 px-4"
+          disabled={disableAssociate}
         >
           Associate Selected
         </Button>
@@ -50,6 +53,7 @@ export function BulkActionBar({
           size="sm"
           onClick={onRemoveSelected}
           className="h-10 px-4 text-white/70 hover:text-white"
+          disabled={disableRemove}
         >
           Remove Selected
         </Button>

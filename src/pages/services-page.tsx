@@ -1,27 +1,65 @@
-import { useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Button } from "@/components/flow/button";
 import { Card, CardDescription, CardTitle } from "@/components/flow/card";
 import { SectionHeading } from "@/components/flow/section-heading";
-import { ServiceCreateForm } from "@/components/services/service-create-form";
+import { DeleteServiceDialog } from "@/components/services/delete-service-dialog";
+import { ServiceForm } from "@/components/services/service-form";
 import { ServicesList } from "@/components/services/services-list";
 import { FeedbackBanner } from "@/components/shared/feedback-banner";
 import { PageState } from "@/components/shared/page-state";
 import { useAuth } from "@/hooks/use-auth";
 import { useCreateServiceMutation } from "@/hooks/use-create-service-mutation";
+import { useDeleteServiceMutation, useUpdateServiceMutation } from "@/hooks/use-service-mutations";
 import { useServicesQuery } from "@/hooks/use-services-query";
-import type { CreateServiceInput } from "@/types/service";
+import { ApiError } from "@/types/api";
+import type { Service } from "@/types/service";
+import type { CreateServiceInput, UpdateServiceInput } from "@/types/service";
 
 export function ServicesPage() {
   const auth = useAuth();
   const formSectionRef = useRef<HTMLDivElement | null>(null);
   const servicesQuery = useServicesQuery();
   const createServiceMutation = useCreateServiceMutation();
+  const updateServiceMutation = useUpdateServiceMutation();
+  const deleteServiceMutation = useDeleteServiceMutation();
+  const [editingService, setEditingService] = useState<Service | null>(null);
+  const [deletingService, setDeletingService] = useState<Service | null>(null);
+  const [deleteErrorMessage, setDeleteErrorMessage] = useState<string | null>(null);
 
   function handleCreateService(input: CreateServiceInput) {
     return createServiceMutation.mutateAsync(input);
   }
 
+  function handleUpdateService(input: UpdateServiceInput) {
+    if (!editingService) {
+      return Promise.reject(new Error("Servico nao selecionado para edicao."));
+    }
+
+    return updateServiceMutation.mutateAsync({
+      id: editingService.id,
+      input,
+    });
+  }
+
+  async function handleDeleteService() {
+    if (!deletingService) return;
+    setDeleteErrorMessage(null);
+
+    try {
+      await deleteServiceMutation.mutateAsync(deletingService.id);
+      setDeletingService(null);
+    } catch (error) {
+      setDeleteErrorMessage(
+        error instanceof ApiError ? error.message : "Nao foi possivel desativar o servico."
+      );
+    }
+  }
+
   const services = servicesQuery.data?.services ?? [];
+  const canManageServices = useMemo(
+    () => ["admin", "mandant"].includes(auth.user?.role ?? ""),
+    [auth.user?.role],
+  );
 
   return (
     <>
@@ -32,12 +70,33 @@ export function ServicesPage() {
       />
 
       <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,26rem)_minmax(0,1fr)]">
-        <div ref={formSectionRef}>
-          <ServiceCreateForm
-            onSubmit={handleCreateService}
-            isSubmitting={createServiceMutation.isPending}
-          />
-        </div>
+        {canManageServices ? (
+          <div ref={formSectionRef}>
+            {editingService ? (
+              <ServiceForm
+                mode="edit"
+                initialValues={editingService}
+                onSubmit={handleUpdateService}
+                onCancelEdit={() => {
+                  setEditingService(null);
+                }}
+                isSubmitting={updateServiceMutation.isPending}
+              />
+            ) : (
+              <ServiceForm
+                onSubmit={handleCreateService}
+                isSubmitting={createServiceMutation.isPending}
+              />
+            )}
+          </div>
+        ) : (
+          <Card variant="premium" padding="lg" className="h-full">
+            <CardTitle>Acesso de leitura</CardTitle>
+            <CardDescription className="mt-3">
+              Apenas usuarios com role `admin` ou `mandant` podem criar, alterar ou remover servicos.
+            </CardDescription>
+          </Card>
+        )}
 
         <div className="grid gap-6">
           <Card variant="glass" padding="lg">
@@ -117,10 +176,36 @@ export function ServicesPage() {
             <ServicesList
               services={services}
               tenantTimezone={auth.tenant?.timezone ?? "UTC"}
+              canManageServices={canManageServices}
+              onEditService={(service) => {
+                setEditingService(service);
+                formSectionRef.current?.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                });
+              }}
+              onDeleteService={(service) => {
+                setDeleteErrorMessage(null);
+                setDeletingService(service);
+              }}
             />
           ) : null}
         </div>
       </div>
+
+      <DeleteServiceDialog
+        service={deletingService}
+        isOpen={deletingService !== null}
+        isSubmitting={deleteServiceMutation.isPending}
+        errorMessage={deleteErrorMessage}
+        onClose={() => {
+          setDeletingService(null);
+          setDeleteErrorMessage(null);
+        }}
+        onConfirm={() => {
+          void handleDeleteService();
+        }}
+      />
     </>
   );
 }
