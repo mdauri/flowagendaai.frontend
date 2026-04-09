@@ -4,6 +4,8 @@ export interface PublicProfessional {
   slug: string;
   tenantId: string;
   tenantTimezone: string;
+  imageUrl?: string | null;
+  thumbnailUrl?: string | null;
 }
 
 export interface PublicServiceItem {
@@ -11,6 +13,8 @@ export interface PublicServiceItem {
   name: string;
   description?: string | null;
   durationInMinutes: number;
+  imageUrl?: string | null;
+  thumbnailUrl?: string | null;
 }
 
 export interface PublicServicesResponse {

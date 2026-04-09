@@ -86,5 +86,7 @@ export interface ProfessionalsByServiceResponse {
     id: string;
     name: string;
     slug: string;
+    imageUrl?: string | null;
+    thumbnailUrl?: string | null;
   }[];
 }

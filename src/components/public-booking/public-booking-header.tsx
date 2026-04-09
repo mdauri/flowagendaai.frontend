@@ -1,17 +1,39 @@
+import { useEffect, useMemo, useState } from "react";
 import type { PublicProfessional } from "@/types/public-booking";
 import { Card, CardTitle } from "@/components/flow/card";
 import { colors } from "@/design-system";
 
 export function PublicBookingHeader({ professional }: { professional: PublicProfessional }) {
+  const imageSrc = useMemo(
+    () => professional.thumbnailUrl ?? professional.imageUrl ?? null,
+    [professional.thumbnailUrl, professional.imageUrl],
+  );
+  const [showImageFallback, setShowImageFallback] = useState(!imageSrc);
+
+  useEffect(() => {
+    setShowImageFallback(!imageSrc);
+  }, [imageSrc]);
+
   return (
     <Card variant="premium" padding="lg" className="relative overflow-hidden w-full">
       <div className="relative z-10 flex items-center gap-4">
-        <div 
-          className="flex h-16 w-16 items-center justify-center rounded-full text-2xl font-black shadow-inner ring-1 ring-white/5"
-          style={{ backgroundColor: colors.background.glass, color: colors.text.primary }}
-        >
-          {professional.name.charAt(0).toUpperCase()}
-        </div>
+        {!showImageFallback && imageSrc ? (
+          <img
+            src={imageSrc}
+            alt={`Foto de ${professional.name}`}
+            className="h-16 w-16 rounded-full object-cover shadow-inner ring-1 ring-white/5"
+            loading="lazy"
+            onError={() => setShowImageFallback(true)}
+          />
+        ) : (
+          <div
+            className="flex h-16 w-16 items-center justify-center rounded-full text-2xl font-black shadow-inner ring-1 ring-white/5"
+            style={{ backgroundColor: colors.background.glass, color: colors.text.primary }}
+            aria-hidden="true"
+          >
+            {professional.name.charAt(0).toUpperCase()}
+          </div>
+        )}
         <div>
           <p className="text-[10px] uppercase font-bold tracking-widest" style={{ color: colors.text.muted }}>
             Agendamento Público

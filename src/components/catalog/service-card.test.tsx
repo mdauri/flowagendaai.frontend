@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ServiceCard } from "./service-card";
 
@@ -98,9 +98,28 @@ describe("ServiceCard", () => {
       />,
     );
 
-    expect(screen.getByRole("img", { name: "Corte Feminino" })).toHaveAttribute(
+    expect(screen.getByRole("img", { name: "Imagem do serviço Corte Feminino" })).toHaveAttribute(
       "src",
       "https://cdn.example.com/thumb.webp",
     );
+  });
+
+  it("should show fallback when image fails to load", () => {
+    render(
+      <ServiceCard
+        service={{
+          ...mockService,
+          imageUrl: "https://cdn.example.com/broken.webp",
+          thumbnailUrl: null,
+        }}
+        tenantSlug="test"
+        onBook={vi.fn()}
+      />,
+    );
+
+    const image = screen.getByRole("img", { name: "Imagem do serviço Corte Feminino" });
+    fireEvent.error(image);
+
+    expect(screen.getByText("CF")).toBeInTheDocument();
   });
 });

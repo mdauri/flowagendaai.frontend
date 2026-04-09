@@ -1,8 +1,8 @@
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/flow/button";
 import { Card } from "@/components/flow/card";
 import { FeedbackBanner } from "@/components/shared/feedback-banner";
 import type { PublicServiceItem } from "@/types/public-booking";
-import { cn } from "@/lib/cn";
 import { colors, semanticTokens } from "@/design-system";
 
 interface ServiceCardProps {
@@ -12,6 +12,25 @@ interface ServiceCardProps {
 }
 
 function ServiceCard({ service, selected, onSelect }: ServiceCardProps) {
+  const imageSrc = useMemo(
+    () => service.thumbnailUrl ?? service.imageUrl ?? null,
+    [service.thumbnailUrl, service.imageUrl],
+  );
+  const [showImageFallback, setShowImageFallback] = useState(!imageSrc);
+
+  useEffect(() => {
+    setShowImageFallback(!imageSrc);
+  }, [imageSrc]);
+
+  const serviceInitials = useMemo(() => {
+    return service.name
+      .split(" ")
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase() ?? "")
+      .join("");
+  }, [service.name]);
+
   return (
     <button
       type="button"
@@ -31,6 +50,25 @@ function ServiceCard({ service, selected, onSelect }: ServiceCardProps) {
           backgroundColor: selected ? semanticTokens.surface.glassHover : semanticTokens.surface.glass
         }}
       >
+        <div className="mb-3">
+          {!showImageFallback && imageSrc ? (
+            <img
+              src={imageSrc}
+              alt={`Imagem do serviço ${service.name}`}
+              className="h-28 w-full rounded-2xl object-cover"
+              loading="lazy"
+              onError={() => setShowImageFallback(true)}
+            />
+          ) : (
+            <div
+              className="flex h-28 w-full items-center justify-center rounded-2xl text-lg font-black"
+              style={{ backgroundColor: colors.background.glassSubtle, color: colors.text.primary }}
+              aria-hidden="true"
+            >
+              {serviceInitials}
+            </div>
+          )}
+        </div>
         <div className="flex items-center justify-between gap-2">
           <span className="text-base font-semibold" style={{ color: colors.text.primary }}>
             {service.name}

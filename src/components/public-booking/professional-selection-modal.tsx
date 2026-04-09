@@ -1,3 +1,4 @@
+import { useMemo, useState } from "react";
 import { X } from "lucide-react";
 import { colors, typography, shadows } from "@/design-system";
 import { Button } from "@/components/flow/button";
@@ -6,6 +7,8 @@ export interface ProfessionalOption {
   id: string;
   name: string;
   slug: string;
+  imageUrl?: string | null;
+  thumbnailUrl?: string | null;
 }
 
 interface ProfessionalSelectionModalProps {
@@ -16,6 +19,41 @@ interface ProfessionalSelectionModalProps {
   serviceId: string;
   onSelectProfessional: (professionalSlug: string) => void;
   onClose: () => void;
+}
+
+interface ProfessionalAvatarProps {
+  professional: ProfessionalOption;
+}
+
+function ProfessionalAvatar({ professional }: ProfessionalAvatarProps) {
+  const [hasImageError, setHasImageError] = useState(false);
+  const preferredImageSrc = useMemo(
+    () => professional.thumbnailUrl ?? professional.imageUrl ?? null,
+    [professional.thumbnailUrl, professional.imageUrl]
+  );
+
+  if (preferredImageSrc && !hasImageError) {
+    return (
+      <img
+        src={preferredImageSrc}
+        alt={`Foto de ${professional.name}`}
+        className="h-full w-full object-cover"
+        onError={() => setHasImageError(true)}
+      />
+    );
+  }
+
+  return (
+    <div
+      className="flex h-full w-full items-center justify-center text-lg font-bold text-white"
+      style={{
+        backgroundColor: colors.brand.primary,
+      }}
+      aria-hidden="true"
+    >
+      {professional.name.charAt(0).toUpperCase()}
+    </div>
+  );
 }
 
 export function ProfessionalSelectionModal({
@@ -99,15 +137,10 @@ export function ProfessionalSelectionModal({
               className="flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/5 p-4 transition-all hover:border-white/20 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/20"
             >
               <div className="flex items-center gap-3">
-                {/* Avatar Placeholder */}
                 <div
-                  className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full text-lg font-bold text-white"
-                  style={{
-                    backgroundColor: colors.brand.primary,
-                  }}
-                  aria-hidden="true"
+                  className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-full"
                 >
-                  {professional.name.charAt(0).toUpperCase()}
+                  <ProfessionalAvatar professional={professional} />
                 </div>
                 <div className="text-left">
                   <p

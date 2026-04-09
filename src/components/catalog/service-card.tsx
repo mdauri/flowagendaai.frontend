@@ -61,7 +61,7 @@ export function ServiceCard({ service, tenantSlug, onBook }: ServiceCardProps) {
         {hasImage ? (
           <img
             src={imageSrc}
-            alt={service.name}
+            alt={`Imagem do serviço ${service.name}`}
             className="h-full w-full object-cover"
             loading="lazy"
             onError={(e) => {

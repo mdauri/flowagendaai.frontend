@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ProfessionalSelectionModal } from "./professional-selection-modal";
 
@@ -8,11 +8,15 @@ const mockProfessionals = [
     id: "prof_123",
     name: "Maria Silva",
     slug: "maria-silva",
+    thumbnailUrl: "https://cdn.example.com/maria_thumb.webp",
+    imageUrl: "https://cdn.example.com/maria.webp",
   },
   {
     id: "prof_456",
     name: "João Santos",
     slug: "joao-santos",
+    thumbnailUrl: null,
+    imageUrl: null,
   },
 ];
 
@@ -156,6 +160,59 @@ describe("ProfessionalSelectionModal", () => {
     );
 
     expect(screen.getByLabelText("Fechar modal")).toBeInTheDocument();
+  });
+
+  it("should render professional image when available", () => {
+    render(
+      <ProfessionalSelectionModal
+        isOpen={true}
+        serviceName="Corte Feminino"
+        professionals={mockProfessionals}
+        tenantSlug="test-tenant"
+        serviceId="svc_123"
+        onSelectProfessional={vi.fn()}
+        onClose={vi.fn()}
+      />
+    );
+
+    const mariaImage = screen.getByRole("img", { name: "Foto de Maria Silva" });
+    expect(mariaImage).toHaveAttribute("src", "https://cdn.example.com/maria_thumb.webp");
+  });
+
+  it("should render fallback initial when professional has no image", () => {
+    render(
+      <ProfessionalSelectionModal
+        isOpen={true}
+        serviceName="Corte Feminino"
+        professionals={mockProfessionals}
+        tenantSlug="test-tenant"
+        serviceId="svc_123"
+        onSelectProfessional={vi.fn()}
+        onClose={vi.fn()}
+      />
+    );
+
+    expect(screen.getByText("J")).toBeInTheDocument();
+  });
+
+  it("should fallback to initial when image loading fails", () => {
+    render(
+      <ProfessionalSelectionModal
+        isOpen={true}
+        serviceName="Corte Feminino"
+        professionals={mockProfessionals}
+        tenantSlug="test-tenant"
+        serviceId="svc_123"
+        onSelectProfessional={vi.fn()}
+        onClose={vi.fn()}
+      />
+    );
+
+    const mariaImage = screen.getByRole("img", { name: "Foto de Maria Silva" });
+    fireEvent.error(mariaImage);
+
+    expect(screen.queryByRole("img", { name: "Foto de Maria Silva" })).not.toBeInTheDocument();
+    expect(screen.getByText("M")).toBeInTheDocument();
   });
 
   it("should render professional avatars with initials", () => {
