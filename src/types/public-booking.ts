@@ -37,6 +37,11 @@ export interface PublicSlotsResponse {
   slots: PublicSlot[];
 }
 
+export interface PublicAvailableDatesResponse {
+  tenantTimezone: string;
+  availableDates: string[];
+}
+
 export interface CreatePublicBookingInput {
   slug: string;
   serviceId: string;

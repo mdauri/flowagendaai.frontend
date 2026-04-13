@@ -86,9 +86,9 @@ export function CalendarGrid({
         {days.map((day) => {
           const isCurrentMonth = day.hasSame(month, "month");
           const isSelected = selectedDate ? day.hasSame(selectedDate, "day") : false;
-          const disabled = isOutOfRange(day);
-          const isToday = day.hasSame(minDate.startOf("day"), "day");
           const hasSlots = availableDates.has(day.toISODate() ?? "");
+          const disabled = !isCurrentMonth || isOutOfRange(day) || !hasSlots;
+          const isToday = day.hasSame(minDate.startOf("day"), "day");
 
           return (
             <button

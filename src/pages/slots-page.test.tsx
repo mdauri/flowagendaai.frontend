@@ -26,6 +26,7 @@ vi.mock("@/services/services-service", () => ({
 vi.mock("@/services/slots-service", () => ({
   slotsService: {
     listAvailable: vi.fn(),
+    listAvailableDates: vi.fn(),
   },
 }));
 
@@ -87,6 +88,15 @@ const slotsResponse = {
   ],
 };
 
+const availableDatesResponse = {
+  professionalId: "professional-1",
+  serviceId: "service-1",
+  tenantTimezone: "America/Sao_Paulo",
+  from: "2026-04-01",
+  to: "2026-04-30",
+  availableDates: ["2026-04-01"],
+};
+
 const refreshedSlotsResponse = {
   ...slotsResponse,
   slots: [
@@ -135,6 +145,9 @@ async function loadSlotsPage(user: ReturnType<typeof userEvent.setup>) {
 
   await selectOption(user, "Selecione um profissional", "Ana");
   await selectOption(user, "Selecione um servico", "Consulta");
+  await waitFor(() => {
+    expect(screen.getByLabelText("Data")).not.toBeDisabled();
+  });
   fireEvent.change(screen.getByLabelText("Data"), {
     target: {
       value: "2026-04-01",
@@ -151,6 +164,7 @@ describe("SlotsPage", () => {
     mockedProfessionalsService.list.mockResolvedValue(professionalsResponse);
     mockedServicesService.list.mockResolvedValue(servicesResponse);
     mockedSlotsService.listAvailable.mockResolvedValue(slotsResponse);
+    mockedSlotsService.listAvailableDates.mockResolvedValue(availableDatesResponse);
   });
 
   test("busca e renderiza slots com CTA de confirmacao desabilitado sem selecao", async () => {

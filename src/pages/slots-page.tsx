@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { DateTime } from "luxon";
 import { Card } from "@/components/flow/card";
 import { SectionHeading } from "@/components/flow/section-heading";
 import { AvailableSlotsList } from "@/components/slots/available-slots-list";
@@ -13,6 +14,7 @@ import { SlotsErrorState } from "@/components/slots/slots-error-state";
 import { TenantTimezoneInfo } from "@/components/slots/tenant-timezone-info";
 import { PageState } from "@/components/shared/page-state";
 import { useAuth } from "@/hooks/use-auth";
+import { useAvailableDatesQuery } from "@/hooks/use-available-dates-query";
 import {
   getAvailableSlotsQueryKey,
   useAvailableSlotsQuery,
@@ -75,6 +77,7 @@ export function SlotsPage() {
   const professionalsQuery = useProfessionalsQuery();
   const servicesQuery = useServicesQuery();
   const [filters, setFilters] = useState<ListAvailableSlotsInput>(initialFilters);
+  const [calendarMonth, setCalendarMonth] = useState(() => DateTime.now().startOf("month"));
   const [submittedFilters, setSubmittedFilters] = useState<ListAvailableSlotsInput | null>(null);
   const [selectedSlotStart, setSelectedSlotStart] = useState<string | null>(null);
   const [confirmedBooking, setConfirmedBooking] = useState<CreateBookingResponse | null>(null);
@@ -85,6 +88,28 @@ export function SlotsPage() {
   const hasCompleteFilters = Boolean(filters.professionalId && filters.serviceId && filters.date);
   const activeTenantTimezone =
     availableSlotsQuery.data?.tenantTimezone ?? auth.tenant?.timezone ?? "UTC";
+  const calendarMonthInTimezone = useMemo(
+    () => calendarMonth.setZone(activeTenantTimezone).startOf("month"),
+    [calendarMonth, activeTenantTimezone]
+  );
+  const availabilityRange = useMemo(() => {
+    if (!filters.professionalId || !filters.serviceId) {
+      return null;
+    }
+
+    return {
+      professionalId: filters.professionalId,
+      serviceId: filters.serviceId,
+      from: calendarMonthInTimezone.startOf("month").toISODate()!,
+      to: calendarMonthInTimezone.endOf("month").toISODate()!,
+    };
+  }, [filters.professionalId, filters.serviceId, calendarMonthInTimezone]);
+  const availableDatesQuery = useAvailableDatesQuery(availabilityRange);
+  const availableDates = useMemo(
+    () => new Set(availableDatesQuery.data?.availableDates ?? []),
+    [availableDatesQuery.data?.availableDates]
+  );
+  const isSelectedDateAvailable = Boolean(filters.date && availableDates.has(filters.date));
   const isBootstrapLoading = professionalsQuery.isLoading || servicesQuery.isLoading;
   const isBootstrapError = professionalsQuery.isError || servicesQuery.isError;
   const slots = availableSlotsQuery.data?.slots ?? [];
@@ -125,8 +150,40 @@ export function SlotsPage() {
     return "";
   }, [professionalsQuery.isError, servicesQuery.isError]);
 
+  const availabilityErrorMessage = useMemo(() => {
+    if (!availableDatesQuery.isError) {
+      return null;
+    }
+
+    if (availableDatesQuery.error instanceof ApiError) {
+      return availableDatesQuery.error.message;
+    }
+
+    return "Nao foi possivel carregar a disponibilidade do mes selecionado.";
+  }, [availableDatesQuery.error, availableDatesQuery.isError]);
+
+  useEffect(() => {
+    if (!filters.date || !availableDatesQuery.data || availableDates.has(filters.date)) {
+      return;
+    }
+
+    const selectedDateInTimezone = DateTime.fromISO(filters.date, { zone: activeTenantTimezone }).startOf("month");
+
+    if (!selectedDateInTimezone.hasSame(calendarMonthInTimezone, "month")) {
+      return;
+    }
+
+    setFilters((current) => ({ ...current, date: "" }));
+  }, [
+    filters.date,
+    availableDatesQuery.data,
+    availableDates,
+    activeTenantTimezone,
+    calendarMonthInTimezone,
+  ]);
+
   function handleSearch() {
-    if (!hasCompleteFilters || isBookingPending) {
+    if (!hasCompleteFilters || !isSelectedDateAvailable || isBookingPending) {
       return;
     }
 
@@ -144,6 +201,31 @@ export function SlotsPage() {
 
   function handleRetry() {
     void availableSlotsQuery.refetch();
+  }
+
+  function handleFiltersChange(nextFilters: ListAvailableSlotsInput) {
+    const professionalChanged = nextFilters.professionalId !== filters.professionalId;
+    const serviceChanged = nextFilters.serviceId !== filters.serviceId;
+    const shouldResetDate = professionalChanged || serviceChanged;
+    const normalizedDate = nextFilters.date
+      ? DateTime.fromISO(nextFilters.date, { zone: activeTenantTimezone })
+      : null;
+
+    if (normalizedDate?.isValid) {
+      setCalendarMonth(normalizedDate.startOf("month"));
+    }
+
+    setFilters({
+      ...nextFilters,
+      date: shouldResetDate ? "" : nextFilters.date,
+    });
+
+    if (shouldResetDate) {
+      setSubmittedFilters(null);
+      setSelectedSlotStart(null);
+      setConfirmedBooking(null);
+      createBookingMutation.reset();
+    }
   }
 
   function handleSelectSlot(slot: AvailableSlot) {
@@ -238,12 +320,19 @@ export function SlotsPage() {
             professionals={professionals}
             services={services}
             filters={filters}
+            timezone={activeTenantTimezone}
+            calendarMonth={calendarMonthInTimezone}
+            availableDates={availableDates}
+            canLoadAvailability={Boolean(filters.professionalId && filters.serviceId)}
+            isAvailabilityLoading={availableDatesQuery.isLoading || availableDatesQuery.isFetching}
+            availabilityErrorMessage={availabilityErrorMessage}
             disabled={isBootstrapLoading}
-            onFiltersChange={setFilters}
+            onCalendarMonthChange={setCalendarMonth}
+            onFiltersChange={handleFiltersChange}
           />
 
           <SlotSearchActions
-            canSearch={hasCompleteFilters}
+            canSearch={hasCompleteFilters && isSelectedDateAvailable}
             isSearching={availableSlotsQuery.isLoading || availableSlotsQuery.isFetching}
             disabled={isBookingPending}
             onSearch={handleSearch}

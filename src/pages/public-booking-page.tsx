@@ -16,6 +16,7 @@ import { ProfessionalSkeleton } from "@/components/public-booking/professional-s
 import { ConnectionErrorState, ProfessionalNotFoundState } from "@/components/public-booking/professional-error";
 import { usePublicProfessionalQuery } from "@/hooks/use-public-professional-query";
 import { usePublicServicesQuery } from "@/hooks/use-public-services-query";
+import { usePublicAvailableDatesQuery } from "@/hooks/use-public-available-dates-query";
 import { usePublicSlotsQuery } from "@/hooks/use-public-slots-query";
 import { useCreatePublicBookingMutation } from "@/hooks/use-create-public-booking-mutation";
 import { ApiError, BOOKING_CONFLICT_ERROR_CODE } from "@/types/api";
@@ -70,7 +71,6 @@ export function PublicBookingPage() {
   const [customerNotes, setCustomerNotes] = useState("");
   const [bookingResult, setBookingResult] = useState<CreatePublicBookingResponse | null>(null);
   const [bookingNotification, setBookingNotification] = useState<BookingNotification | null>(null);
-  const [availableDates, setAvailableDates] = useState<Set<string>>(() => new Set());
 
   const professionalQuery = usePublicProfessionalQuery(slug ?? "", { enabled: Boolean(slug) });
   const servicesQuery = usePublicServicesQuery(slug);
@@ -87,6 +87,30 @@ export function PublicBookingPage() {
   const minDate = useMemo(() => DateTime.now().setZone(tenantTimezone).startOf("day"), [tenantTimezone]);
   const maxDate = useMemo(() => minDate.plus({ days: 30 }), [minDate]);
   const [calendarMonth, setCalendarMonth] = useState(() => minDate.startOf("month"));
+  const monthRange = useMemo(() => {
+    const monthStart = calendarMonth.startOf("month");
+    const monthEnd = calendarMonth.endOf("month");
+    const from = monthStart < minDate ? minDate : monthStart;
+    const to = monthEnd > maxDate ? maxDate : monthEnd;
+
+    if (from > to) {
+      return null;
+    }
+
+    return {
+      from: from.toISODate()!,
+      to: to.toISODate()!,
+    };
+  }, [calendarMonth, minDate, maxDate]);
+  const availableDatesQuery = usePublicAvailableDatesQuery(
+    slug && selectedService?.id && monthRange
+      ? { slug, serviceId: selectedService.id, from: monthRange.from, to: monthRange.to }
+      : undefined
+  );
+  const availableDates = useMemo(
+    () => new Set(availableDatesQuery.data?.availableDates ?? []),
+    [availableDatesQuery.data?.availableDates]
+  );
 
   useEffect(() => {
     if (!servicesQuery.data?.length) return;
@@ -110,7 +134,6 @@ export function PublicBookingPage() {
 
   useEffect(() => {
     if (!selectedService?.id) {
-      setAvailableDates(new Set());
       setSelectedDate(null);
       setSelectedSlot(null);
       setCalendarMonth(minDate.startOf("month"));
@@ -124,24 +147,16 @@ export function PublicBookingPage() {
   }, [minDate, selectedDate]);
 
   useEffect(() => {
-    if (!slotsQuery.data?.slots || !selectedDate) return;
+    if (!selectedDate || !availableDatesQuery.data) return;
+    if (!selectedDate.hasSame(calendarMonth, "month")) return;
+    const selectedDateKey = selectedDate.toISODate();
 
-    setAvailableDates((prev) => {
-      const next = new Set(prev);
-      const key = selectedDate.toISODate();
-      if (!key) {
-        return next;
-      }
+    if (!selectedDateKey) return;
+    if (availableDates.has(selectedDateKey)) return;
 
-      if (slotsQuery.data?.slots.length > 0) {
-        next.add(key);
-      } else {
-        next.delete(key);
-      }
-
-      return next;
-    });
-  }, [slotsQuery.data, selectedDate]);
+    setSelectedDate(null);
+    setSelectedSlot(null);
+  }, [selectedDate, calendarMonth, availableDatesQuery.data, availableDates]);
 
   const timezone = slotsQuery.data?.tenantTimezone ?? tenantTimezone;
   const stepOrder: PublicBookingStep[] = ["service", "date", "slot", "customer"];
@@ -150,6 +165,7 @@ export function PublicBookingPage() {
   const selectedSlotStart = selectedSlot?.start ?? null;
   const slotError = slotsQuery.error as ApiError | null;
   const isSlotRateLimit = slotError?.status === 429;
+  const availableDatesError = availableDatesQuery.error as ApiError | null;
 
   const isNameValid = customerName.trim().length >= 3;
   const isPhoneValid = BRAZILIAN_PHONE_REGEX.test(customerPhone);
@@ -169,7 +185,6 @@ export function PublicBookingPage() {
     setSelectedService(service);
     setSelectedDate(null);
     setSelectedSlot(null);
-    setAvailableDates(new Set());
     setCalendarMonth(minDate.startOf("month"));
     setBookingNotification(null);
   };
@@ -195,7 +210,6 @@ export function PublicBookingPage() {
     setCustomerNotes("");
     setBookingResult(null);
     setBookingNotification(null);
-    setAvailableDates(new Set());
     setCalendarMonth(minDate.startOf("month"));
     setCurrentStep("service");
   };
@@ -436,6 +450,29 @@ export function PublicBookingPage() {
                 availableDates={availableDates}
                 onSelectDate={handleDateSelect}
               />
+              {availableDatesQuery.isLoading ? (
+                <p className="text-sm text-white/70">Carregando disponibilidade do mês...</p>
+              ) : null}
+              {availableDatesError ? (
+                <div className="space-y-3">
+                  <FeedbackBanner
+                    tone={availableDatesError.status === 429 ? "warning" : "danger"}
+                    title={
+                      availableDatesError.status === 429
+                        ? "Limite temporário"
+                        : "Não foi possível carregar os dias disponíveis"
+                    }
+                    description={
+                      availableDatesError.status === 429
+                        ? `Tente novamente em ${availableDatesError.retryAfterSeconds ?? 30} segundos.`
+                        : "Verifique sua conexão e tente outra vez."
+                    }
+                  />
+                  <Button variant="secondary" size="md" onClick={() => availableDatesQuery.refetch()}>
+                    Recarregar dias
+                  </Button>
+                </div>
+              ) : null}
               <p className="text-sm text-white/70">Horários em: {timezone}</p>
             </div>
           )}

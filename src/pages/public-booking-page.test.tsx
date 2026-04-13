@@ -61,6 +61,7 @@ const mutateMock = vi.fn<
 
 const mockProfessionalQuery = vi.fn();
 const mockServicesQuery = vi.fn();
+const mockAvailableDatesQuery = vi.fn();
 const mockSlotsQuery = vi.fn();
 const mockCreateBookingMutation = {
   mutate: mutateMock,
@@ -77,6 +78,9 @@ vi.mock("@/hooks/use-public-professional-query", () => ({
 }));
 vi.mock("@/hooks/use-public-services-query", () => ({
   usePublicServicesQuery: () => mockServicesQuery(),
+}));
+vi.mock("@/hooks/use-public-available-dates-query", () => ({
+  usePublicAvailableDatesQuery: () => mockAvailableDatesQuery(),
 }));
 vi.mock("@/hooks/use-public-slots-query", () => ({
   usePublicSlotsQuery: () => mockSlotsQuery(),
@@ -103,6 +107,18 @@ const createServicesResponse = (overrides = {}) => ({
   ...overrides,
 });
 
+const createAvailableDatesResponse = (overrides = {}) => ({
+  data: {
+    tenantTimezone: mockProfessional.tenantTimezone,
+    availableDates: [DateTime.now().setZone(mockProfessional.tenantTimezone).toISODate() ?? ""],
+  },
+  isLoading: false,
+  isError: false,
+  error: null,
+  refetch: vi.fn(),
+  ...overrides,
+});
+
 const createSlotsResponse = (overrides = {}) => ({
   data: { slots: [mockSlot], tenantTimezone: mockProfessional.tenantTimezone },
   isLoading: false,
@@ -121,6 +137,7 @@ const createMutationMock = (
 beforeEach(() => {
   mockProfessionalQuery.mockReturnValue(createProfessionalResponse());
   mockServicesQuery.mockReturnValue(createServicesResponse());
+  mockAvailableDatesQuery.mockReturnValue(createAvailableDatesResponse());
   mockSlotsQuery.mockReturnValue(createSlotsResponse());
   mutateMock.mockReset();
   mockCreateBookingMutation.status = "idle";
@@ -213,6 +230,26 @@ describe("PublicBookingPage", () => {
     expect(screen.getByText(/Complete seus dados/i)).toBeInTheDocument();
   });
 
+  it("keeps unavailable day disabled in calendar", async () => {
+    mockAvailableDatesQuery.mockReturnValue(
+      createAvailableDatesResponse({ data: { tenantTimezone: mockProfessional.tenantTimezone, availableDates: [] } })
+    );
+    renderPage();
+    const user = userEvent.setup();
+
+    await user.click(screen.getByText(/Corte Feminino/i));
+    await user.click(screen.getByRole("button", { name: /Continuar/i }));
+
+    const todayLabel = DateTime.now().setZone(mockProfessional.tenantTimezone).day.toString();
+    const dayButtons = await screen.findAllByRole("button", {
+      name: new RegExp("^" + todayLabel + "$"),
+    });
+    const enabledToday = dayButtons.find((button) => !button.hasAttribute("disabled"));
+
+    expect(enabledToday).toBeUndefined();
+    expect(screen.getByRole("button", { name: /Ver horários/i })).toBeDisabled();
+  });
+
   it("shows empty state when there are no slots", async () => {
     mockSlotsQuery.mockReturnValue(
       createSlotsResponse({ data: { slots: [], tenantTimezone: mockProfessional.tenantTimezone } })
@@ -223,6 +260,7 @@ describe("PublicBookingPage", () => {
     await progressToSlotStep(user);
 
     expect(screen.getByText(/Sem horários disponíveis/i)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Recarregar/i })).not.toBeInTheDocument();
   });
 
   it("shows retry feedback when slot request is rate limited", async () => {

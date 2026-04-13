@@ -2,6 +2,7 @@ import { httpClient } from "@/lib/http-client";
 import type {
   CreatePublicBookingInput,
   CreatePublicBookingResponse,
+  PublicAvailableDatesResponse,
   PublicProfessional,
   PublicServicesResponse,
   PublicSlotsResponse,
@@ -31,6 +32,26 @@ export const publicBookingService = {
     return httpClient<PublicSlotsResponse>(`/public/professionals/${slug}/slots?${searchParams}`, {
       skipAuth: true,
     });
+  },
+
+  async listAvailableDates(
+    slug: string,
+    serviceId: string,
+    from: string,
+    to: string
+  ): Promise<PublicAvailableDatesResponse> {
+    const searchParams = new URLSearchParams({
+      serviceId,
+      from,
+      to,
+    });
+
+    return httpClient<PublicAvailableDatesResponse>(
+      `/public/professionals/${slug}/available-dates?${searchParams}`,
+      {
+        skipAuth: true,
+      }
+    );
   },
 
   async createBooking(input: CreatePublicBookingInput): Promise<CreatePublicBookingResponse> {
