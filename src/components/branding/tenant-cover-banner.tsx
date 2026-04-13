@@ -52,7 +52,11 @@ function SkeletonBanner({ variant }: { variant: "full" | "compact" }) {
   return (
     <div
       className={cn(
+<<<<<<< HEAD
         "relative overflow-hidden rounded-xxl",
+=======
+        "relative overflow-hidden rounded-[2.25rem]",
+>>>>>>> refs/remotes/origin/master
         heightClasses[variant],
       )}
       role="status"
