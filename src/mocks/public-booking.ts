@@ -6,4 +6,10 @@ export const mockPublicProfessional: PublicProfessional = {
   slug: "maria-silva",
   tenantId: "tenant_456",
   tenantTimezone: "America/Sao_Paulo",
+  tenantName: "Test Studio",
+  tenantSlug: "test-studio",
+  tenantLogoUrl: null,
+  tenantCoverImageUrl: null,
+  tenantCoverThumbnailUrl: null,
+  tenantPublicAddress: null,
 };

@@ -15,6 +15,12 @@ type ResetFeedbackState =
       tone: "danger";
     }
   | {
+      kind: "weakPassword";
+      title: string;
+      description: string;
+      tone: "warning";
+    }
+  | {
       kind: "expired";
       title: string;
       description: string;
@@ -41,6 +47,15 @@ function isExpiredTokenError(error: ApiError) {
 function isInvalidTokenError(error: ApiError) {
   const content = `${error.code} ${error.message}`.toLowerCase();
   return content.includes("invalid") || content.includes("inval");
+}
+
+function isWeakPasswordError(error: ApiError) {
+  const content = `${error.code} ${error.message}`.toLowerCase();
+  return (
+    error.code === "WEAK_PASSWORD" ||
+    content.includes("weak_password") ||
+    (content.includes("senha") && content.includes("minimo"))
+  );
 }
 
 export function ResetPasswordForm() {
@@ -99,6 +114,16 @@ export function ResetPasswordForm() {
         title: "Link expirado",
         description:
           "Este link expirou por seguranca. Solicite um novo link para redefinir sua senha.",
+        tone: "warning",
+      };
+    }
+
+    if (isWeakPasswordError(error)) {
+      return {
+        kind: "weakPassword",
+        title: "Senha invalida",
+        description:
+          "A senha deve ter no minimo 8 caracteres e incluir pelo menos uma letra e um numero.",
         tone: "warning",
       };
     }

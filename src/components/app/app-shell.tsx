@@ -102,6 +102,34 @@ export function AppShell({
             >
               Slots
             </NavLink>
+            <NavLink
+              to="/app/settings"
+              className={({ isActive }) =>
+                cn(
+                  "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
+                  isActive
+                    ? "border-primary bg-primary text-black"
+                    : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white"
+                )
+              }
+            >
+              Configuracoes
+            </NavLink>
+            {user.role === "system-admin" ? (
+              <NavLink
+                to="/app/system-admin/tenants/provision"
+                className={({ isActive }) =>
+                  cn(
+                    "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
+                    isActive
+                      ? "border-primary bg-primary text-black"
+                      : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white"
+                  )
+                }
+              >
+                Provisionamento
+              </NavLink>
+            ) : null}
           </nav>
         </div>
         <div className="min-w-0 xl:max-w-[360px]">

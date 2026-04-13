@@ -62,6 +62,8 @@ export interface PublicCatalogTenant {
   slug: string | null;
   timezone: string;
   logoUrl?: string | null;
+  coverImageUrl?: string | null;
+  publicAddress?: string | null;
 }
 
 export interface PublicCatalogService {

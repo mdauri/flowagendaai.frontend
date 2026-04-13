@@ -6,6 +6,7 @@ import { CatalogSkeleton } from "@/components/catalog/catalog-skeleton";
 import { CatalogEmptyState } from "@/components/catalog/catalog-empty-state";
 import { CatalogErrorState } from "@/components/catalog/catalog-error-state";
 import { ProfessionalSelectionModal } from "@/components/public-booking/professional-selection-modal";
+import { TenantCoverBanner } from "@/components/branding/tenant-cover-banner";
 import { usePublicCatalogQuery } from "@/hooks/use-public-catalog-query";
 import { useProfessionalsByServiceQuery } from "@/hooks/use-professionals-by-service-query";
 import { ApiError } from "@/types/api";
@@ -152,60 +153,18 @@ export function CatalogPage() {
       } as React.CSSProperties}
     >
       <div className="mx-auto max-w-[1200px]">
-        {/* Header */}
-        <header
-          className="mb-8 flex items-center gap-4 rounded-[2.25rem] border border-[var(--border-default)] bg-[var(--surface-premium-gradient)] p-6 backdrop-blur-[24px]"
-          style={{
-            borderColor: "rgba(255, 255, 255, 0.15)",
-          }}
-        >
-          {/* Logo */}
-          {catalog?.tenant?.logoUrl ? (
-            <img
-              src={catalog.tenant.logoUrl}
-              alt={catalog.tenant.name}
-              className="h-16 w-16 flex-shrink-0 rounded-full border border-white/10 object-cover"
-              loading="eager"
-            />
-          ) : (
-            <div
-              className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full border border-white/10 text-2xl font-black text-white"
-              style={{
-                backgroundColor: colors.brand.primary,
-              }}
-              aria-hidden="true"
-            >
-              {catalog?.tenant?.name?.charAt(0).toUpperCase()}
-            </div>
-          )}
-
-          {/* Tenant Info */}
-          <div className="flex flex-1 flex-col gap-1">
-            <h1
-              className="text-2xl font-black"
-              style={{
-                color: colors.text.primary,
-                fontFamily: typography.family.sans,
-                fontWeight: typography.weight.black,
-                lineHeight: typography.leading.tight,
-                letterSpacing: typography.tracking.tight,
-              }}
-            >
-              {catalog?.tenant?.name}
-            </h1>
-            {catalog?.tenant?.slug && (
-              <p
-                className="text-sm font-medium"
-                style={{
-                  color: colors.text.muted,
-                  fontFamily: typography.family.sans,
-                }}
-              >
-                @{catalog.tenant.slug}
-              </p>
-            )}
-          </div>
-        </header>
+        {/* Cover Banner */}
+        {catalog.tenant && (
+          <TenantCoverBanner
+            tenantName={catalog.tenant.name}
+            tenantSlug={catalog.tenant.slug ?? undefined}
+            logoUrl={catalog.tenant.logoUrl}
+            coverImageUrl={catalog.tenant.coverImageUrl}
+            publicAddress={catalog.tenant.publicAddress}
+            variant="full"
+            className="mb-8"
+          />
+        )}
 
         {/* Services Grid */}
         <main>
