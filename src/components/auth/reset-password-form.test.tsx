@@ -154,6 +154,29 @@ describe("ResetPasswordForm", () => {
     ).toBeInTheDocument();
   });
 
+  test("mostra instrucoes quando a senha e fraca", () => {
+    resetPasswordMutationState.error = new ApiError(
+      400,
+      "WEAK_PASSWORD",
+      "A nova senha deve ter no minimo 8 caracteres, com pelo menos uma letra e um numero.",
+      "req-weak-password"
+    );
+
+    renderWithProviders(<ResetPasswordForm />, {
+      withRouter: true,
+      route: "/reset-password?token=token-valido",
+    });
+
+    expect(screen.getByText("Senha invalida")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "A senha deve ter no minimo 8 caracteres e incluir pelo menos uma letra e um numero."
+      )
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText("Nova senha")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Redefinir senha" })).toBeInTheDocument();
+  });
+
   test("mostra erro generico de redefinicao", () => {
     resetPasswordMutationState.error = new ApiError(
       500,

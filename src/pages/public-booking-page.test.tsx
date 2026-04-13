@@ -17,6 +17,12 @@ const mockProfessional = {
   slug: "maria-silva",
   tenantId: "tenant-1",
   tenantTimezone: "America/Sao_Paulo",
+  tenantName: "Test Studio",
+  tenantSlug: "test-studio",
+  tenantLogoUrl: null,
+  tenantCoverImageUrl: null,
+  tenantCoverThumbnailUrl: null,
+  tenantPublicAddress: null,
 };
 
 const mockServices = [

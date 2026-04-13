@@ -48,6 +48,31 @@ describe("ServiceForm", () => {
     );
   });
 
+  it("renders mandatory fields in create mode", () => {
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
+    });
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <ServiceForm onSubmit={vi.fn()} isSubmitting={false} />
+      </QueryClientProvider>,
+    );
+
+    expect(screen.getByLabelText("Nome do servico")).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText(
+        "Descreva o que esta incluso no servico, prerequisitos, ou outras informacoes relevantes."
+      )
+    ).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Ex.: 60")).toBeInTheDocument();
+    expect(screen.getByText("Preco")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Criar servico" })).toBeInTheDocument();
+  });
+
   it("loads edit values and allows canceling inline edit", () => {
     const queryClient = new QueryClient({
       defaultOptions: {

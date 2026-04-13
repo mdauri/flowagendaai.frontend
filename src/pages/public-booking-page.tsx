@@ -5,6 +5,7 @@ import { useSearchParams, useParams } from "react-router-dom";
 import { Button } from "@/components/flow/button";
 import { FeedbackBanner } from "@/components/shared/feedback-banner";
 import { PublicBookingHeader } from "@/components/public-booking/public-booking-header";
+import { TenantCoverBanner } from "@/components/branding/tenant-cover-banner";
 import { SlotGrid } from "@/components/public-booking/slots";
 import { CustomerDataForm, SummaryCard } from "@/components/public-booking/customer-data-form";
 import { ServiceSelector } from "@/components/public-booking/service-selector";
@@ -352,7 +353,7 @@ export function PublicBookingPage() {
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
 
   return (
-    <div 
+    <div
       className="min-h-screen pb-32 text-white transition-colors duration-500"
       style={{
         backgroundColor: colors.background.base,
@@ -360,6 +361,17 @@ export function PublicBookingPage() {
       }}
     >
       <div className="mx-auto flex max-w-2xl flex-col gap-6 px-4 py-6 transition-all duration-300 sm:px-6 lg:px-8">
+        {/* Cover Banner */}
+        <TenantCoverBanner
+          tenantName={professional.tenantName}
+          tenantSlug={professional.tenantSlug ?? undefined}
+          logoUrl={professional.tenantLogoUrl}
+          coverImageUrl={professional.tenantCoverImageUrl}
+          coverThumbnailUrl={professional.tenantCoverThumbnailUrl}
+          publicAddress={professional.tenantPublicAddress}
+          variant="compact"
+        />
+
         <PublicBookingHeader professional={professional} />
         <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
           <div className="flex items-center justify-between">

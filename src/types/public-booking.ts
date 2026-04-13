@@ -4,6 +4,12 @@ export interface PublicProfessional {
   slug: string;
   tenantId: string;
   tenantTimezone: string;
+  tenantName: string;
+  tenantSlug: string | null;
+  tenantLogoUrl: string | null;
+  tenantCoverImageUrl: string | null;
+  tenantCoverThumbnailUrl: string | null;
+  tenantPublicAddress: string | null;
   imageUrl?: string | null;
   thumbnailUrl?: string | null;
 }

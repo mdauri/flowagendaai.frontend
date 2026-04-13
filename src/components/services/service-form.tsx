@@ -91,7 +91,9 @@ export function ServiceForm(props: ServiceFormProps) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [charCount, setCharCount] = useState(0);
-  const [imageSelectionError, setImageSelectionError] = useState<string | null>(null);
+  const [imageSelectionError, setImageSelectionError] = useState<string | null>(
+    null,
+  );
   const [imageUploadError, setImageUploadError] = useState<string | null>(null);
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
@@ -231,10 +233,11 @@ export function ServiceForm(props: ServiceFormProps) {
     setImageUploadProgress(10);
 
     try {
-      const { uploadUrl, objectKey, imageUrl } = await servicesService.requestUploadUrl(serviceId, {
-        filename: file.name,
-        contentType: file.type,
-      });
+      const { uploadUrl, objectKey, imageUrl } =
+        await servicesService.requestUploadUrl(serviceId, {
+          filename: file.name,
+          contentType: file.type,
+        });
 
       setImageUploadProgress(40);
 
@@ -252,7 +255,10 @@ export function ServiceForm(props: ServiceFormProps) {
 
       setImageUploadProgress(80);
 
-      const confirmedUpload = await servicesService.confirmUpload(serviceId, objectKey);
+      const confirmedUpload = await servicesService.confirmUpload(
+        serviceId,
+        objectKey,
+      );
       setImageUploadProgress(100);
 
       return {
@@ -276,7 +282,7 @@ export function ServiceForm(props: ServiceFormProps) {
       form.description.length <= 1000 &&
       Number.isInteger(parsedDuration) &&
       parsedDuration > 0 &&
-      parsedDuration <= 720 &&
+      parsedDuration <= 960 &&
       Number.isFinite(parsedPrice) &&
       parsedPrice > 0 &&
       parsedPrice <= 99999.99
@@ -292,7 +298,10 @@ export function ServiceForm(props: ServiceFormProps) {
     const parsedDurationInMinutes = Number(form.durationInMinutes);
     const parsedPrice = Number.parseFloat(form.price.replace(",", "."));
 
-    if (!Number.isInteger(parsedDurationInMinutes) || parsedDurationInMinutes <= 0) {
+    if (
+      !Number.isInteger(parsedDurationInMinutes) ||
+      parsedDurationInMinutes <= 0
+    ) {
       setErrorMessage("Informe uma duracao valida em minutos maior que zero.");
       return;
     }
@@ -315,7 +324,9 @@ export function ServiceForm(props: ServiceFormProps) {
         editProps!.onCancelEdit();
       } catch (error) {
         setErrorMessage(
-          error instanceof ApiError ? error.message : "Nao foi possivel salvar o servico."
+          error instanceof ApiError
+            ? error.message
+            : "Nao foi possivel salvar o servico.",
         );
       }
 
@@ -342,25 +353,29 @@ export function ServiceForm(props: ServiceFormProps) {
         try {
           const uploaded = await uploadSelectedImage(serviceId, pendingImage);
 
-          queryClient.setQueryData<ListServicesResponse>(["services"], (current) => {
-            if (!current) return current;
-            return {
-              ...current,
-              services: current.services.map((service) => {
-                if (service.id !== serviceId) return service;
-                return {
-                  ...service,
-                  imageUrl: uploaded.imageUrl,
-                  thumbnailUrl: uploaded.thumbnailUrl,
-                };
-              }),
-            };
-          });
+          queryClient.setQueryData<ListServicesResponse>(
+            ["services"],
+            (current) => {
+              if (!current) return current;
+              return {
+                ...current,
+                services: current.services.map((service) => {
+                  if (service.id !== serviceId) return service;
+                  return {
+                    ...service,
+                    imageUrl: uploaded.imageUrl,
+                    thumbnailUrl: uploaded.thumbnailUrl,
+                  };
+                }),
+              };
+            },
+          );
 
           await queryClient.invalidateQueries({ queryKey: ["services"] });
 
           handleImageSelection(null);
-          nextSuccessMessage = "Servico e imagem adicionados na listagem atual.";
+          nextSuccessMessage =
+            "Servico e imagem adicionados na listagem atual.";
         } catch (uploadError) {
           const message =
             uploadError instanceof ApiError
@@ -375,7 +390,7 @@ export function ServiceForm(props: ServiceFormProps) {
       setErrorMessage(
         error instanceof ApiError
           ? error.message
-          : "Nao foi possivel criar o servico. Tente novamente em instantes."
+          : "Nao foi possivel criar o servico. Tente novamente em instantes.",
       );
     }
   }
@@ -384,7 +399,9 @@ export function ServiceForm(props: ServiceFormProps) {
     <Card variant="premium" padding="lg" className="h-full">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <CardTitle>{isEditMode ? "Editar servico" : "Novo servico"}</CardTitle>
+          <CardTitle>
+            {isEditMode ? "Editar servico" : "Novo servico"}
+          </CardTitle>
           <CardDescription className="mt-3">
             {isEditMode
               ? "Atualize os dados operacionais do servico dentro do tenant atual."
@@ -394,100 +411,120 @@ export function ServiceForm(props: ServiceFormProps) {
       </div>
 
       <form className="mt-8 grid gap-5" onSubmit={handleSubmit}>
+        <div className="grid gap-5">
+          <label className="grid gap-2" htmlFor={nameId}>
+            <span className="text-sm font-semibold text-white">
+              Nome do servico
+            </span>
+            <Input
+              ref={nameInputRef}
+              id={nameId}
+              name="name"
+              inputSize="md"
+              value={form.name}
+              onChange={(event) => {
+                setForm((current) => ({
+                  ...current,
+                  name: event.target.value,
+                }));
+              }}
+              placeholder="Ex.: Corte tradicional"
+              required
+              disabled={props.isSubmitting}
+            />
+          </label>
+
+          <label className="grid gap-2" htmlFor={descriptionId}>
+            <div className="flex items-end justify-between gap-4">
+              <span className="text-sm font-semibold text-white">
+                Descricao (opcional)
+              </span>
+              <span className="text-xs text-text-soft">{charCount}/1000</span>
+            </div>
+            <Textarea
+              id={descriptionId}
+              name="description"
+              value={form.description}
+              onChange={(event) => {
+                const value = event.target.value;
+                setForm((current) => ({
+                  ...current,
+                  description: value,
+                }));
+                setCharCount(value.length);
+              }}
+              placeholder="Descreva o que esta incluso no servico, prerequisitos, ou outras informacoes relevantes."
+              maxLength={1000}
+              rows={4}
+              disabled={props.isSubmitting}
+            />
+            <div className="flex items-center justify-between">
+              <p className="text-sm leading-6 text-text-soft">
+                Informe detalhes do servico para ajudar os clientes a entender o
+                que estao agendando.
+              </p>
+              <span
+                className={`text-sm font-medium ${charCount >= 900 ? "text-warning" : "text-text-soft"}`}
+              >
+                {charCount}/1000
+              </span>
+            </div>
+          </label>
+
+          <label className="grid gap-2" htmlFor={durationInMinutesId}>
+            <span className="text-sm font-semibold text-white">
+              Duracao em minutos
+            </span>
+            <Input
+              id={durationInMinutesId}
+              name="durationInMinutes"
+              type="number"
+              min={1}
+              step={1}
+              inputSize="md"
+              value={form.durationInMinutes}
+              onChange={(event) => {
+                setForm((current) => ({
+                  ...current,
+                  durationInMinutes: event.target.value,
+                }));
+              }}
+              placeholder="Ex.: 60"
+              required
+              disabled={props.isSubmitting}
+            />
+            <p className="text-sm leading-6 text-text-soft">
+              Campo obrigatorio. Use minutos inteiros maiores que zero.
+            </p>
+          </label>
+
+          <label className="grid gap-2" htmlFor={priceId}>
+            <span className="text-sm font-semibold text-white">Preco</span>
+            <PriceInput
+              value={
+                form.price
+                  ? Number.parseFloat(form.price.replace(",", "."))
+                  : null
+              }
+              onChange={(value) => {
+                setForm((current) => ({
+                  ...current,
+                  price: value !== null ? value.toString() : "",
+                }));
+              }}
+              disabled={props.isSubmitting}
+              required
+              placeholder="R$ 0,00"
+            />
+          </label>
+        </div>
+
         {isEditMode ? (
           <div className="grid gap-5">
-            <label className="grid gap-2" htmlFor={nameId}>
-              <span className="text-sm font-semibold text-white">Nome do servico</span>
-              <Input
-                ref={nameInputRef}
-                id={nameId}
-                name="name"
-                inputSize="md"
-                value={form.name}
-                onChange={(event) => {
-                  setForm((current) => ({
-                    ...current,
-                    name: event.target.value,
-                  }));
-                }}
-                placeholder="Ex.: Corte tradicional"
-                required
-                disabled={props.isSubmitting}
-              />
-            </label>
-
-            <label className="grid gap-2" htmlFor={descriptionId}>
-              <div className="flex items-end justify-between gap-4">
-                <span className="text-sm font-semibold text-white">Descricao (opcional)</span>
-                <span className="text-xs text-text-soft">{charCount}/1000</span>
-              </div>
-              <Textarea
-                id={descriptionId}
-                name="description"
-                value={form.description}
-                onChange={(event) => {
-                  const value = event.target.value;
-                  setForm((current) => ({
-                    ...current,
-                    description: value,
-                  }));
-                  setCharCount(value.length);
-                }}
-                placeholder="Descreva o que esta incluso no servico, prerequisitos, ou outras informacoes relevantes."
-                maxLength={1000}
-                rows={4}
-                disabled={props.isSubmitting}
-              />
-              <div className="flex items-center justify-between">
-                <p className="text-sm leading-6 text-text-soft">
-                  Informe detalhes do servico para ajudar os clientes a entender o que estao agendando.
-                </p>
-                <span className={`text-sm font-medium ${charCount >= 900 ? "text-warning" : "text-text-soft"}`}>
-                  {charCount}/1000
-                </span>
-              </div>
-            </label>
-
-            <label className="grid gap-2" htmlFor={durationInMinutesId}>
-              <span className="text-sm font-semibold text-white">Duracao em minutos</span>
-              <Input
-                id={durationInMinutesId}
-                name="durationInMinutes"
-                type="number"
-                min={1}
-                step={1}
-                inputSize="md"
-                value={form.durationInMinutes}
-                onChange={(event) => {
-                  setForm((current) => ({
-                    ...current,
-                    durationInMinutes: event.target.value,
-                  }));
-                }}
-                placeholder="Ex.: 60"
-                required
-                disabled={props.isSubmitting}
-              />
-              <p className="text-sm leading-6 text-text-soft">Campo obrigatorio. Use minutos inteiros maiores que zero.</p>
-            </label>
-
-            <label className="grid gap-2" htmlFor={priceId}>
-              <span className="text-sm font-semibold text-white">Preco</span>
-              <PriceInput
-                value={form.price ? Number.parseFloat(form.price.replace(",", ".")) : null}
-                onChange={(value) => {
-                  setForm((current) => ({
-                    ...current,
-                    price: value !== null ? value.toString() : "",
-                  }));
-                }}
-                disabled={props.isSubmitting}
-                required
-                placeholder="R$ 0,00"
-              />
-            </label>
-
-            <label className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/5 p-4" htmlFor={activeId}>
+            <label
+              className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/5 p-4"
+              htmlFor={activeId}
+            >
               <input
                 id={activeId}
                 type="checkbox"
@@ -502,8 +539,12 @@ export function ServiceForm(props: ServiceFormProps) {
                 className="mt-1 h-4 w-4"
               />
               <div className="grid gap-1">
-                <span className="text-sm font-semibold text-white">Servico ativo</span>
-                <span className="text-xs text-text-soft">Servicos inativos nao podem ser associados a profissionais.</span>
+                <span className="text-sm font-semibold text-white">
+                  Servico ativo
+                </span>
+                <span className="text-xs text-text-soft">
+                  Servicos inativos nao podem ser associados a profissionais.
+                </span>
               </div>
             </label>
 
@@ -515,11 +556,15 @@ export function ServiceForm(props: ServiceFormProps) {
                 currentImageUrl={editService!.imageUrl ?? null}
                 onUploadComplete={async () => {
                   setImageUploadError(null);
-                  await queryClient.invalidateQueries({ queryKey: ["services"] });
+                  await queryClient.invalidateQueries({
+                    queryKey: ["services"],
+                  });
                 }}
                 onUploadError={(error) => {
                   setImageUploadError(
-                    error instanceof ApiError ? error.message : error.message || "Falha ao atualizar a imagem."
+                    error instanceof ApiError
+                      ? error.message
+                      : error.message || "Falha ao atualizar a imagem.",
                   );
                 }}
               />
@@ -527,10 +572,14 @@ export function ServiceForm(props: ServiceFormProps) {
           </div>
         ) : (
           <div className="grid gap-2">
-            <span className="text-sm font-semibold text-white">Imagem do servico (opcional)</span>
+            <span className="text-sm font-semibold text-white">
+              Imagem do servico (opcional)
+            </span>
             <div
               className={`relative flex h-48 items-center justify-center overflow-hidden rounded-2xl border p-4 transition-colors ${
-                isDraggingImage ? "border-[var(--drag-border)] bg-[var(--drag-surface)]" : "border-white/10 bg-white/5"
+                isDraggingImage
+                  ? "border-(--drag-border) bg-(--drag-surface)"
+                  : "border-white/10 bg-white/5"
               }`}
               aria-label="Pré-visualização da imagem"
               onDragEnter={handleImageDragEnter}
@@ -557,7 +606,9 @@ export function ServiceForm(props: ServiceFormProps) {
                       ? "Solte a imagem para carregar a pré-visualização."
                       : "Arraste e solte ou selecione uma imagem JPG, PNG ou WebP de até 5MB."}
                   </p>
-                  <p>Ela será enviada automaticamente após o serviço ser criado.</p>
+                  <p>
+                    Ela será enviada automaticamente após o serviço ser criado.
+                  </p>
                 </div>
               )}
               <button
@@ -589,15 +640,20 @@ export function ServiceForm(props: ServiceFormProps) {
                 </button>
               ) : null}
               <span className="text-xs text-text-soft">
-                {selectedImageFile ? selectedImageFile.name : "JPG/PNG/WebP · max 5MB"}
+                {selectedImageFile
+                  ? selectedImageFile.name
+                  : "JPG/PNG/WebP · max 5MB"}
               </span>
             </div>
 
-            {imageSelectionError ? <p className="text-xs text-warning">{imageSelectionError}</p> : null}
+            {imageSelectionError ? (
+              <p className="text-xs text-warning">{imageSelectionError}</p>
+            ) : null}
 
             {isImageUploading ? (
               <p className="text-xs text-text-soft">
-                Enviando imagem... {Math.min(100, Math.max(0, Math.round(imageUploadProgress)))}%
+                Enviando imagem...{" "}
+                {Math.min(100, Math.max(0, Math.round(imageUploadProgress)))}%
               </p>
             ) : null}
           </div>
@@ -613,14 +669,22 @@ export function ServiceForm(props: ServiceFormProps) {
 
         {errorMessage ? (
           <FeedbackBanner
-            title={isEditMode ? "Falha ao salvar alteracoes" : "Falha ao criar servico"}
+            title={
+              isEditMode
+                ? "Falha ao salvar alteracoes"
+                : "Falha ao criar servico"
+            }
             description={errorMessage}
           />
         ) : null}
 
         {imageUploadError ? (
           <FeedbackBanner
-            title={isEditMode ? "Falha ao atualizar a imagem" : "Falha no upload da imagem"}
+            title={
+              isEditMode
+                ? "Falha ao atualizar a imagem"
+                : "Falha no upload da imagem"
+            }
             description={imageUploadError}
           />
         ) : null}
@@ -637,7 +701,11 @@ export function ServiceForm(props: ServiceFormProps) {
           <Button
             type="submit"
             size="md"
-            disabled={props.isSubmitting || !canSave || (!isEditMode && isImageUploading)}
+            disabled={
+              props.isSubmitting ||
+              !canSave ||
+              (!isEditMode && isImageUploading)
+            }
           >
             {props.isSubmitting || (!isEditMode && isImageUploading)
               ? "Salvando..."
