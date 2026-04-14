@@ -150,8 +150,11 @@ async function loadSlotsPage(user: ReturnType<typeof userEvent.setup>) {
   });
   fireEvent.change(screen.getByLabelText("Data"), {
     target: {
-      value: "2026-04-01",
+      value: "01/04/2026",
     },
+  });
+  await waitFor(() => {
+    expect(screen.getByRole("button", { name: "Buscar horarios" })).toBeEnabled();
   });
   await user.click(screen.getByRole("button", { name: "Buscar horarios" }));
 

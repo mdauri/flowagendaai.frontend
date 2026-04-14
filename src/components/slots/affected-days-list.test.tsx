@@ -28,8 +28,9 @@ describe("AffectedDaysList", () => {
     render(<AffectedDaysList days={sampleDays} timezone="UTC" />);
 
     expect(screen.getByText("Dias afetados:")).toBeInTheDocument();
-    // Format is "sáb 18/04: 15:00 - 18:00 (3h)" - use flexible regex
-    expect(screen.getByText(/18\/04.*15:00.*3h/)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Dia 1: .*18\/04/)).toBeInTheDocument();
+    expect(screen.getByText(/15:00 - 18:00/)).toBeInTheDocument();
+    expect(screen.getByText(/\(3h\)/)).toBeInTheDocument();
   });
 
   it("shows day of week, date, time range, duration", () => {

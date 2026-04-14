@@ -58,4 +58,13 @@ export const semanticTokens = {
     glassHover: "rgba(255, 255, 255, 0.07)",
     premiumGradient: "linear-gradient(to bottom right, #19130F, #141416, #0F0F11)",
   },
+  overlay: {
+    warmPrimary: "rgba(255, 140, 56, 0.18)",
+    warmPrimarySoft: "rgba(255, 140, 56, 0.16)",
+    warmSecondary: "rgba(255, 184, 77, 0.12)",
+    warmSecondarySoft: "rgba(255, 184, 77, 0.10)",
+    heroGlow: "rgba(255, 138, 61, 0.20)",
+  },
 } as const;
+
+export type SemanticTokens = typeof semanticTokens;

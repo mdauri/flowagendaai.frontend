@@ -20,14 +20,6 @@ export function LoginForm() {
     emailRef.current?.focus();
   }, []);
 
-  useEffect(() => {
-    if (loginMutation.isSuccess) {
-      void auth.refetchCurrentUser().then(() => {
-        navigate("/app", { replace: true });
-      });
-    }
-  }, [auth, loginMutation.isSuccess, navigate]);
-
   const error = loginMutation.error;
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -38,6 +30,8 @@ export function LoginForm() {
         email,
         password,
       });
+      await auth.refetchCurrentUser();
+      navigate("/app", { replace: true });
     } catch {
       // The mutation state already drives the visible feedback for invalid login.
     }
