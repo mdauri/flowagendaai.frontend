@@ -21,15 +21,33 @@ export interface PublicServiceItem {
   durationInMinutes: number;
   imageUrl?: string | null;
   thumbnailUrl?: string | null;
+  /** True when durationInMinutes > 960 (multi-day service) */
+  isMultiDay?: boolean;
 }
 
 export interface PublicServicesResponse {
   services: PublicServiceItem[];
 }
 
+/** A single day's portion of a multi-day service */
+export interface DaySegment {
+  /** ISO civil date (e.g., "2026-04-18") */
+  date: string;
+  /** ISO UTC datetime for segment start */
+  start: string;
+  /** ISO UTC datetime for segment end */
+  end: string;
+  /** Duration in minutes for this specific day segment */
+  durationMinutes: number;
+}
+
 export interface PublicSlot {
   start: string;
   end: string;
+  /** Present only for multi-day services */
+  daysAffected?: DaySegment[];
+  /** Present only for multi-day services */
+  totalDurationMinutes?: number;
 }
 
 export interface PublicSlotsResponse {
@@ -62,6 +80,8 @@ export interface CreatePublicBookingResponse {
   customerEmail?: string | null;
   professionalName: string;
   serviceName: string;
+  /** Present only for multi-day bookings */
+  daysAffected?: DaySegment[];
 }
 
 export type PublicBookingStep = "service" | "date" | "slot" | "customer" | "confirm" | "success";

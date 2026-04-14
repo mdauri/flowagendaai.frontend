@@ -2,6 +2,7 @@ import { Badge } from "@/components/flow/badge";
 import { Button } from "@/components/flow/button";
 import { Card, CardDescription, CardTitle } from "@/components/flow/card";
 import { FeedbackBanner } from "@/components/shared/feedback-banner";
+import { MultiDaySummary } from "@/components/slots/multi-day-summary";
 import { semanticTokens } from "@/design-system";
 import { formatDateTimeInTenantTimezone, formatUtcTimeRangeInTenantTimezone } from "@/lib/date-time";
 import type { CreateBookingResponse } from "@/types/booking";
@@ -26,6 +27,7 @@ interface BookingConfirmationPanelProps {
   onRetry: () => void;
   onRefreshSlots: () => void;
   onResetSuccess: () => void;
+  daysAffected?: { date: string; start: string; end: string; durationMinutes: number }[];
 }
 
 function SlotSummary({
@@ -149,13 +151,24 @@ export function BookingConfirmationPanel({
       </div>
 
       {selectedSlot ? (
-        <SlotSummary
-          start={selectedSlot.start}
-          end={selectedSlot.end}
-          tenantTimezone={tenantTimezone}
-          professionalName={professionalName}
-          serviceName={serviceName}
-        />
+        selectedSlot.daysAffected && selectedSlot.daysAffected.length > 0 ? (
+          <MultiDaySummary
+            start={selectedSlot.start}
+            end={selectedSlot.end}
+            daysAffected={selectedSlot.daysAffected}
+            timezone={tenantTimezone}
+            professionalName={professionalName}
+            serviceName={serviceName}
+          />
+        ) : (
+          <SlotSummary
+            start={selectedSlot.start}
+            end={selectedSlot.end}
+            tenantTimezone={tenantTimezone}
+            professionalName={professionalName}
+            serviceName={serviceName}
+          />
+        )
       ) : (
         <div className="rounded-[28px] border border-dashed border-white/10 bg-white/5 p-4 text-sm leading-6 text-text-soft">
           Selecione um horario para continuar.

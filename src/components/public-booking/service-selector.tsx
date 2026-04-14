@@ -2,8 +2,12 @@ import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/flow/button";
 import { Card } from "@/components/flow/card";
 import { FeedbackBanner } from "@/components/shared/feedback-banner";
+import { MultiDayBadge } from "@/components/slots/multi-day-badge";
+import { DurationHelper } from "@/components/services/duration-helper";
 import type { PublicServiceItem } from "@/types/public-booking";
 import { colors, semanticTokens } from "@/design-system";
+
+const MAX_SERVICE_DURATION = 960;
 
 interface ServiceCardProps {
   service: PublicServiceItem;
@@ -82,6 +86,14 @@ function ServiceCard({ service, selected, onSelect }: ServiceCardProps) {
         <p className="mt-1.5 text-sm font-medium" style={{ color: colors.text.soft }}>
           {service.durationInMinutes} minutos
         </p>
+        {service.durationInMinutes > MAX_SERVICE_DURATION && (
+          <div className="mt-2">
+            <MultiDayBadge
+              daysCount={Math.ceil(service.durationInMinutes / (10 * 60))}
+              variant="compact"
+            />
+          </div>
+        )}
         {service.description && (
           <p
             className="mt-2 text-sm"

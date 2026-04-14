@@ -1,6 +1,6 @@
 import { Badge } from "@/components/flow/badge";
 import { Button } from "@/components/flow/button";
-import { formatUtcTimeRangeInTenantTimezone } from "@/lib/date-time";
+import { formatUtcTimeRangeWithDateWhenCrossesDay } from "@/lib/date-time";
 import type { AvailableSlot } from "@/types/slot";
 
 interface AvailableSlotItemProps {
@@ -32,7 +32,7 @@ export function AvailableSlotItem({
     >
       <span className="flex flex-col gap-1">
         <span className="text-base font-semibold text-white">
-          {formatUtcTimeRangeInTenantTimezone(slot.start, slot.end, tenantTimezone)}
+          {formatUtcTimeRangeWithDateWhenCrossesDay(slot.start, slot.end, tenantTimezone)}
         </span>
         <span className="text-sm text-text-soft">{tenantTimezone}</span>
       </span>

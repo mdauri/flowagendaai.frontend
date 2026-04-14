@@ -3,7 +3,8 @@ import { Input } from "@/components/flow/input";
 import { formatBrazilianPhone } from "@/utils/phone";
 import { DateTime } from "luxon";
 import { colors, radius, semanticTokens, typography } from "@/design-system";
-import type { PublicServiceItem } from "@/types/public-booking";
+import type { PublicServiceItem, DaySegment } from "@/types/public-booking";
+import { MultiDayBookingSummary } from "@/components/public-booking/multi-day-booking-summary";
 
 interface CustomerDataFormProps {
   name: string;
@@ -120,6 +121,7 @@ interface SummaryCardProps {
   professionalName: string;
   timezone: string;
   customerPhone: string;
+  daysAffected?: DaySegment[];
 }
 
 export function SummaryCard({
@@ -130,7 +132,23 @@ export function SummaryCard({
   professionalName,
   timezone,
   customerPhone,
+  daysAffected,
 }: SummaryCardProps) {
+  // When daysAffected is present, render MultiDayBookingSummary
+  if (daysAffected && daysAffected.length > 0) {
+    return (
+      <MultiDayBookingSummary
+        service={service}
+        start={slotStart}
+        end={slotEnd}
+        daysAffected={daysAffected}
+        professionalName={professionalName}
+        timezone={timezone}
+        customerPhone={customerPhone}
+      />
+    );
+  }
+
   const startDate = DateTime.fromISO(slotStart, { zone: "utc" }).setZone(timezone);
   const endDate = DateTime.fromISO(slotEnd, { zone: "utc" }).setZone(timezone);
 

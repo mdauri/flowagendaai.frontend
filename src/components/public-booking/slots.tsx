@@ -1,8 +1,13 @@
 import { DateTime } from "luxon";
 import { FeedbackBanner } from "@/components/shared/feedback-banner";
+import { MultiDaySlotCard } from "@/components/public-booking/multi-day-slot-card";
 import { cn } from "@/lib/cn";
 import { colors, radius, semanticTokens } from "@/design-system";
 import type { PublicSlot } from "@/types/public-booking";
+
+function isMultiDaySlot(slot: PublicSlot): slot is PublicSlot & { daysAffected: { date: string; start: string; end: string; durationMinutes: number }[] } {
+  return "daysAffected" in slot && Array.isArray(slot.daysAffected) && slot.daysAffected.length > 0;
+}
 
 interface SlotCardProps {
   slot: PublicSlot;
@@ -71,15 +76,28 @@ export function SlotGrid({ slots, selectedSlotStart, timezone, onSelect, isLoadi
 
   return (
     <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
-      {slots.map((slot) => (
-        <SlotCard
-          key={slot.start}
-          slot={slot}
-          timezone={timezone}
-          selected={selectedSlotStart === slot.start}
-          onSelect={() => onSelect(slot)}
-        />
-      ))}
+      {slots.map((slot) => {
+        if (isMultiDaySlot(slot)) {
+          return (
+            <MultiDaySlotCard
+              key={slot.start}
+              slot={slot}
+              timezone={timezone}
+              selected={selectedSlotStart === slot.start}
+              onSelect={() => onSelect(slot)}
+            />
+          );
+        }
+        return (
+          <SlotCard
+            key={slot.start}
+            slot={slot}
+            timezone={timezone}
+            selected={selectedSlotStart === slot.start}
+            onSelect={() => onSelect(slot)}
+          />
+        );
+      })}
     </div>
   );
 }

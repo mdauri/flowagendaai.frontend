@@ -10,6 +10,8 @@ export interface Service {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+  /** True when durationInMinutes > 960 (multi-day service) */
+  isMultiDay?: boolean;
 }
 
 export interface ListServicesResponse {
@@ -74,6 +76,8 @@ export interface PublicCatalogService {
   price: number;
   imageUrl?: string | null;
   thumbnailUrl?: string | null;
+  /** True when durationInMinutes > 960 (multi-day service) */
+  isMultiDay?: boolean;
 }
 
 export interface PublicCatalogResponse {

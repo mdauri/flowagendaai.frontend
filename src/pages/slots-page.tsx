@@ -162,26 +162,6 @@ export function SlotsPage() {
     return "Nao foi possivel carregar a disponibilidade do mes selecionado.";
   }, [availableDatesQuery.error, availableDatesQuery.isError]);
 
-  useEffect(() => {
-    if (!filters.date || !availableDatesQuery.data || availableDates.has(filters.date)) {
-      return;
-    }
-
-    const selectedDateInTimezone = DateTime.fromISO(filters.date, { zone: activeTenantTimezone }).startOf("month");
-
-    if (!selectedDateInTimezone.hasSame(calendarMonthInTimezone, "month")) {
-      return;
-    }
-
-    setFilters((current) => ({ ...current, date: "" }));
-  }, [
-    filters.date,
-    availableDatesQuery.data,
-    availableDates,
-    activeTenantTimezone,
-    calendarMonthInTimezone,
-  ]);
-
   function handleSearch() {
     if (!hasCompleteFilters || !isSelectedDateAvailable || isBookingPending) {
       return;

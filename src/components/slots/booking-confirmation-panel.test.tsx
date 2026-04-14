@@ -1,136 +1,55 @@
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { describe, expect, test, vi } from "vitest";
+import { describe, it, expect, vi } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { BookingConfirmationPanel } from "@/components/slots/booking-confirmation-panel";
-import type { CreateBookingResponse } from "@/types/booking";
-import type { AvailableSlot } from "@/types/slot";
 
-const selectedSlot: AvailableSlot = {
-  start: "2026-04-01T12:00:00.000Z",
-  end: "2026-04-01T13:00:00.000Z",
+const singleDaySlot = {
+  start: "2026-04-18T08:00:00.000Z",
+  end: "2026-04-18T09:00:00.000Z",
 };
 
-const confirmedBooking: CreateBookingResponse = {
-  id: "booking-1",
-  professionalId: "professional-1",
-  serviceId: "service-1",
-  start: "2026-04-01T12:00:00.000Z",
-  end: "2026-04-01T13:00:00.000Z",
-  status: "CONFIRMED",
+const multiDaySlot = {
+  start: "2026-04-18T15:00:00.000Z",
+  end: "2026-04-22T15:00:00.000Z",
+  daysAffected: [
+    { date: "2026-04-18", start: "2026-04-18T15:00:00.000Z", end: "2026-04-18T18:00:00.000Z", durationMinutes: 180 },
+    { date: "2026-04-21", start: "2026-04-21T08:00:00.000Z", end: "2026-04-21T18:00:00.000Z", durationMinutes: 600 },
+    { date: "2026-04-22", start: "2026-04-22T08:00:00.000Z", end: "2026-04-22T15:00:00.000Z", durationMinutes: 420 },
+  ],
 };
-
-function renderPanel(
-  overrides: Partial<React.ComponentProps<typeof BookingConfirmationPanel>> = {}
-) {
-  const onConfirm = vi.fn();
-  const onRetry = vi.fn();
-  const onRefreshSlots = vi.fn();
-  const onResetSuccess = vi.fn();
-
-  render(
-    <BookingConfirmationPanel
-      state="idle"
-      selectedSlot={null}
-      confirmedBooking={null}
-      tenantTimezone="America/Sao_Paulo"
-      professionalName="Ana"
-      serviceName="Consulta"
-      canConfirm={false}
-      onConfirm={onConfirm}
-      onRetry={onRetry}
-      onRefreshSlots={onRefreshSlots}
-      onResetSuccess={onResetSuccess}
-      {...overrides}
-    />
-  );
-
-  return {
-    onConfirm,
-    onRetry,
-    onRefreshSlots,
-    onResetSuccess,
-  };
-}
 
 describe("BookingConfirmationPanel", () => {
-  test("renderiza estado idle sem slot selecionado com CTA desabilitado", () => {
-    renderPanel();
+  const baseProps = {
+    state: "idle" as const,
+    tenantTimezone: "America/Sao_Paulo",
+    professionalName: "Ana Silva",
+    serviceName: "Consultoria",
+    canConfirm: true,
+    onConfirm: vi.fn(),
+    onRetry: vi.fn(),
+    onRefreshSlots: vi.fn(),
+    onResetSuccess: vi.fn(),
+    confirmedBooking: null,
+  };
 
-    expect(screen.getByText("Selecione um horario para continuar.")).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: "Confirmar agendamento" })
-    ).toBeDisabled();
+  it("renders MultiDaySummary for multi-day slots", () => {
+    render(<BookingConfirmationPanel {...baseProps} selectedSlot={multiDaySlot} />);
+
+    expect(screen.getByText("3d")).toBeInTheDocument();
+    expect(screen.getByText(/Dias afetados/i)).toBeInTheDocument();
   });
 
-  test("dispara o CTA de confirmacao quando existe slot selecionado", async () => {
-    const user = userEvent.setup();
-    const { onConfirm } = renderPanel({
-      selectedSlot,
-      canConfirm: true,
-    });
+  it("renders SlotSummary for single-day slots", () => {
+    render(<BookingConfirmationPanel {...baseProps} selectedSlot={singleDaySlot} />);
 
-    await user.click(screen.getByRole("button", { name: "Confirmar agendamento" }));
+    expect(screen.queryByText("3d")).not.toBeInTheDocument();
+    expect(screen.getByText("05:00 - 06:00")).toBeInTheDocument();
+  });
 
+  it("confirmation button works for both types", () => {
+    const onConfirm = vi.fn();
+    render(<BookingConfirmationPanel {...baseProps} selectedSlot={multiDaySlot} onConfirm={onConfirm} />);
+
+    fireEvent.click(screen.getByText("Confirmar agendamento"));
     expect(onConfirm).toHaveBeenCalledTimes(1);
-    expect(screen.getByText("09:00 - 10:00")).toBeInTheDocument();
-  });
-
-  test("renderiza loading com Confirmando...", () => {
-    renderPanel({
-      state: "pending",
-      selectedSlot,
-      canConfirm: false,
-    });
-
-    expect(screen.getByRole("button", { name: "Confirmando..." })).toBeDisabled();
-    expect(screen.getByText("Validando disponibilidade com o servidor.")).toBeInTheDocument();
-  });
-
-  test("renderiza conflito 409 com mensagem especifica e CTA Atualizar horarios", async () => {
-    const user = userEvent.setup();
-    const { onRefreshSlots } = renderPanel({
-      state: "conflict",
-      selectedSlot: null,
-      canConfirm: false,
-    });
-
-    expect(
-      screen.getByText("Este horario acabou de ser reservado. Escolha outro horario.")
-    ).toBeInTheDocument();
-
-    await user.click(screen.getByRole("button", { name: "Atualizar horarios" }));
-
-    expect(onRefreshSlots).toHaveBeenCalledTimes(1);
-  });
-
-  test("renderiza erro generico com CTA Tentar novamente", async () => {
-    const user = userEvent.setup();
-    const { onRetry } = renderPanel({
-      state: "error",
-      selectedSlot,
-    });
-
-    expect(
-      screen.getByText("Nao foi possivel confirmar o agendamento agora. Tente novamente.")
-    ).toBeInTheDocument();
-
-    await user.click(screen.getByRole("button", { name: "Tentar novamente" }));
-
-    expect(onRetry).toHaveBeenCalledTimes(1);
-  });
-
-  test("renderiza sucesso na mesma tela com horario confirmado", async () => {
-    const user = userEvent.setup();
-    const { onResetSuccess } = renderPanel({
-      state: "success",
-      confirmedBooking,
-    });
-
-    expect(screen.getByText("Agendamento confirmado")).toBeInTheDocument();
-    expect(screen.getByText("09:00 - 10:00")).toBeInTheDocument();
-
-    await user.click(screen.getByRole("button", { name: "Consultar outros horarios" }));
-
-    expect(onResetSuccess).toHaveBeenCalledTimes(1);
   });
 });

@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, it, beforeEach, expect, vi } from "vitest";
 import { renderWithProviders } from "@/test/render";
 import { PublicBookingPage } from "./public-booking-page";
-import { ApiError, BOOKING_CONFLICT_ERROR_CODE } from "@/types/api";
+import { ApiError, BOOKING_CONFLICT_ERROR_CODE, MULTI_DAY_CONFLICT_ERROR_CODE } from "@/types/api";
 import type {
   CreatePublicBookingInput,
   CreatePublicBookingResponse,
@@ -351,6 +351,38 @@ describe("PublicBookingPage", () => {
 
     await waitFor(() => {
       expect(screen.getByText(/Tente novamente em 42 segundos/i)).toBeInTheDocument();
+    });
+  });
+
+  it("shows multi-day conflict banner when API returns MULTI_DAY_CONFLICT details", async () => {
+    const multiDayConflictError = new ApiError(
+      409,
+      MULTI_DAY_CONFLICT_ERROR_CODE,
+      "conflict",
+      "req",
+      {
+        conflictDay: "2026-04-21",
+        conflictStart: "2026-04-21T08:00:00.000Z",
+        conflictEnd: "2026-04-21T18:00:00.000Z",
+      }
+    );
+    createMutationMock((variables, options) => {
+      options?.onError?.(multiDayConflictError, variables, undefined, {} as never);
+      return Promise.resolve(mockBooking);
+    });
+    renderPage();
+    const user = userEvent.setup();
+
+    await progressToSlotStep(user);
+    await user.click(await screen.findByRole("button", { name: /10:00 – 11:00/i }));
+    await user.click(screen.getByRole("button", { name: /Continuar/i }));
+    await user.type(screen.getByPlaceholderText(/Seu nome/i), "João da Silva");
+    await user.type(screen.getByPlaceholderText(/\+55 \(11\) 9xxxx-xxxx/i), "11912345678");
+    await user.click(screen.getByRole("button", { name: /Confirmar agendamento/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/Horario indisponivel/i)).toBeInTheDocument();
+      expect(screen.getByText(/21\/04.*nao esta disponivel/i)).toBeInTheDocument();
     });
   });
 });

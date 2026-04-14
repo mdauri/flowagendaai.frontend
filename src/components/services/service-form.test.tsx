@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ServiceForm } from "./service-form";
 
@@ -111,5 +111,63 @@ describe("ServiceForm", () => {
     expect(screen.getByDisplayValue("Corte tradicional")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Cancelar edicao" }));
     expect(cancelEdit).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows DurationHelper when duration > 960", async () => {
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
+    });
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <ServiceForm onSubmit={vi.fn()} isSubmitting={false} />
+      </QueryClientProvider>,
+    );
+
+    const durationInput = screen.getByPlaceholderText("Ex.: 60");
+    await fireEvent.change(durationInput, { target: { value: "1440" } });
+
+    // Check that the helper text appears (it should show "Maximo 4320 minutos")
+    expect(await screen.findByText(/Maximo 4320 minutos/)).toBeInTheDocument();
+  });
+
+  it("does not show DurationHelper for single-day duration", () => {
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
+    });
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <ServiceForm onSubmit={vi.fn()} isSubmitting={false} />
+      </QueryClientProvider>,
+    );
+
+    const durationInput = screen.getByPlaceholderText("Ex.: 60");
+    fireEvent.change(durationInput, { target: { value: "60" } });
+
+    expect(screen.queryByText(/Servico multi-dia/)).not.toBeInTheDocument();
+  });
+
+  it("shows max duration hint in helper text", () => {
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
+    });
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <ServiceForm onSubmit={vi.fn()} isSubmitting={false} />
+      </QueryClientProvider>,
+    );
+
+    expect(screen.getByText(/Maximo 4320 minutos/)).toBeInTheDocument();
   });
 });

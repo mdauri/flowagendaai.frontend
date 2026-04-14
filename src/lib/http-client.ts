@@ -7,6 +7,30 @@ interface RequestOptions extends RequestInit {
   skipAuth?: boolean;
 }
 
+function extractDetailsFromErrorPayload(payload: Record<string, unknown> | null): unknown {
+  if (!payload) {
+    return undefined;
+  }
+
+  if ("details" in payload && payload.details !== undefined) {
+    return payload.details;
+  }
+
+  const conflictDay = payload.conflictDay;
+  const conflictStart = payload.conflictStart;
+  const conflictEnd = payload.conflictEnd;
+
+  if (
+    typeof conflictDay === "string" &&
+    typeof conflictStart === "string" &&
+    typeof conflictEnd === "string"
+  ) {
+    return { conflictDay, conflictStart, conflictEnd };
+  }
+
+  return undefined;
+}
+
 export async function httpClient<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const headers = new Headers(options.headers);
   const hasBody = options.body !== undefined && options.body !== null;
@@ -45,7 +69,7 @@ export async function httpClient<T>(path: string, options: RequestOptions = {}):
       payload?.code ?? "HTTP_ERROR",
       payload?.message ?? "Nao foi possivel concluir a requisicao.",
       payload?.requestId ?? "unknown",
-      payload?.details,
+      extractDetailsFromErrorPayload(payload as Record<string, unknown> | null),
       retryAfterSeconds
     );
   }

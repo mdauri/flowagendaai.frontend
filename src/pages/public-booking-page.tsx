@@ -14,17 +14,19 @@ import { BookingSuccess } from "@/components/public-booking/booking-success";
 import { ProcessingOverlay } from "@/components/public-booking/processing-overlay";
 import { ProfessionalSkeleton } from "@/components/public-booking/professional-skeleton";
 import { ConnectionErrorState, ProfessionalNotFoundState } from "@/components/public-booking/professional-error";
+import { MultiDayConflictError } from "@/components/public-booking/multi-day-conflict-error";
 import { usePublicProfessionalQuery } from "@/hooks/use-public-professional-query";
 import { usePublicServicesQuery } from "@/hooks/use-public-services-query";
 import { usePublicAvailableDatesQuery } from "@/hooks/use-public-available-dates-query";
 import { usePublicSlotsQuery } from "@/hooks/use-public-slots-query";
 import { useCreatePublicBookingMutation } from "@/hooks/use-create-public-booking-mutation";
-import { ApiError, BOOKING_CONFLICT_ERROR_CODE } from "@/types/api";
+import { ApiError, BOOKING_CONFLICT_ERROR_CODE, MULTI_DAY_CONFLICT_ERROR_CODE } from "@/types/api";
 import type {
   CreatePublicBookingResponse,
   PublicBookingStep,
   PublicServiceItem,
   PublicSlot,
+  DaySegment,
 } from "@/types/public-booking";
 
 const BRAZILIAN_PHONE_REGEX = /^\+55\s\(\d{2}\)\s\d{5}-\d{4}$/;
@@ -71,6 +73,11 @@ export function PublicBookingPage() {
   const [customerNotes, setCustomerNotes] = useState("");
   const [bookingResult, setBookingResult] = useState<CreatePublicBookingResponse | null>(null);
   const [bookingNotification, setBookingNotification] = useState<BookingNotification | null>(null);
+  const [multiDayConflictError, setMultiDayConflictError] = useState<{
+    conflictDay: string;
+    conflictStart: string;
+    conflictEnd: string;
+  } | null>(null);
 
   const professionalQuery = usePublicProfessionalQuery(slug ?? "", { enabled: Boolean(slug) });
   const servicesQuery = usePublicServicesQuery(slug);
@@ -267,6 +274,31 @@ export function PublicBookingPage() {
                 title: "Muitas solicitações",
                 description: `Tente novamente em ${error.retryAfterSeconds ?? 30} segundos.`,
               });
+              setCurrentStep("slot");
+              setSelectedSlot(null);
+              slotsQuery.refetch();
+              return;
+            }
+
+            if (
+              error instanceof ApiError &&
+              error.status === 409 &&
+              error.code === MULTI_DAY_CONFLICT_ERROR_CODE
+            ) {
+              const details = (error as ApiError & { details?: { conflictDay?: string; conflictStart?: string; conflictEnd?: string } }).details;
+              const conflictDay = details?.conflictDay ?? (error as ApiError & { conflictDay?: string }).conflictDay;
+              const conflictStart = details?.conflictStart ?? (error as ApiError & { conflictStart?: string }).conflictStart;
+              const conflictEnd = details?.conflictEnd ?? (error as ApiError & { conflictEnd?: string }).conflictEnd;
+
+              if (conflictDay && conflictStart && conflictEnd) {
+                setMultiDayConflictError({ conflictDay, conflictStart, conflictEnd });
+              } else {
+                setBookingNotification({
+                  type: "conflict",
+                  title: "Horario em disputa",
+                  description: "Este horario acabou de ser reservado. Atualize a lista e escolha outro.",
+                });
+              }
               setCurrentStep("slot");
               setSelectedSlot(null);
               slotsQuery.refetch();
@@ -483,6 +515,18 @@ export function PublicBookingPage() {
                 <p className="text-sm text-white/70">Selecione o horário que prefere</p>
               </div>
               {slotBanner}
+              {multiDayConflictError && (
+                <MultiDayConflictError
+                  conflictDay={multiDayConflictError.conflictDay}
+                  conflictStart={multiDayConflictError.conflictStart}
+                  conflictEnd={multiDayConflictError.conflictEnd}
+                  timezone={timezone}
+                  onRetry={() => {
+                    setMultiDayConflictError(null);
+                    slotsQuery.refetch();
+                  }}
+                />
+              )}
               <SlotGrid
                 slots={slotsQuery.data?.slots ?? []}
                 selectedSlotStart={selectedSlotStart}
@@ -517,6 +561,7 @@ export function PublicBookingPage() {
                 professionalName={professional.name}
                 timezone={timezone}
                 customerPhone={customerPhone}
+                daysAffected={(selectedSlot as PublicSlot & { daysAffected?: DaySegment[] }).daysAffected}
               />
             </div>
           )}

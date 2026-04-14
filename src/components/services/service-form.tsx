@@ -16,6 +16,7 @@ import { Input } from "@/components/flow/input";
 import { Textarea } from "@/components/flow/textarea";
 import { FeedbackBanner } from "@/components/shared/feedback-banner";
 import { PriceInput } from "@/components/services/price-input";
+import { DurationHelper } from "@/components/services/duration-helper";
 import { ServiceImageUpload } from "@/components/services/service-image-upload";
 import { servicesService } from "@/services/services-service";
 import { ApiError } from "@/types/api";
@@ -282,7 +283,7 @@ export function ServiceForm(props: ServiceFormProps) {
       form.description.length <= 1000 &&
       Number.isInteger(parsedDuration) &&
       parsedDuration > 0 &&
-      parsedDuration <= 960 &&
+      parsedDuration <= 4320 &&
       Number.isFinite(parsedPrice) &&
       parsedPrice > 0 &&
       parsedPrice <= 99999.99
@@ -493,8 +494,9 @@ export function ServiceForm(props: ServiceFormProps) {
               required
               disabled={props.isSubmitting}
             />
+            <DurationHelper durationInMinutes={Number(form.durationInMinutes)} />
             <p className="text-sm leading-6 text-text-soft">
-              Campo obrigatorio. Use minutos inteiros maiores que zero.
+              Campo obrigatorio. Use minutos inteiros maiores que zero. Maximo 4320 minutos (72 horas).
             </p>
           </label>
 

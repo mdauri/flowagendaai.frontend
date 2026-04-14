@@ -6,6 +6,7 @@ export interface ApiErrorResponse {
 }
 
 export const BOOKING_CONFLICT_ERROR_CODE = "BOOKING_CONFLICT";
+export const MULTI_DAY_CONFLICT_ERROR_CODE = "MULTI_DAY_CONFLICT";
 
 export class ApiError extends Error {
   constructor(

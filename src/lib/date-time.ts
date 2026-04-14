@@ -39,6 +39,23 @@ export function formatUtcTimeRangeInTenantTimezone(
   return `${startDateTime.toFormat("HH:mm")} - ${endDateTime.toFormat("HH:mm")}`;
 }
 
+export function formatUtcTimeRangeWithDateWhenCrossesDay(
+  start: string,
+  end: string,
+  timezone: string
+): string {
+  const startDateTime = DateTime.fromISO(start, { zone: "utc" }).setZone(timezone);
+  const endDateTime = DateTime.fromISO(end, { zone: "utc" }).setZone(timezone);
+
+  const sameDay = startDateTime.hasSame(endDateTime, "day");
+
+  if (sameDay) {
+    return `${startDateTime.toFormat("HH:mm")} - ${endDateTime.toFormat("HH:mm")}`;
+  }
+
+  return `${startDateTime.toFormat("dd/MM HH:mm")} - ${endDateTime.toFormat("dd/MM HH:mm")}`;
+}
+
 export function formatUtcTimeInTenantTimezone(
   dayOfWeek: AvailabilityDayOfWeek,
   utcTime: string,

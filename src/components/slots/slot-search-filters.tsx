@@ -1,4 +1,4 @@
-import { useId } from "react";
+import { useEffect, useId, useState } from "react";
 import { DateTime } from "luxon";
 import { Input } from "@/components/flow/input";
 import { Select } from "@/components/flow/select";
@@ -43,9 +43,48 @@ export function SlotSearchFilters({
   const selectedDate = filters.date
     ? DateTime.fromISO(filters.date, { zone: timezone }).startOf("day")
     : null;
+  const [dateInputValue, setDateInputValue] = useState(() =>
+    filters.date
+      ? DateTime.fromISO(filters.date, { zone: timezone }).toFormat("dd/MM/yyyy")
+      : ""
+  );
   const minDate = DateTime.now().setZone(timezone).minus({ months: 12 }).startOf("month");
   const maxDate = DateTime.now().setZone(timezone).plus({ months: 12 }).endOf("month");
   const isDateInputDisabled = disabled || !canLoadAvailability || isAvailabilityLoading;
+
+  useEffect(() => {
+    if (!filters.date) {
+      setDateInputValue("");
+      return;
+    }
+
+    const parsed = DateTime.fromISO(filters.date, { zone: timezone });
+    if (!parsed.isValid) {
+      return;
+    }
+
+    setDateInputValue(parsed.toFormat("dd/MM/yyyy"));
+  }, [filters.date, timezone]);
+
+  function parseCivilDateFromInput(value: string): DateTime | null {
+    const trimmed = value.trim();
+
+    const parsedBr = DateTime.fromFormat(trimmed, "dd/MM/yyyy", {
+      zone: timezone,
+      locale: "pt-BR",
+    });
+
+    if (parsedBr.isValid && parsedBr.toFormat("dd/MM/yyyy") === trimmed) {
+      return parsedBr.startOf("day");
+    }
+
+    const parsedIso = DateTime.fromISO(trimmed, { zone: timezone });
+    if (parsedIso.isValid && parsedIso.toISODate() === trimmed) {
+      return parsedIso.startOf("day");
+    }
+
+    return null;
+  }
 
   return (
     <Card variant="premium" padding="lg">
@@ -101,15 +140,18 @@ export function SlotSearchFilters({
           <span className="text-sm font-semibold text-white">Data</span>
           <Input
             id={dateId}
-            type="date"
+            type="text"
             inputSize="md"
-            value={filters.date}
+            inputMode="numeric"
+            placeholder="dd/mm/aaaa"
+            value={dateInputValue}
             disabled={isDateInputDisabled}
             required
             onChange={(event) => {
-              const nextDate = event.target.value;
+              const nextValue = event.target.value;
+              setDateInputValue(nextValue);
 
-              if (!nextDate) {
+              if (nextValue.trim() === "") {
                 onFiltersChange({
                   ...filters,
                   date: "",
@@ -117,20 +159,45 @@ export function SlotSearchFilters({
                 return;
               }
 
-              if (!availableDates.has(nextDate)) {
-                onFiltersChange({
-                  ...filters,
-                  date: "",
-                });
+              const parsedDate = parseCivilDateFromInput(nextValue);
+              if (!parsedDate) {
                 return;
               }
 
+              const nextIsoDate = parsedDate.toISODate()!;
               onFiltersChange({
                 ...filters,
-                date: nextDate,
+                date: nextIsoDate,
               });
+              onCalendarMonthChange(parsedDate.startOf("month"));
+            }}
+            onBlur={() => {
+              const trimmed = dateInputValue.trim();
 
-              onCalendarMonthChange(DateTime.fromISO(nextDate, { zone: timezone }).startOf("month"));
+              if (trimmed === "") {
+                onFiltersChange({
+                  ...filters,
+                  date: "",
+                });
+                return;
+              }
+
+              const parsedDate = parseCivilDateFromInput(trimmed);
+              if (!parsedDate) {
+                onFiltersChange({
+                  ...filters,
+                  date: "",
+                });
+                return;
+              }
+
+              const normalizedText = parsedDate.toFormat("dd/MM/yyyy");
+              setDateInputValue(normalizedText);
+              onFiltersChange({
+                ...filters,
+                date: parsedDate.toISODate()!,
+              });
+              onCalendarMonthChange(parsedDate.startOf("month"));
             }}
           />
         </label>

@@ -282,4 +282,20 @@ describe("SlotsPage", () => {
     expect(screen.getByText("11:00 - 12:00")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Consultar outros horarios" })).toBeInTheDocument();
   });
+
+  test("permite digitar data indisponivel sem limpar o campo automaticamente", async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<SlotsPage />);
+
+    await selectOption(user, "Selecione um profissional", "Ana");
+    await selectOption(user, "Selecione um servico", "Consulta");
+
+    const dateInput = await screen.findByLabelText("Data");
+    fireEvent.change(dateInput, {
+      target: { value: "02/04/2026" },
+    });
+
+    expect((dateInput as HTMLInputElement).value).toBe("02/04/2026");
+    expect(screen.getByRole("button", { name: "Buscar horarios" })).toBeDisabled();
+  });
 });

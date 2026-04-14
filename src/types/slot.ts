@@ -1,6 +1,10 @@
+import type { DaySegment } from "@/types/public-booking";
+
 export interface AvailableSlot {
   start: string;
   end: string;
+  /** Present only for multi-day services */
+  daysAffected?: DaySegment[];
 }
 
 export interface ListAvailableSlotsInput {
