@@ -4,6 +4,8 @@ import { DateTime } from "luxon";
 import { DashboardPage } from "@/pages/dashboard-page";
 import { renderWithProviders } from "@/test/render";
 import { dashboardService } from "@/services/dashboard-service";
+import { useProfessionalsQuery } from "@/hooks/use-professionals-query";
+import { useServicesQuery } from "@/hooks/use-services-query";
 import { ApiError } from "@/types/api";
 
 vi.mock("@/services/dashboard-service", () => ({
@@ -11,8 +13,16 @@ vi.mock("@/services/dashboard-service", () => ({
     getSummary: vi.fn(),
   },
 }));
+vi.mock("@/hooks/use-professionals-query", () => ({
+  useProfessionalsQuery: vi.fn(),
+}));
+vi.mock("@/hooks/use-services-query", () => ({
+  useServicesQuery: vi.fn(),
+}));
 
 const mockedDashboardService = vi.mocked(dashboardService);
+const mockedUseProfessionalsQuery = vi.mocked(useProfessionalsQuery);
+const mockedUseServicesQuery = vi.mocked(useServicesQuery);
 
 const successResponse = {
   date: "2026-03-30",
@@ -85,6 +95,18 @@ describe("DashboardPage", () => {
     vi.spyOn(DateTime, "local").mockReturnValue(
       DateTime.fromISO("2026-03-30T15:00:00.000Z") as ReturnType<typeof DateTime.local>
     );
+    mockedUseProfessionalsQuery.mockReturnValue({
+      data: { professionals: [{ id: "professional-1", name: "Ana" }] },
+      isLoading: false,
+      isError: false,
+      refetch: vi.fn(),
+    } as unknown as ReturnType<typeof useProfessionalsQuery>);
+    mockedUseServicesQuery.mockReturnValue({
+      data: { services: [{ id: "service-1", name: "Consulta" }] },
+      isLoading: false,
+      isError: false,
+      refetch: vi.fn(),
+    } as unknown as ReturnType<typeof useServicesQuery>);
   });
 
   afterEach(() => {
@@ -100,7 +122,11 @@ describe("DashboardPage", () => {
     expect(
       screen.getByLabelText("Carregando dashboard operacional")
     ).toBeInTheDocument();
-    expect(mockedDashboardService.getSummary).toHaveBeenCalledWith("2026-03-30");
+    expect(mockedDashboardService.getSummary).toHaveBeenCalledWith({
+      date: "2026-03-30",
+      professionalId: undefined,
+      serviceId: undefined,
+    });
   });
 
   test("renderiza estado vazio com KPIs zerados e listas vazias", async () => {
@@ -162,6 +188,10 @@ describe("DashboardPage", () => {
     expect(screen.getAllByText("Ana")).toHaveLength(2);
     expect(screen.getByText("Retorno")).toBeInTheDocument();
     expect(screen.getAllByText("America/Sao_Paulo")).toHaveLength(2);
-    expect(mockedDashboardService.getSummary).toHaveBeenCalledWith("2026-03-30");
+    expect(mockedDashboardService.getSummary).toHaveBeenCalledWith({
+      date: "2026-03-30",
+      professionalId: undefined,
+      serviceId: undefined,
+    });
   });
 });

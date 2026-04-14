@@ -1,10 +1,23 @@
 import { httpClient } from "@/lib/http-client";
-import type { DashboardSummaryResponse } from "@/types/dashboard";
+import type {
+  DashboardSummaryQueryParams,
+  DashboardSummaryResponse,
+} from "@/types/dashboard";
 
 export const dashboardService = {
-  async getSummary(date: string): Promise<DashboardSummaryResponse> {
+  async getSummary(input: DashboardSummaryQueryParams): Promise<DashboardSummaryResponse> {
+    const searchParams = new URLSearchParams({ date: input.date });
+
+    if (input.professionalId) {
+      searchParams.set("professionalId", input.professionalId);
+    }
+
+    if (input.serviceId) {
+      searchParams.set("serviceId", input.serviceId);
+    }
+
     return httpClient<DashboardSummaryResponse>(
-      `/dashboard/summary?date=${encodeURIComponent(date)}`
+      `/dashboard/summary?${searchParams.toString()}`
     );
   },
 };

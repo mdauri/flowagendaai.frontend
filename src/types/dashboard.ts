@@ -43,3 +43,9 @@ export interface DashboardSummaryResponse {
   upcomingBookings: DashboardSummaryBookingItem[];
   professionalOccupancy: DashboardProfessionalOccupancyItem[];
 }
+
+export interface DashboardSummaryQueryParams {
+  date: string;
+  professionalId?: string;
+  serviceId?: string;
+}
