@@ -10,15 +10,9 @@ const glassListItemVariants = cva(
         compact: "rounded-md px-4 py-3",
         feature: "rounded-(--radius-lg) px-4 py-4",
       },
-      iconSize: {
-        sm: "h-6 w-6 text-xs",
-        md: "h-7 w-7 text-xs",
-        lg: "h-8 w-8",
-      },
     },
     defaultVariants: {
       size: "compact",
-      iconSize: "md",
     },
   }
 );
@@ -63,7 +57,9 @@ export function GlassListItem({
       <div className={cn(glassListItemIconVariants({ iconSize }), iconClassName)}>
         {icon}
       </div>
-      <p className={cn("text-sm text-text-soft", labelClassName)}>{label}</p>
+      <p className={cn("min-w-0 text-sm text-text-soft", labelClassName)}>
+        {label}
+      </p>
     </div>
   );
 }

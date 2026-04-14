@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
-import { MessageCircle } from "lucide-react";
-
+import { LogIn, MessageCircle } from "lucide-react";
 import { Button } from "@/components/landing/flow/button";
 
 const WHATSAPP_LINK = import.meta.env.VITE_WHATSAPP_LINK ?? "#";
+const FRONTEND_URL =
+  import.meta.env.NEXT_PUBLIC_FRONTEND_URL ?? "http://localhost:5173";
 
 export function Navbar() {
   return (
@@ -11,7 +12,11 @@ export function Navbar() {
       <div className="mx-auto flex max-w-7xl items-center justify-between rounded-full border border-white/10 bg-white/5 px-4 py-3 backdrop-blur-xl">
         <div className="flex items-center gap-3">
           <Link to="/" className="flex items-center ">
-            <img src="/agendoro-logo.png" alt="Agendoro" className="h-20 w-20" />
+            <img
+              src="/agendoro-logo.png"
+              alt="Agendoro"
+              className="h-20 w-20"
+            />
           </Link>
           <div>
             <p className="text-sm font-semibold tracking-wide text-white">
@@ -35,6 +40,17 @@ export function Navbar() {
             Depoimentos
           </a>
         </nav>
+        <Button
+          variant="ghost"
+          size="sm"
+          as="a"
+          href={`${FRONTEND_URL}/login`}
+          aria-label="Entrar no sistema"
+          className="hidden md:inline-flex"
+        >
+          <LogIn className="w-4 h-4" />
+          Entrar
+        </Button>
         <Button
           size="md"
           as="a"

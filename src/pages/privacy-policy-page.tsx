@@ -3,13 +3,13 @@ import { Link } from "react-router-dom";
 import { Card } from "@/components/landing/flow/card";
 import { compositionPatterns, semanticTokens } from "@/design-system";
 
-const updatedAt = "27 de março de 2026";
+const updatedAt = "14 de abril de 2026";
 
 const sections = [
   {
     title: "1. Identificação do controlador",
     content: [
-      "Esta Política de Privacidade descreve como o Agendoro trata dados pessoais e dados operacionais relacionados ao uso da plataforma de agendamento, automação e integrações.",
+      "Esta Política de Privacidade descreve como o Agendoro trata dados pessoais e dados operacionais relacionados ao uso da plataforma de agendamento, automação e gestão de compromissos.",
       "Controlador responsável: DAURI DESENVOLVIMENTO E TECNOLOGIA LTDA.",
       "CNPJ: 46.320.035/0001-09",
       "Endereço: Rua Dom Afonso, 191 - Jacarei - Sao Paulo",
@@ -20,38 +20,20 @@ const sections = [
     title: "2. Dados que podemos coletar",
     content: [
       "Podemos coletar dados fornecidos diretamente pelo usuário, como nome, telefone, e-mail, informações comerciais e detalhes necessários para configuração da agenda.",
-      "Também podemos tratar dados operacionais de agendamento, como serviços, horários, profissionais vinculados, histórico de eventos e informações de sincronização.",
+      "Também podemos tratar dados operacionais de agendamento, como serviços, horários, profissionais vinculados, histórico de eventos e informações relacionadas à gestão da agenda dentro da própria plataforma.",
       "Podemos ainda registrar dados técnicos básicos de navegação, incluindo IP, tipo de dispositivo, navegador, páginas acessadas, data e hora de acesso, para segurança, estabilidade e prevenção de abuso.",
-      "Quando houver integração autorizada com o Google Calendar, poderemos acessar dados de calendário e eventos necessários para a funcionalidade solicitada pelo usuário.",
     ],
   },
   {
     title: "3. Finalidades do tratamento",
     content: [
-      "Utilizamos os dados para operar a plataforma, configurar agendas, exibir eventos, sincronizar compromissos, automatizar fluxos e permitir o uso das funcionalidades contratadas.",
+      "Utilizamos os dados para operar a plataforma, configurar agendas, exibir eventos, automatizar fluxos e permitir o uso das funcionalidades contratadas.",
       "Os dados também podem ser usados para comunicação com o usuário, suporte operacional, prevenção de fraude, segurança da aplicação e melhoria da experiência do serviço solicitado.",
-      "Quando aplicável, dados do Google Calendar poderão ser usados para leitura de eventos, sincronização de compromissos e listagem de informações necessárias ao funcionamento da agenda.",
+      "Toda a gestão de agenda e disponibilidade é realizada internamente pela plataforma Agendoro, sem dependência de integrações externas de calendário.",
     ],
   },
   {
-    title: "4. Base de acesso aos dados do Google",
-    content: [
-      "O acesso a dados do Google ocorre somente mediante autorização expressa do usuário ou responsável pela conta conectada.",
-      "Os dados recebidos das APIs do Google serão utilizados apenas para fornecer, manter ou melhorar funcionalidades diretamente solicitadas pelo usuário dentro do escopo da integração autorizada.",
-      "Os dados do Google não serão vendidos, não serão usados para publicidade direcionada e não serão compartilhados comercialmente com terceiros.",
-      "Os dados recebidos das APIs do Google não serão usados para desenvolver, treinar ou melhorar modelos generalistas de inteligência artificial.",
-    ],
-  },
-  {
-    title: "5. Dados específicos do Google Calendar",
-    content: [
-      "Quando a integração estiver habilitada, poderemos acessar o calendário principal ou calendários autorizados para leitura de eventos, horários, títulos, descrições, participantes, localizações e metadados relevantes à operação do serviço.",
-      "Poderá haver armazenamento mínimo e proporcional de informações necessárias para sincronização, atualização de agenda, prevenção de duplicidades, rastreabilidade operacional e continuidade do serviço.",
-      "Se aplicável, tokens de acesso ou atualização poderão ser mantidos de forma segura para permitir sincronização contínua entre a conta autorizada e a plataforma.",
-    ],
-  },
-  {
-    title: "6. Compartilhamento de dados",
+    title: "4. Compartilhamento de dados",
     content: [
       "Os dados poderão ser compartilhados apenas com provedores de infraestrutura, hospedagem, monitoramento, armazenamento, autenticação ou mensageria que sejam necessários à prestação do serviço.",
       "Não comercializamos dados pessoais e não compartilhamos informações para fins de revenda, perfilamento comercial externo ou publicidade comportamental.",
@@ -59,7 +41,7 @@ const sections = [
     ],
   },
   {
-    title: "7. Retenção e exclusão",
+    title: "5. Retenção e exclusão",
     content: [
       "Os dados serão mantidos pelo tempo necessário para cumprir as finalidades desta política, prestar o serviço contratado, atender obrigações legais e resguardar direitos em processos administrativos, regulatórios ou judiciais.",
       "Sempre que possível, os dados serão excluídos, anonimizados ou desassociados da identidade do titular após solicitação válida, encerramento da relação ou perda de necessidade operacional.",
@@ -67,30 +49,22 @@ const sections = [
     ],
   },
   {
-    title: "8. Segurança e proteção das credenciais",
+    title: "6. Segurança e proteção das credenciais",
     content: [
-      "Adotamos medidas técnicas e organizacionais razoáveis para proteger dados pessoais, credenciais de integração e informações operacionais contra acesso não autorizado, perda, uso indevido, alteração e divulgação indevida.",
+      "Adotamos medidas técnicas e organizacionais razoáveis para proteger dados pessoais, credenciais de acesso e informações operacionais contra acesso não autorizado, perda, uso indevido, alteração e divulgação indevida.",
       "O acesso interno a dados e credenciais é restrito ao mínimo necessário para operação, suporte e manutenção do serviço.",
-      "Tokens, segredos de integração e credenciais de acesso devem ser armazenados em ambiente seguro, com proteção contra exposição indevida no cliente ou em repositórios públicos.",
+      "Credenciais de acesso e segredos operacionais devem ser armazenados em ambiente seguro, com proteção contra exposição indevida no cliente ou em repositórios públicos.",
     ],
   },
   {
-    title: "9. Direitos do titular",
+    title: "7. Direitos do titular",
     content: [
       "O titular poderá solicitar, nos termos da legislação aplicável, confirmação de tratamento, acesso, correção, atualização, anonimização, exclusão, portabilidade, limitação de uso e revogação de consentimento quando aplicável.",
       "Solicitações relacionadas a privacidade e proteção de dados podem ser enviadas para privacidade@dauri.com.br",
     ],
   },
   {
-    title: "10. Revogação do acesso à conta Google",
-    content: [
-      "O usuário poderá revogar o acesso do Agendoro à conta Google a qualquer momento nas configurações de segurança e permissões da própria Conta Google.",
-      "Após a revogação, funcionalidades dependentes da integração poderão deixar de operar parcial ou totalmente até que nova autorização seja concedida.",
-      "Sempre que possível, a revogação poderá ser complementada com solicitação de remoção de dados operacionais mantidos pela plataforma, observadas obrigações legais e necessidades mínimas de segurança.",
-    ],
-  },
-  {
-    title: "11. Alterações desta política",
+    title: "8. Alterações desta política",
     content: [
       "Esta Política de Privacidade poderá ser atualizada periodicamente para refletir mudanças legais, operacionais, técnicas ou de produto.",
       "A data de atualização exibida nesta página indica a versão mais recente em vigor. Recomendamos revisão periódica do conteúdo.",
@@ -121,13 +95,14 @@ export function PrivacyPolicyPage() {
                   Política de Privacidade
                 </p>
                 <h1 className="mt-3 text-4xl font-black tracking-tight text-white md:text-5xl">
-                  Privacidade, uso de dados e integração com Google Calendar
+                  Privacidade, uso de dados e funcionamento da plataforma
+                  Agendoro
                 </h1>
                 <p className="mt-4 max-w-3xl text-base leading-7 text-text-soft md:text-lg">
                   Este documento descreve como o Agendoro trata dados pessoais,
-                  dados operacionais e informações oriundas de integrações com
-                  serviços do Google, incluindo Google Calendar, sempre dentro
-                  do escopo autorizado pelo usuário.
+                  dados operacionais e informações relacionadas ao uso da
+                  plataforma, sempre dentro do escopo das funcionalidades
+                  contratadas pelo usuário.
                 </p>
                 <p className="mt-4 text-sm text-text-muted">
                   Última atualização: {updatedAt}
@@ -142,7 +117,9 @@ export function PrivacyPolicyPage() {
                   padding="sm"
                   radiusSize="lg"
                   className="md:p-6"
-                  style={{ backgroundColor: semanticTokens.surface.glassSubtle }}
+                  style={{
+                    backgroundColor: semanticTokens.surface.glassSubtle,
+                  }}
                 >
                   <h2 className="text-2xl font-black tracking-tight text-white">
                     {section.title}

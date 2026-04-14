@@ -115,7 +115,7 @@ export function LandingPage() {
                   <GlassListItem
                     key={benefit}
                     icon="✓"
-                    iconSize="lg"
+                    //iconSize="lg"
                     label={benefit}
                     size="feature"
                   />
