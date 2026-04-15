@@ -11,7 +11,7 @@ fi
 echo "==> Logging into GHCR as $GHCR_USERNAME"
 echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USERNAME" --password-stdin
 
-cd /opt/agendoro
+cd /opt/agendoro-frontend
 
 echo "==> Pulling latest images"
 docker compose -f docker-compose.prod.yml pull
