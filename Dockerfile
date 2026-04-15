@@ -5,6 +5,12 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY . .
+
+ARG VITE_API_BASE_URL
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+ARG VITE_WHATSAPP_LINK
+ENV VITE_WHATSAPP_LINK=$VITE_WHATSAPP_LINK
+
 RUN npm run build
 
 FROM nginx:alpine

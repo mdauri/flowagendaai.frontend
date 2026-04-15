@@ -1,0 +1,35 @@
+services:
+  agendoro-api:
+    image: ghcr.io/mdauri/agendoro-api:latest
+    container_name: agendoro-api
+    restart: unless-stopped
+    env_file:
+      - .env.api
+    networks:
+      - web
+      - postgres-internal
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.agendoro-api.rule=Host(`api.agenda.dauri.com.br`)"
+      - "traefik.http.routers.agendoro-api.entrypoints=websecure"
+      - "traefik.http.routers.agendoro-api.tls.certresolver=letsencrypt"
+      - "traefik.http.services.agendoro-api.loadbalancer.server.port=3333"
+
+  agendoro-frontend:
+    image: ghcr.io/mdauri/agendoro-frontend:latest
+    container_name: agendoro-frontend
+    restart: unless-stopped
+    networks:
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.agendoro-frontend.rule=Host(`agenda.dauri.com.br`)"
+      - "traefik.http.routers.agendoro-frontend.entrypoints=websecure"
+      - "traefik.http.routers.agendoro-frontend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.agendoro-frontend.loadbalancer.server.port=80"
+
+networks:
+  web:
+    external: true
+  postgres-internal:
+    external: true

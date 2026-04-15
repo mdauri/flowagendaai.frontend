@@ -1,0 +1,141 @@
+name: Deploy API Agendoro
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: agendoro-production
+  cancel-in-progress: true
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    environment: production
+
+    permissions:
+      contents: read
+      packages: write
+
+    env:
+      API_IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/agendoro-api
+      FRONTEND_IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/agendoro-frontend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login no GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_PAT }}
+
+      # API
+      - name: Install API dependencies
+        working-directory: ./api
+        run: npm ci
+
+      - name: Test API
+        working-directory: ./api
+        run: npm test --if-present
+
+      - name: Build API
+        working-directory: ./api
+        run: npm run build
+
+      # Frontend
+      - name: Install Frontend dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Test Frontend
+        working-directory: ./frontend
+        run: npm test --if-present
+
+      - name: Build Frontend
+        working-directory: ./frontend
+        env:
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+          VITE_WHATSAPP_LINK: ${{ VITE_WHATSAPP_LINK }}
+        run: npm run build
+
+      - name: Metadata da imagem API
+        id: meta-api
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.API_IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest
+            type=sha
+
+      - name: Metadata da imagem Frontend
+        id: meta-frontend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.FRONTEND_IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest
+            type=sha
+
+      - name: Build e push da imagem API
+        uses: docker/build-push-action@v6
+        with:
+          context: ./api
+          push: true
+          tags: ${{ steps.meta-api.outputs.tags }}
+          labels: ${{ steps.meta-api.outputs.labels }}
+
+      - name: Build e push da imagem Frontend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          push: true
+          tags: ${{ steps.meta-frontend.outputs.tags }}
+          labels: ${{ steps.meta-frontend.outputs.labels }}
+          build-args: |
+            VITE_API_URL=${{ secrets.VITE_API_URL }}
+            VITE_WHATSAPP_LINK: ${{ VITE_WHATSAPP_LINK }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    needs: build-and-push
+
+    steps:
+      - name: Copy compose and deploy script to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "deploy/docker-compose.prod.yml,deploy/deploy.sh"
+          target: "/opt/agendoro"
+          strip_components: 1
+
+      - name: Executar deploy remoto
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          GHCR_USERNAME: ${{ github.repository_owner }}
+          GHCR_TOKEN: ${{ secrets.GHCR_PAT }}
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          envs: GHCR_USERNAME,GHCR_TOKEN
+          script: |
+            mkdir -p /opt/agendoro
+            chmod +x /opt/agendoro/deploy.sh
+            cd /opt/agendoro
+            /opt/agendoro/deploy.sh
