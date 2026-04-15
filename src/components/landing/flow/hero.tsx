@@ -51,13 +51,7 @@ const heroMetrics = [
   },
 ] as const;
 
-function HeroKpiCard({
-  title,
-  subtitle,
-}: {
-  title: string;
-  subtitle: string;
-}) {
+function HeroKpiCard({ title, subtitle }: { title: string; subtitle: string }) {
   return (
     <Card padding="sm" radiusSize="sm" className="p-5">
       <div className="text-2xl font-black text-secondary">{title}</div>
@@ -128,41 +122,41 @@ export function Hero() {
             variant="subtle"
             className="mb-6 px-4 py-2 text-sm text-badge-text"
           >
-            Agenda automática · WhatsApp · Google Calendar
+            Sua agenda organizada · WhatsApp · Link próprio
           </Badge>
 
           <h1 className="max-w-4xl text-4xl font-black leading-tight tracking-tight text-white md:text-6xl lg:text-7xl">
-            Pare de perder clientes por causa da
+            Sua agenda organizada.
             <span className="bg-linear-to-r from-primary via-secondary to-tertiary bg-clip-text text-transparent">
               {" "}
-              sua agenda
+              Seus clientes encantados.
             </span>
           </h1>
 
           <p className="mt-6 max-w-2xl text-base leading-7 text-text-soft md:text-lg">
-            O Agendoro configura tudo pra você. Seus clientes agendam sozinhos,
-            as confirmações saem automáticas pelo WhatsApp e sua agenda nunca
-            mais vai virar bagunça.
+            Tenha uma plataforma profissional para gerir seus horários,
+            profissionais e serviços por apenas R$ 97/mês, ou automatize seu
+            atendimento via WhatsApp.
           </p>
 
           <div className="mt-8 flex flex-col gap-4 sm:flex-row">
             <Button
               as="a"
-              href={WHATSAPP_LINK}
-              target="_blank"
-              rel="noopener noreferrer"
+              href="#precos"
+              //target="_blank"
+              //rel="noopener noreferrer"
             >
-              Quero automatizar minha agenda
+              Organizar minha agenda
             </Button>
-            <Button as="a" href="#como-funciona" variant="secondary">
-              Ver como funciona
+            <Button as="a" href="#beneficios" variant="secondary">
+              Ver benefícios
             </Button>
           </div>
 
           <div className="mt-10 grid gap-4 sm:grid-cols-3">
-            {heroKpis.map(([title, subtitle]) => (
-              <HeroKpiCard key={title} title={title} subtitle={subtitle} />
-            ))}
+            <HeroKpiCard title="+2.500" subtitle="agendamentos realizados" />
+            <HeroKpiCard title="+120" subtitle="clientes atendidos" />
+            <HeroKpiCard title="5 min" subtitle="para organizar seu negócio" />
           </div>
         </div>
 

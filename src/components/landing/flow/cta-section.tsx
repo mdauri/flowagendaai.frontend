@@ -29,9 +29,9 @@ export function CTASection() {
           <div className="flex flex-col gap-4 sm:flex-row lg:flex-col">
             <Button
               as="a"
-              href={WHATSAPP_LINK}
-              target="_blank"
-              rel="noopener noreferrer"
+              href="#precos"
+              //target="_blank"
+              //rel="noopener noreferrer"
             >
               Falar no WhatsApp agora
             </Button>

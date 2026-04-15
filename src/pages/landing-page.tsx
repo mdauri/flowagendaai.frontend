@@ -30,9 +30,9 @@ const features = [
       "Confirmações e lembretes automáticos direto no WhatsApp. Menos faltas, menos trabalho manual, mais resultado.",
   },
   {
-    title: "Google Calendar integrado",
+    title: "Link de agendamento próprio",
     description:
-      "Tudo sincronizado em tempo real. Você vê a agenda no celular, no computador, em qualquer lugar.",
+      "Seu cliente escolhe o horário em segundos, sem precisar falar com ninguém. Tudo centralizado no Agendoro.",
   },
 ];
 
@@ -40,7 +40,7 @@ const benefits = [
   "Mais agendamentos sem aumentar a equipe",
   "Zero furo com confirmação automática pelo WhatsApp",
   "Visual profissional que transmite confiança",
-  "Configuração completa feita por nós em até 48h",
+  "Organização completa da sua agenda em minutos",
 ];
 
 const audiences = [
@@ -139,9 +139,9 @@ export function LandingPage() {
               />
               <Button
                 as="a"
-                href={WHATSAPP_LINK}
-                target="_blank"
-                rel="noopener noreferrer"
+                href="#precos"
+                //target="_blank"
+                //rel="noopener noreferrer"
               >
                 Quero o Agendoro no meu negócio
               </Button>

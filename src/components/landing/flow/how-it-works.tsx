@@ -8,23 +8,23 @@ const steps = [
   {
     icon: MessageCircle,
     number: "01",
-    title: "Fale com a gente pelo WhatsApp",
+    title: "Escolha seu plano",
     description:
-      "Conta sobre o seu negócio, seus serviços e como funciona sua agenda hoje. Leva menos de 10 minutos.",
+      "Decida entre organizar sua agenda manualmente ou automatizar todo o seu atendimento via WhatsApp.",
   },
   {
     icon: Settings,
     number: "02",
-    title: "A gente monta tudo pra você",
+    title: "Configure do seu jeito",
     description:
-      "Em até 48 horas seu sistema de agendamento está configurado, integrado ao WhatsApp e ao Google Calendar — sem você precisar mexer em nada.",
+      "Cadastre seus serviços e profissionais em minutos ou deixe que nossa equipe faça a implantação completa para você.",
   },
   {
     icon: Zap,
     number: "03",
     title: "Sua agenda roda sozinha",
     description:
-      "Seus clientes agendam direto, recebem confirmação automática e você para de perder horário por falta de resposta.",
+      "Seus clientes agendam direto pelo seu link exclusivo, recebem confirmações e você ganha tempo para o que importa.",
   },
 ];
 
@@ -78,9 +78,9 @@ export function HowItWorks() {
         <div className="mt-10 flex justify-center">
           <Button
             as="a"
-            href={WHATSAPP_LINK}
-            target="_blank"
-            rel="noopener noreferrer"
+            href="#precos"
+            //target="_blank"
+            //rel="noopener noreferrer"
           >
             Começar agora pelo WhatsApp
           </Button>

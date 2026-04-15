@@ -4,7 +4,7 @@ import { Button } from "@/components/landing/flow/button";
 
 const WHATSAPP_LINK = import.meta.env.VITE_WHATSAPP_LINK ?? "#";
 const FRONTEND_URL =
-  import.meta.env.NEXT_PUBLIC_FRONTEND_URL ?? "http://localhost:5173";
+  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5173";
 
 export function Navbar() {
   return (
@@ -54,9 +54,9 @@ export function Navbar() {
         <Button
           size="md"
           as="a"
-          href={WHATSAPP_LINK}
-          target="_blank"
-          rel="noopener noreferrer"
+          href="#precos"
+          //target="_blank"
+          //rel="noopener noreferrer"
         >
           <MessageCircle className="w-6 h-6" />
           Quero vender mais

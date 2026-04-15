@@ -37,11 +37,11 @@ const solutions = [
   },
   {
     icon: "✓",
-    label: "Google Calendar sincronizado em tempo real",
+    label: "Link de agendamento profissional e personalizado",
   },
   {
     icon: "✓",
-    label: "Configuração completa em até 48 horas",
+    label: "Comece a organizar hoje mesmo ou deixe que nós automatizamos",
   },
 ];
 
@@ -56,11 +56,12 @@ export function PainSection() {
               O problema
             </p>
             <h2 className="mt-3 text-3xl font-black tracking-tight text-white md:text-5xl">
-              Sem controle da agenda, você perde clientes todo dia
+              Agenda bagunçada é dinheiro saindo pelo ralo
             </h2>
             <p className="mt-4 text-base leading-7 text-text-soft">
-              Você já passou por isso — ou passa agora. E sabe que não é falta
-              de competência, é falta de sistema.
+              O custo de um esquecimento ou de uma mensagem não respondida é
+              mais alto do que você imagina. Não é falta de competência, é falta
+              de sistema.
             </p>
 
             <div className="mt-8 space-y-4">
@@ -69,15 +70,16 @@ export function PainSection() {
                   key={pain.problem}
                   className="flex gap-4 rounded-(--radius-lg) border border-white/10 bg-white/5 p-5 backdrop-blur-xl"
                 >
-                <div
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-black"
-                  style={{
-                    backgroundColor: semanticTokens.feedback.danger.background,
-                    color: semanticTokens.feedback.danger.text,
-                  }}
-                >
-                  {pain.icon}
-                </div>
+                  <div
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-black"
+                    style={{
+                      backgroundColor:
+                        semanticTokens.feedback.danger.background,
+                      color: semanticTokens.feedback.danger.text,
+                    }}
+                  >
+                    {pain.icon}
+                  </div>
                   <div>
                     <p className="font-bold text-white">{pain.problem}</p>
                     <p className="mt-1 text-sm leading-6 text-text-muted">
@@ -95,33 +97,23 @@ export function PainSection() {
               A solução
             </p>
             <h3 className="mt-3 text-2xl font-black tracking-tight text-white md:text-3xl">
-              Uma agenda que funciona sozinha. Nós configuramos tudo pra você.
+              Organizamos seu negócio ou automatizamos seu crescimento.
             </h3>
             <p className="mt-4 text-sm leading-7 text-text-soft">
-              Fale com a gente, conta sobre o seu negócio e em até 48 horas seu
-              sistema de agendamento está no ar — do zero, sem você precisar
-              mexer em nada.
+              Tenha controle total da sua agenda por R$ 97/mês, com link de
+              agendamento próprio. Quando estiver pronto, evolua para a
+              automação completa com robô de WhatsApp.
             </p>
 
             <div className="mt-7 space-y-3">
               {solutions.map((s) => (
-                <GlassListItem
-                  key={s.label}
-                  icon={s.icon}
-                  label={s.label}
-                />
+                <GlassListItem key={s.label} icon={s.icon} label={s.label} />
               ))}
             </div>
 
             <div className="mt-8">
-              <Button
-                as="a"
-                href={WHATSAPP_LINK}
-                className="w-full"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Falar no WhatsApp agora
+              <Button as="a" href="#precos" className="w-full">
+                Escolher meu plano agora
               </Button>
             </div>
           </Card>
