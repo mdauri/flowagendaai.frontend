@@ -14,7 +14,7 @@ const glassListItemVariants = cva(
     defaultVariants: {
       size: "compact",
     },
-  }
+  },
 );
 
 const glassListItemIconVariants = cva(
@@ -30,11 +30,12 @@ const glassListItemIconVariants = cva(
     defaultVariants: {
       iconSize: "md",
     },
-  }
+  },
 );
 
 export interface GlassListItemProps
-  extends React.HTMLAttributes<HTMLDivElement>,
+  extends
+    React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof glassListItemVariants> {
   icon: React.ReactNode;
   label: string;
@@ -46,15 +47,15 @@ export function GlassListItem({
   className,
   icon,
   iconClassName,
-  iconSize,
+  //iconSize,
   label,
   labelClassName,
   size,
   ...props
 }: GlassListItemProps) {
   return (
-    <div className={cn(glassListItemVariants({ size, iconSize }), className)} {...props}>
-      <div className={cn(glassListItemIconVariants({ iconSize }), iconClassName)}>
+    <div className={cn(glassListItemVariants({ size }), className)} {...props}>
+      <div className={cn(glassListItemIconVariants(), iconClassName)}>
         {icon}
       </div>
       <p className={cn("min-w-0 text-sm text-text-soft", labelClassName)}>
