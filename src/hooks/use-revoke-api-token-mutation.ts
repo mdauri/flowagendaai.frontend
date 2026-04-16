@@ -6,9 +6,10 @@ export function useRevokeApiTokenMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => apiTokensService.revoke(id),
+    mutationFn: ({ id, tenantId }: { id: string; tenantId: string }) =>
+      apiTokensService.revoke(id, tenantId),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: API_TOKENS_QUERY_KEY });
+      await queryClient.invalidateQueries({ queryKey: API_TOKENS_QUERY_KEY, exact: false });
     },
   });
 }

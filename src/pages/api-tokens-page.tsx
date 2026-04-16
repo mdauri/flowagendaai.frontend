@@ -3,11 +3,13 @@ import { Loader2, Copy, Trash2 } from "lucide-react";
 import { Button } from "@/components/flow/button";
 import { Card, CardDescription, CardTitle } from "@/components/flow/card";
 import { Input } from "@/components/flow/input";
+import { Select } from "@/components/flow/select";
 import { Checkbox } from "@/components/flow/checkbox";
 import { PageState } from "@/components/shared/page-state";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { useApiTokensQuery } from "@/hooks/use-api-tokens-query";
+import { useSystemAdminTenantsQuery } from "@/hooks/use-system-admin-tenants-query";
 import { useCreateApiTokenMutation } from "@/hooks/use-create-api-token-mutation";
 import { useRevokeApiTokenMutation } from "@/hooks/use-revoke-api-token-mutation";
 import { ApiError } from "@/types/api";
@@ -91,14 +93,16 @@ function mapApiError(error: ApiError): string {
 export function ApiTokensPage() {
   const auth = useAuth();
   const { toast } = useToast();
-  const listQuery = useApiTokensQuery();
+  const tenantsQuery = useSystemAdminTenantsQuery();
+  const [selectedTenantId, setSelectedTenantId] = useState<string>("");
+  const listQuery = useApiTokensQuery(selectedTenantId || null);
   const createMutation = useCreateApiTokenMutation();
   const revokeMutation = useRevokeApiTokenMutation();
   const [form, setForm] = useState<FormState>(emptyFormState);
   const [oneTimeToken, setOneTimeToken] = useState<string | null>(null);
 
   const isAllowed = useMemo(
-    () => ["admin", "mandant", "system-admin"].includes(auth.user?.role ?? ""),
+    () => auth.user?.role === "system-admin",
     [auth.user?.role]
   );
 
@@ -114,10 +118,15 @@ export function ApiTokensPage() {
     return (
       <PageState
         title="Acesso restrito"
-        description="Apenas admin, mandant ou system-admin podem gerenciar tokens M2M."
+        description="Apenas system-admin pode gerenciar tokens M2M."
       />
     );
   }
+
+  const tenantOptions = (tenantsQuery.data?.items ?? []).map((tenant) => ({
+    value: tenant.id,
+    label: `${tenant.name} (${tenant.slug})`,
+  }));
 
   async function handleCreate(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -149,6 +158,15 @@ export function ApiTokensPage() {
       return;
     }
 
+    if (!selectedTenantId) {
+      toast({
+        title: "Mandante obrigatorio",
+        description: "Selecione o mandante para gerar o token.",
+        variant: "warning",
+      });
+      return;
+    }
+
     const expiresAtDate = new Date(form.expiresAt);
     if (Number.isNaN(expiresAtDate.getTime()) || expiresAtDate.getTime() <= Date.now()) {
       toast({
@@ -160,6 +178,7 @@ export function ApiTokensPage() {
     }
 
     const payload: CreateApiTokenInput = {
+      tenantId: selectedTenantId,
       name: form.name.trim(),
       prefix: form.prefix.trim().toLowerCase(),
       scopes: form.scopes,
@@ -197,8 +216,17 @@ export function ApiTokensPage() {
   }
 
   async function handleRevoke(id: string) {
+    if (!selectedTenantId) {
+      toast({
+        title: "Mandante obrigatorio",
+        description: "Selecione um mandante para revogar o token.",
+        variant: "warning",
+      });
+      return;
+    }
+
     try {
-      await revokeMutation.mutateAsync(id);
+      await revokeMutation.mutateAsync({ id, tenantId: selectedTenantId });
       toast({
         title: "Token revogado",
         description: "O token foi revogado com sucesso.",
@@ -260,8 +288,41 @@ export function ApiTokensPage() {
       <Card variant="premium" padding="lg">
         <CardTitle>API Tokens M2M</CardTitle>
         <CardDescription className="mt-3">
-          Crie e gerencie tokens para integracoes externas com menor privilegio.
+          Crie e gerencie tokens para mandantes especificos com menor privilegio.
         </CardDescription>
+      </Card>
+
+      <Card variant="glass" padding="lg">
+        <CardTitle>Mandante alvo</CardTitle>
+        <CardDescription className="mt-2">
+          Selecione o mandante para criar, listar e revogar tokens.
+        </CardDescription>
+        {tenantsQuery.isLoading ? (
+          <div className="mt-4 flex items-center gap-2 text-text-soft">
+            <Loader2 size={16} className="animate-spin" />
+            Carregando mandantes...
+          </div>
+        ) : tenantsQuery.isError ? (
+          <PageState
+            title="Falha ao carregar mandantes"
+            description="Nao foi possivel carregar a lista de mandantes."
+            actionLabel="Tentar novamente"
+            onAction={() => void tenantsQuery.refetch()}
+          />
+        ) : (
+          <div className="mt-4 grid gap-2">
+            <label className="text-sm font-semibold text-white" htmlFor="api-token-tenant">
+              Mandante
+            </label>
+            <Select
+              id="api-token-tenant"
+              value={selectedTenantId}
+              options={tenantOptions}
+              placeholder="Selecione um mandante"
+              onValueChange={setSelectedTenantId}
+            />
+          </div>
+        )}
       </Card>
 
       <Card variant="glass" padding="lg">
@@ -335,7 +396,11 @@ export function ApiTokensPage() {
           </div>
 
           <div className="flex items-center gap-3">
-            <Button type="submit" size="md" disabled={createMutation.isPending}>
+            <Button
+              type="submit"
+              size="md"
+              disabled={createMutation.isPending || !selectedTenantId || tenantsQuery.isLoading}
+            >
               {createMutation.isPending ? (
                 <>
                   <Loader2 size={16} className="animate-spin" />
@@ -370,7 +435,12 @@ export function ApiTokensPage() {
 
       <Card variant="glass" padding="lg">
         <CardTitle>Tokens cadastrados</CardTitle>
-        {listQuery.isLoading ? (
+        {!selectedTenantId ? (
+          <PageState
+            title="Selecione um mandante"
+            description="Escolha um mandante para visualizar os tokens M2M."
+          />
+        ) : listQuery.isLoading ? (
           <div className="mt-4 flex items-center gap-2 text-text-soft">
             <Loader2 size={16} className="animate-spin" />
             Carregando tokens...

@@ -13,6 +13,20 @@ function resolveCustomerName(customerName: string | null) {
   return customerName ?? "Cliente nao informado";
 }
 
+function resolveCustomerContacts(booking: DashboardSummaryBookingItem): string[] {
+  const contacts: string[] = [];
+
+  if (booking.customerEmail) {
+    contacts.push(booking.customerEmail);
+  }
+
+  if (booking.customerPhone) {
+    contacts.push(booking.customerPhone);
+  }
+
+  return contacts;
+}
+
 export function DashboardUpcomingList({ bookings, tenantTimezone }: DashboardUpcomingListProps) {
   if (bookings.length === 0) {
     return (
@@ -31,7 +45,10 @@ export function DashboardUpcomingList({ bookings, tenantTimezone }: DashboardUpc
       </CardDescription>
 
       <ul className="mt-6 grid gap-3" aria-label="Proximos atendimentos">
-        {bookings.map((booking) => (
+        {bookings.map((booking) => {
+          const customerContacts = resolveCustomerContacts(booking);
+
+          return (
           <li
             key={booking.bookingId}
             className="rounded-[24px] border border-white/10 bg-white/5 p-4"
@@ -44,6 +61,9 @@ export function DashboardUpcomingList({ bookings, tenantTimezone }: DashboardUpc
                 <p className="mt-2 text-sm font-semibold text-white">
                   {resolveCustomerName(booking.customerName)}
                 </p>
+                {customerContacts.length > 0 && (
+                  <p className="mt-1 text-xs text-text-soft">{customerContacts.join(" • ")}</p>
+                )}
                 <p className="mt-1 text-sm text-text-soft">{booking.professionalName}</p>
                 <p className="mt-1 text-xs text-text-soft">{booking.serviceName}</p>
               </div>
@@ -51,7 +71,8 @@ export function DashboardUpcomingList({ bookings, tenantTimezone }: DashboardUpc
               <DashboardStatusBadge status={booking.status} />
             </div>
           </li>
-        ))}
+          );
+        })}
       </ul>
     </Card>
   );

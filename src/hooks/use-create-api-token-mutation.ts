@@ -9,7 +9,7 @@ export function useCreateApiTokenMutation() {
   return useMutation({
     mutationFn: (input: CreateApiTokenInput) => apiTokensService.create(input),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: API_TOKENS_QUERY_KEY });
+      await queryClient.invalidateQueries({ queryKey: API_TOKENS_QUERY_KEY, exact: false });
     },
   });
 }

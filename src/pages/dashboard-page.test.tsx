@@ -47,6 +47,8 @@ const successResponse = {
       end: "2026-03-30T13:00:00.000Z",
       status: "CONFIRMED",
       customerName: null,
+      customerEmail: null,
+      customerPhone: null,
       professionalId: "professional-1",
       professionalName: "Ana",
       serviceId: "service-1",
@@ -60,6 +62,8 @@ const successResponse = {
       end: "2026-03-30T15:00:00.000Z",
       status: "PENDING",
       customerName: "Bruno",
+      customerEmail: "bruno@example.com",
+      customerPhone: "+55 (11) 91234-5678",
       professionalId: "professional-2",
       professionalName: "Carlos",
       serviceId: "service-2",
@@ -185,6 +189,8 @@ describe("DashboardPage", () => {
     expect(screen.getAllByText("62.50%")).toHaveLength(2);
     expect(screen.getByText("Cliente nao informado")).toBeInTheDocument();
     expect(screen.getByText("Bruno")).toBeInTheDocument();
+    expect(screen.getByText("bruno@example.com • +55 (11) 91234-5678")).toBeInTheDocument();
+    expect(screen.queryByText(/null • null/i)).not.toBeInTheDocument();
     expect(screen.getAllByText("Ana")).toHaveLength(2);
     expect(screen.getByText("Retorno")).toBeInTheDocument();
     expect(screen.getAllByText("America/Sao_Paulo")).toHaveLength(2);

@@ -6,6 +6,7 @@ export type ApiTokenScope =
   | "webhooks:receive";
 
 export interface CreateApiTokenInput {
+  tenantId: string;
   name: string;
   prefix: string;
   scopes: ApiTokenScope[];

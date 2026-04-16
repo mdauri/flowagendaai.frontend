@@ -18,6 +18,8 @@ export interface DashboardSummaryBookingItem {
   end: string;
   status: string;
   customerName: string | null;
+  customerEmail: string | null;
+  customerPhone: string | null;
   professionalId: string;
   professionalName: string;
   serviceId: string;

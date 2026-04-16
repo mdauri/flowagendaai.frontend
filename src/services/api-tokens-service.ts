@@ -6,8 +6,9 @@ import type {
 } from "@/types/api-token";
 
 export const apiTokensService = {
-  async list(): Promise<ListApiTokensResponse> {
-    return httpClient<ListApiTokensResponse>("/admin/api-tokens");
+  async list(tenantId: string): Promise<ListApiTokensResponse> {
+    const searchParams = new URLSearchParams({ tenantId });
+    return httpClient<ListApiTokensResponse>(`/admin/api-tokens?${searchParams.toString()}`);
   },
 
   async create(input: CreateApiTokenInput): Promise<CreateApiTokenResponse> {
@@ -17,8 +18,9 @@ export const apiTokensService = {
     });
   },
 
-  async revoke(id: string): Promise<void> {
-    await httpClient<void>(`/admin/api-tokens/${id}`, {
+  async revoke(id: string, tenantId: string): Promise<void> {
+    const searchParams = new URLSearchParams({ tenantId });
+    await httpClient<void>(`/admin/api-tokens/${id}?${searchParams.toString()}`, {
       method: "DELETE",
     });
   },
