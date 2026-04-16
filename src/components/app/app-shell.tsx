@@ -115,7 +115,7 @@ export function AppShell({
             >
               Configuracoes
             </NavLink>
-            {["admin", "mandant", "system-admin"].includes(user.role) ? (
+            {user.role === "system-admin" ? (
               <NavLink
                 to="/app/api-tokens"
                 className={({ isActive }) =>
