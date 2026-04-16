@@ -117,6 +117,21 @@ export function AppShell({
             </NavLink>
             {user.role === "system-admin" ? (
               <NavLink
+                to="/app/api-tokens"
+                className={({ isActive }) =>
+                  cn(
+                    "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
+                    isActive
+                      ? "border-primary bg-primary text-black"
+                      : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white"
+                  )
+                }
+              >
+                API Tokens
+              </NavLink>
+            ) : null}
+            {user.role === "system-admin" ? (
+              <NavLink
                 to="/app/system-admin/tenants/provision"
                 className={({ isActive }) =>
                   cn(

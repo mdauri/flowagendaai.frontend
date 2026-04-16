@@ -22,3 +22,13 @@ export interface ProvisionTenantResponse {
   };
   createdAt: string;
 }
+
+export interface SystemAdminTenantListItem {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+export interface ListSystemAdminTenantsResponse {
+  items: SystemAdminTenantListItem[];
+}

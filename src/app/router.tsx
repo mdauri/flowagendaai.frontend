@@ -13,6 +13,7 @@ import { ResetPasswordPage } from "@/pages/reset-password-page";
 import { ServicesPage } from "@/pages/services-page";
 import { SlotsPage } from "@/pages/slots-page";
 import { SettingsPage } from "@/pages/settings-page";
+import { ApiTokensPage } from "@/pages/api-tokens-page";
 import { SystemAdminTenantProvisionPage } from "@/pages/system-admin-tenant-provision-page";
 import { TermsPage } from "@/pages/terms-page";
 import { ProfessionalServiceManager } from "@/components/professional-service-manager";
@@ -56,6 +57,7 @@ export function AppRouter() {
           <Route path="availability" element={<AvailabilityPage />} />
           <Route path="slots" element={<SlotsPage />} />
           <Route path="settings" element={<SettingsPage />} />
+          <Route path="api-tokens" element={<ApiTokensPage />} />
           <Route path="system-admin/tenants/provision" element={<SystemAdminTenantProvisionPage />} />
           <Route path="*" element={<Navigate to="dashboard" replace />} />
         </Route>
