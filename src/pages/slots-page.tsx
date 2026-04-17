@@ -55,6 +55,22 @@ function resolveSlotsErrorMessage(error: unknown) {
   return "Nao foi possivel concluir a consulta de slots. Tente novamente em instantes.";
 }
 
+function resolveBookingErrorMessage(error: unknown): string {
+  if (error instanceof ApiError) {
+    const normalizedMessage = error.message.toLowerCase();
+    const outsideBusinessHours =
+      error.code === "INVALID_INPUT" &&
+      (normalizedMessage.includes("horario de funcionamento") ||
+        normalizedMessage.includes("horário de funcionamento"));
+
+    if (outsideBusinessHours) {
+      return "Este horário está fora do período de funcionamento do estabelecimento.";
+    }
+  }
+
+  return "Nao foi possivel confirmar o agendamento agora. Tente novamente.";
+}
+
 function SlotsLoadingState() {
   return (
     <Card variant="glass" padding="lg" className="grid gap-4" aria-live="polite">
@@ -274,6 +290,10 @@ export function SlotsPage() {
 
     return "idle";
   })();
+  const bookingErrorDescription =
+    bookingPanelState === "error"
+      ? resolveBookingErrorMessage(createBookingMutation.error)
+      : undefined;
 
   const showBookingPanel =
     submittedFilters !== null &&
@@ -391,6 +411,7 @@ export function SlotsPage() {
               onRetry={handleRetryBooking}
               onRefreshSlots={handleRefreshSlots}
               onResetSuccess={handleResetBookingSuccess}
+              errorDescription={bookingErrorDescription}
             />
           </div>
         ) : null}

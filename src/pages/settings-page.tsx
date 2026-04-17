@@ -5,6 +5,7 @@ import { Input } from "@/components/flow/input";
 import { GeolocationAddressInput } from "@/components/settings/geolocation-address-input";
 import { CoverImageUpload } from "@/components/settings/cover-image-upload";
 import { LogoUpload } from "@/components/settings/logo-upload";
+import { BusinessHoursConfig } from "@/components/settings/business-hours-config";
 import { tenantService } from "@/services/tenant-service";
 import { tenantCoverImageService } from "@/services/tenant-cover-image-service";
 import { tenantLogoImageService } from "@/services/tenant-logo-image-service";
@@ -194,6 +195,9 @@ export function SettingsPage() {
           disabled={saveState === "saving"}
         />
       </section>
+
+      {/* Business Hours Section */}
+      <BusinessHoursConfig />
 
       {/* Save Button and Feedback */}
       <div className="flex items-center gap-3">
