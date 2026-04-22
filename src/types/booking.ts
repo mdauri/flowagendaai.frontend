@@ -13,3 +13,15 @@ export interface CreateBookingResponse {
   end: string;
   status: "CONFIRMED";
 }
+
+export type BookingStatus = "PENDING" | "CONFIRMED" | "CANCELLED" | "COMPLETED";
+
+export interface CancelBookingResponse {
+  booking: {
+    id: string;
+    status: BookingStatus;
+    cancelledAt: string;
+    cancelledByType: "TENANT_USER" | "PUBLIC" | "SYSTEM";
+    cancelReason?: string | null;
+  };
+}

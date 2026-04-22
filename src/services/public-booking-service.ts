@@ -7,6 +7,7 @@ import type {
   PublicServicesResponse,
   PublicSlotsResponse,
 } from "@/types/public-booking";
+import type { CancelBookingResponse } from "@/types/booking";
 
 export const publicBookingService = {
   async getProfessional(slug: string): Promise<PublicProfessional> {
@@ -56,6 +57,17 @@ export const publicBookingService = {
 
   async createBooking(input: CreatePublicBookingInput): Promise<CreatePublicBookingResponse> {
     return httpClient<CreatePublicBookingResponse>("/public/bookings", {
+      method: "POST",
+      skipAuth: true,
+      body: JSON.stringify(input),
+    });
+  },
+
+  async cancelBooking(
+    bookingId: string,
+    input: { cancelToken: string; reason?: string }
+  ): Promise<CancelBookingResponse> {
+    return httpClient<CancelBookingResponse>(`/public/bookings/${bookingId}/cancel`, {
       method: "POST",
       skipAuth: true,
       body: JSON.stringify(input),

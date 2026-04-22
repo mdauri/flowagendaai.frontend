@@ -1,5 +1,5 @@
 import { httpClient } from "@/lib/http-client";
-import type { CreateBookingInput, CreateBookingResponse } from "@/types/booking";
+import type { CancelBookingResponse, CreateBookingInput, CreateBookingResponse } from "@/types/booking";
 
 export const bookingsService = {
   async create(input: CreateBookingInput): Promise<CreateBookingResponse> {
@@ -13,6 +13,13 @@ export const bookingsService = {
           }
         : undefined,
       body: JSON.stringify(payload),
+    });
+  },
+
+  async cancel(bookingId: string, input: { reason?: string }): Promise<CancelBookingResponse> {
+    return httpClient<CancelBookingResponse>(`/bookings/${bookingId}/cancel`, {
+      method: "POST",
+      body: JSON.stringify(input),
     });
   },
 };

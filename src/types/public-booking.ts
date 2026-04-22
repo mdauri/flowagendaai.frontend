@@ -80,6 +80,8 @@ export interface CreatePublicBookingResponse {
   customerEmail?: string | null;
   professionalName: string;
   serviceName: string;
+  cancelToken?: string;
+  cancelTokenExpiresAt?: string;
   /** Present only for multi-day bookings */
   daysAffected?: DaySegment[];
 }

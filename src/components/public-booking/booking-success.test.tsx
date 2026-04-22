@@ -1,6 +1,7 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { BookingSuccess } from "@/components/public-booking/booking-success";
+import { renderWithProviders } from "@/test/render";
 
 const singleDayBooking = {
   id: "booking-1",
@@ -36,21 +37,21 @@ describe("BookingSuccess", () => {
   };
 
   it("shows MultiDayBadge and affected days for multi-day booking", () => {
-    render(<BookingSuccess {...baseProps} booking={multiDayBooking} />);
+    renderWithProviders(<BookingSuccess {...baseProps} booking={multiDayBooking} />);
 
     expect(screen.getByText("Multi-dia: 3 dias")).toBeInTheDocument();
     expect(screen.getByText(/Dias afetados/)).toBeInTheDocument();
   });
 
   it("does not show extra section for single-day booking", () => {
-    render(<BookingSuccess {...baseProps} booking={singleDayBooking} />);
+    renderWithProviders(<BookingSuccess {...baseProps} booking={singleDayBooking} />);
 
     expect(screen.queryByText(/Multi-dia/)).not.toBeInTheDocument();
     expect(screen.queryByText(/Dias afetados/)).not.toBeInTheDocument();
   });
 
   it("Add to calendar button present for both types", () => {
-    const { rerender } = render(<BookingSuccess {...baseProps} booking={singleDayBooking} />);
+    const { rerender } = renderWithProviders(<BookingSuccess {...baseProps} booking={singleDayBooking} />);
     expect(screen.getByText(/Adicionar ao calend[aá]rio/)).toBeInTheDocument();
 
     rerender(<BookingSuccess {...baseProps} booking={multiDayBooking} />);
@@ -58,7 +59,7 @@ describe("BookingSuccess", () => {
   });
 
   it("Success message renders correctly", () => {
-    render(<BookingSuccess {...baseProps} booking={multiDayBooking} />);
+    renderWithProviders(<BookingSuccess {...baseProps} booking={multiDayBooking} />);
 
     expect(screen.getByText("Agendamento confirmado!")).toBeInTheDocument();
   });

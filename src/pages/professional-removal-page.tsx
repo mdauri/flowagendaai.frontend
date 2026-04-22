@@ -10,6 +10,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { useImpactedProfessionalBookingsQuery } from "@/hooks/use-impacted-professional-bookings-query";
 import { professionalsService } from "@/services/professionals-service";
 import { ApiError } from "@/types/api";
+import { CancelBookingDialog } from "@/components/bookings/cancel-booking-dialog";
+import type { ImpactedBooking } from "@/types/professional";
 
 export function ProfessionalRemovalPage() {
   const navigate = useNavigate();
@@ -21,6 +23,8 @@ export function ProfessionalRemovalPage() {
   const [pageError, setPageError] = useState<string | null>(null);
   const [pageInfo, setPageInfo] = useState<string | null>(null);
   const [isFinalizing, setIsFinalizing] = useState(false);
+  const [cancelDialogBooking, setCancelDialogBooking] = useState<ImpactedBooking | null>(null);
+  const [cancelDialogError, setCancelDialogError] = useState<string | null>(null);
 
   const canManageProfessionals = useMemo(
     () => ["admin", "mandant"].includes(auth.user?.role ?? ""),
@@ -54,6 +58,7 @@ export function ProfessionalRemovalPage() {
   async function handleCancel(bookingId: string) {
     setPageError(null);
     setPageInfo(null);
+    setCancelDialogError(null);
     setBusyBookingId(bookingId);
 
     try {
@@ -67,9 +72,10 @@ export function ProfessionalRemovalPage() {
           : "Agendamento cancelado. Nenhum email foi enviado porque o booking nao possui email cadastrado."
       );
     } catch (error) {
-      setPageError(
-        error instanceof ApiError ? error.message : "Nao foi possivel cancelar o agendamento."
-      );
+      const message =
+        error instanceof ApiError ? error.message : "Nao foi possivel cancelar o agendamento.";
+      setPageError(message);
+      setCancelDialogError(message);
     } finally {
       setBusyBookingId(null);
     }
@@ -226,10 +232,14 @@ export function ProfessionalRemovalPage() {
                     </Button>
                     <Button
                       type="button"
-                      variant="secondary"
+                      variant="danger"
                       size="md"
                       disabled={busyBookingId === booking.id}
-                      onClick={() => void handleCancel(booking.id)}
+                      onClick={() => {
+                        setPageError(null);
+                        setPageInfo(null);
+                        setCancelDialogBooking(booking);
+                      }}
                     >
                       Cancelar booking
                     </Button>
@@ -240,6 +250,36 @@ export function ProfessionalRemovalPage() {
           })}
         </div>
       )}
+
+      <CancelBookingDialog
+        isOpen={Boolean(cancelDialogBooking)}
+        context="professional-removal"
+        bookingSummary={{
+          customerName: cancelDialogBooking?.customerName ?? null,
+          customerPhone: cancelDialogBooking?.customerPhone ?? null,
+          customerEmail: cancelDialogBooking?.customerEmail ?? null,
+          professionalName: professional.name,
+          serviceName: cancelDialogBooking?.service?.name ?? null,
+          start: cancelDialogBooking?.start ?? null,
+          end: cancelDialogBooking?.end ?? null,
+        }}
+        supportReason={false}
+        isSubmitting={busyBookingId === cancelDialogBooking?.id}
+        errorMessage={cancelDialogError}
+        onClose={() => {
+          if (busyBookingId === cancelDialogBooking?.id) {
+            return;
+          }
+          setCancelDialogBooking(null);
+        }}
+        onConfirm={() => {
+          if (!cancelDialogBooking) {
+            return;
+          }
+          void handleCancel(cancelDialogBooking.id);
+          setCancelDialogBooking(null);
+        }}
+      />
     </div>
   );
 }
