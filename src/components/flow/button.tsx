@@ -11,11 +11,12 @@ const buttonVariants = cva(
         primary: "hover:translate-y-[var(--control-hover-lift-y)]",
         secondary: "hover:[background-color:var(--control-hover-glass-background)]",
         ghost: "hover:[color:var(--control-hover-ghost-text)]",
+        danger: "hover:translate-y-[var(--control-hover-lift-y)]",
       },
       size: {
-        sm: "h-10 px-4 py-2",
-        md: "h-12 px-5 py-3",
-        lg: "h-14 px-7 py-4 text-base",
+        sm: "min-h-10 px-4 py-2",
+        md: "min-h-12 px-5 py-3",
+        lg: "min-h-14 px-7 py-4 text-base",
       },
     },
     defaultVariants: {
@@ -56,6 +57,12 @@ const buttonVariantStyles: Record<NonNullable<VariantProps<typeof buttonVariants
   },
   ghost: {
     color: colors.text.soft,
+  },
+  danger: {
+    backgroundColor: semanticTokens.feedback.danger.background,
+    borderColor: semanticTokens.feedback.danger.border,
+    color: colors.text.primary,
+    boxShadow: "0 0 0 1px rgba(248, 113, 113, 0.12), 0 16px 40px rgba(0, 0, 0, 0.4)",
   },
 };
 

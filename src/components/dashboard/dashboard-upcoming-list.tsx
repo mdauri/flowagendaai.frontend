@@ -3,10 +3,13 @@ import { formatUtcTimeRangeInTenantTimezone } from "@/lib/date-time";
 import type { DashboardSummaryBookingItem } from "@/types/dashboard";
 import { DashboardStatusBadge } from "@/components/dashboard/dashboard-status-badge";
 import { DashboardEmptyState } from "@/components/dashboard/dashboard-empty-state";
+import { DashboardBookingActionsMenu } from "@/components/dashboard/dashboard-booking-actions-menu";
 
 interface DashboardUpcomingListProps {
   bookings: DashboardSummaryBookingItem[];
   tenantTimezone: string;
+  busyBookingId?: string | null;
+  onCancelBooking?: (booking: DashboardSummaryBookingItem) => void;
 }
 
 function resolveCustomerName(customerName: string | null) {
@@ -27,7 +30,12 @@ function resolveCustomerContacts(booking: DashboardSummaryBookingItem): string[]
   return contacts;
 }
 
-export function DashboardUpcomingList({ bookings, tenantTimezone }: DashboardUpcomingListProps) {
+export function DashboardUpcomingList({
+  bookings,
+  tenantTimezone,
+  busyBookingId,
+  onCancelBooking,
+}: DashboardUpcomingListProps) {
   if (bookings.length === 0) {
     return (
       <DashboardEmptyState
@@ -47,6 +55,9 @@ export function DashboardUpcomingList({ bookings, tenantTimezone }: DashboardUpc
       <ul className="mt-6 grid gap-3" aria-label="Proximos atendimentos">
         {bookings.map((booking) => {
           const customerContacts = resolveCustomerContacts(booking);
+          const isEligible = booking.status === "CONFIRMED" || booking.status === "PENDING";
+          const isCancelled = booking.status === "CANCELLED";
+          const isCompleted = booking.status === "COMPLETED";
 
           return (
           <li
@@ -68,7 +79,25 @@ export function DashboardUpcomingList({ bookings, tenantTimezone }: DashboardUpc
                 <p className="mt-1 text-xs text-text-soft">{booking.serviceName}</p>
               </div>
 
-              <DashboardStatusBadge status={booking.status} />
+              <div className="flex flex-col items-end gap-3">
+                <DashboardStatusBadge status={booking.status} />
+                {onCancelBooking ? (
+                  <DashboardBookingActionsMenu
+                    disabled={busyBookingId === booking.bookingId}
+                    onCancel={() => onCancelBooking(booking)}
+                    cancelDisabled={!isEligible || busyBookingId === booking.bookingId}
+                    cancelLabel={
+                      busyBookingId === booking.bookingId
+                        ? "Cancelando..."
+                        : isCancelled
+                          ? "Ja cancelado"
+                          : isCompleted
+                            ? "Concluido"
+                            : "Cancelar agendamento"
+                    }
+                  />
+                ) : null}
+              </div>
             </div>
           </li>
           );

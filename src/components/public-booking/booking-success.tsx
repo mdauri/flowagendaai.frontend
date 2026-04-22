@@ -7,6 +7,10 @@ import { DateTime } from "luxon";
 import { colors, semanticTokens } from "@/design-system";
 import type { CreatePublicBookingResponse, DaySegment } from "@/types/public-booking";
 import { useState } from "react";
+import { CancelBookingDialog } from "@/components/bookings/cancel-booking-dialog";
+import { useCancelPublicBookingMutation } from "@/hooks/use-cancel-public-booking-mutation";
+import { FeedbackBanner } from "@/components/shared/feedback-banner";
+import { ApiError } from "@/types/api";
 
 interface BookingSuccessProps {
   booking: CreatePublicBookingResponse;
@@ -17,10 +21,16 @@ interface BookingSuccessProps {
 
 export function BookingSuccess({ booking, timezone, shareUrl, onNewBooking }: BookingSuccessProps) {
   const [copied, setCopied] = useState(false);
+  const cancelPublicBookingMutation = useCancelPublicBookingMutation();
+  const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
+  const [cancelError, setCancelError] = useState<string | null>(null);
+  const [cancelInfo, setCancelInfo] = useState<string | null>(null);
+  const [isCancelled, setIsCancelled] = useState(false);
   const startDate = DateTime.fromISO(booking.start, { zone: "utc" }).setZone(timezone);
   const endDate = DateTime.fromISO(booking.end, { zone: "utc" }).setZone(timezone);
   const isMultiDay = booking.daysAffected && booking.daysAffected.length > 0;
   const daysAffected = booking.daysAffected as DaySegment[] | undefined;
+  const canCancel = Boolean(booking.cancelToken) && !isCancelled;
 
   const handleAddToCalendar = () => {
     const blob = generatePublicBookingICS({
@@ -99,18 +109,113 @@ export function BookingSuccess({ booking, timezone, shareUrl, onNewBooking }: Bo
       </Card>
 
       <div className="flex flex-col gap-3 sm:flex-row pt-2">
-        <Button className="w-full" variant="secondary" onClick={handleAddToCalendar} size="md">
+        <Button
+          className="w-full"
+          variant="secondary"
+          onClick={handleAddToCalendar}
+          size="md"
+          disabled={isCancelled}
+        >
            Adicionar ao calendário
         </Button>
         <Button className="w-full" variant="primary" onClick={onNewBooking} size="md">
           Novo agendamento
         </Button>
       </div>
+
+      {canCancel ? (
+        <div className="pt-2">
+          <Button
+            className="w-full"
+            variant="danger"
+            size="md"
+            onClick={() => {
+              setCancelInfo(null);
+              setCancelError(null);
+              setIsCancelDialogOpen(true);
+            }}
+          >
+            Cancelar agendamento
+          </Button>
+        </div>
+      ) : null}
+
+      {cancelInfo ? (
+        <FeedbackBanner
+          tone="info"
+          title="Atualizacao registrada"
+          description={cancelInfo}
+        />
+      ) : null}
+
+      {cancelError ? (
+        <FeedbackBanner
+          title="Nao foi possivel cancelar"
+          description={cancelError}
+        />
+      ) : null}
+
       <div className="flex justify-center">
         <Button className="w-full" variant="ghost" onClick={handleShare} size="md">
           {copied ? "Link copiado" : "Compartilhar"}
         </Button>
       </div>
+
+      <CancelBookingDialog
+        isOpen={isCancelDialogOpen}
+        context="public"
+        bookingSummary={{
+          customerName: booking.customerName,
+          customerPhone: booking.customerPhone,
+          customerEmail: booking.customerEmail ?? null,
+          professionalName: booking.professionalName,
+          serviceName: booking.serviceName,
+          start: booking.start,
+          end: booking.end,
+        }}
+        isSubmitting={cancelPublicBookingMutation.isPending}
+        errorMessage={cancelError}
+        onClose={() => {
+          if (cancelPublicBookingMutation.isPending) {
+            return;
+          }
+          setIsCancelDialogOpen(false);
+          setCancelError(null);
+        }}
+        onConfirm={async (input) => {
+          setCancelError(null);
+          setCancelInfo(null);
+
+          try {
+            await cancelPublicBookingMutation.mutateAsync({
+              bookingId: booking.id,
+              cancelToken: booking.cancelToken ?? "",
+              reason: input.reason,
+            });
+            setIsCancelDialogOpen(false);
+            setIsCancelled(true);
+            setCancelInfo("Agendamento cancelado.");
+          } catch (error) {
+            if (error instanceof ApiError && error.status === 404) {
+              setCancelError(
+                "Nao foi possivel validar o cancelamento. Verifique o link ou contate o estabelecimento."
+              );
+              return;
+            }
+
+            if (error instanceof ApiError && error.status === 409) {
+              setCancelError(
+                "Este agendamento ja foi resolvido. Atualize a pagina e tente novamente."
+              );
+              return;
+            }
+
+            setCancelError(
+              error instanceof ApiError ? error.message : "Nao foi possivel cancelar agora. Tente novamente."
+            );
+          }
+        }}
+      />
     </div>
   );
 }

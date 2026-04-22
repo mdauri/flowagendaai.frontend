@@ -126,6 +126,7 @@ describe("ProfessionalRemovalPage", () => {
     });
 
     await user.click(screen.getByRole("button", { name: "Cancelar booking" }));
+    await user.click(screen.getByRole("button", { name: "Confirmar cancelamento" }));
 
     expect(await screen.findByText("Booking ja resolvido.")).toBeInTheDocument();
   });

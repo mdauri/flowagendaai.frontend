@@ -28,6 +28,7 @@ interface BookingConfirmationPanelProps {
   onRefreshSlots: () => void;
   onResetSuccess: () => void;
   daysAffected?: { date: string; start: string; end: string; durationMinutes: number }[];
+  errorDescription?: string;
 }
 
 function SlotSummary({
@@ -127,6 +128,7 @@ export function BookingConfirmationPanel({
   onRetry,
   onRefreshSlots,
   onResetSuccess,
+  errorDescription,
 }: BookingConfirmationPanelProps) {
   if (state === "success" && confirmedBooking) {
     return (
@@ -186,7 +188,10 @@ export function BookingConfirmationPanel({
       {state === "error" ? (
         <FeedbackBanner
           title="Falha ao confirmar"
-          description="Nao foi possivel confirmar o agendamento agora. Tente novamente."
+          description={
+            errorDescription ??
+            "Nao foi possivel confirmar o agendamento agora. Tente novamente."
+          }
           tone="warning"
         />
       ) : null}
