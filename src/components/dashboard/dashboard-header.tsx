@@ -12,6 +12,8 @@ interface DashboardHeaderProps {
   tenantTimezone: string;
   professionalId: string;
   serviceId: string;
+  status: string;
+  customerQuery: string;
   professionals: Array<{ id: string; name: string }>;
   services: Array<{ id: string; name: string }>;
   onDateChange: (date: string) => void;
@@ -21,6 +23,8 @@ interface DashboardHeaderProps {
   onTomorrow: () => void;
   onProfessionalChange: (professionalId: string) => void;
   onServiceChange: (serviceId: string) => void;
+  onStatusChange: (status: string) => void;
+  onCustomerQueryChange: (value: string) => void;
   onClearFilters: () => void;
 }
 
@@ -37,6 +41,8 @@ export function DashboardHeader({
   tenantTimezone,
   professionalId,
   serviceId,
+  status,
+  customerQuery,
   professionals,
   services,
   onDateChange,
@@ -46,6 +52,8 @@ export function DashboardHeader({
   onTomorrow,
   onProfessionalChange,
   onServiceChange,
+  onStatusChange,
+  onCustomerQueryChange,
   onClearFilters,
 }: DashboardHeaderProps) {
   const isToday = isTodayInTenant(date, tenantTimezone);
@@ -57,6 +65,12 @@ export function DashboardHeader({
     value: service.id,
     label: service.name,
   }));
+  const statusOptions = [
+    { value: "CONFIRMED", label: "Confirmado" },
+    { value: "PENDING", label: "Pendente" },
+    { value: "CANCELLED", label: "Cancelado" },
+    { value: "COMPLETED", label: "Concluido" },
+  ];
 
   return (
     <div className="grid gap-4">
@@ -141,7 +155,7 @@ export function DashboardHeader({
             </div>
           </div>
 
-          <div className="grid gap-3 md:grid-cols-2">
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-2">
             <div className="grid gap-1.5">
               <p className="text-xs uppercase tracking-[0.12em] text-text-soft">Profissional</p>
               <Select
@@ -161,6 +175,29 @@ export function DashboardHeader({
                 placeholder="Todos os servicos"
                 onValueChange={onServiceChange}
                 aria-describedby="dashboard-service-filter"
+              />
+            </div>
+
+            <div className="grid gap-1.5">
+              <p className="text-xs uppercase tracking-[0.12em] text-text-soft">Status</p>
+              <Select
+                value={status}
+                options={statusOptions}
+                placeholder="Todos os status"
+                onValueChange={onStatusChange}
+                aria-describedby="dashboard-status-filter"
+              />
+            </div>
+
+            <div className="grid gap-1.5">
+              <p className="text-xs uppercase tracking-[0.12em] text-text-soft">Cliente</p>
+              <Input
+                value={customerQuery}
+                type="search"
+                inputSize="sm"
+                placeholder="Nome ou telefone"
+                onChange={(event) => onCustomerQueryChange(event.target.value)}
+                aria-label="Filtrar por cliente"
               />
             </div>
           </div>

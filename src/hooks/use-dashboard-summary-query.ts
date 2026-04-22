@@ -8,6 +8,9 @@ export function getDashboardSummaryQueryKey(input: DashboardSummaryQueryParams) 
     input.date,
     input.professionalId ?? null,
     input.serviceId ?? null,
+    input.status ?? null,
+    input.customerName ?? null,
+    input.customerPhone ?? null,
   ] as const;
 }
 

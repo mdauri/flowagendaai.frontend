@@ -1,5 +1,11 @@
 import { httpClient } from "@/lib/http-client";
-import type { CancelBookingResponse, CreateBookingInput, CreateBookingResponse } from "@/types/booking";
+import type {
+  CancelBookingResponse,
+  CreateBookingInput,
+  CreateBookingResponse,
+  GetBookingByIdResponse,
+  ListBookingsResponse,
+} from "@/types/booking";
 
 export const bookingsService = {
   async create(input: CreateBookingInput): Promise<CreateBookingResponse> {
@@ -21,5 +27,34 @@ export const bookingsService = {
       method: "POST",
       body: JSON.stringify(input),
     });
+  },
+
+  async getById(id: string): Promise<GetBookingByIdResponse> {
+    return httpClient<GetBookingByIdResponse>(`/bookings/${id}`, { method: "GET" });
+  },
+
+  async list(params: {
+    from: string;
+    to: string;
+    professionalId?: string;
+    status?: string;
+    customerName?: string;
+    customerPhone?: string;
+    page?: number;
+    pageSize?: number;
+  }): Promise<ListBookingsResponse> {
+    const search = new URLSearchParams({
+      from: params.from,
+      to: params.to,
+    });
+
+    if (params.professionalId) search.set("professionalId", params.professionalId);
+    if (params.status) search.set("status", params.status);
+    if (params.customerName) search.set("customerName", params.customerName);
+    if (params.customerPhone) search.set("customerPhone", params.customerPhone);
+    if (typeof params.page === "number") search.set("page", String(params.page));
+    if (typeof params.pageSize === "number") search.set("pageSize", String(params.pageSize));
+
+    return httpClient<ListBookingsResponse>(`/bookings?${search.toString()}`, { method: "GET" });
   },
 };

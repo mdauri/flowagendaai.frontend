@@ -6,7 +6,10 @@ import { cn } from "@/lib/cn";
 
 interface DashboardBookingActionsMenuProps {
   disabled?: boolean;
+  onViewDetails?: () => void;
   onCancel: () => void;
+  viewDetailsDisabled?: boolean;
+  viewDetailsLabel?: string;
   cancelDisabled?: boolean;
   cancelLabel: string;
 }
@@ -15,7 +18,10 @@ const MENU_WIDTH_PX = 220;
 
 export function DashboardBookingActionsMenu({
   disabled = false,
+  onViewDetails,
   onCancel,
+  viewDetailsDisabled = false,
+  viewDetailsLabel = "Ver detalhes",
   cancelDisabled = false,
   cancelLabel,
 }: DashboardBookingActionsMenuProps) {
@@ -96,6 +102,20 @@ export function DashboardBookingActionsMenu({
               className="fixed z-[999] w-[220px] rounded-[24px] border border-white/10 bg-[#121216] p-2 shadow-lg"
               style={{ top: menuRect.top, left: Math.max(12, menuRect.left) }}
             >
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                className="mb-2 w-full justify-start"
+                role="menuitem"
+                disabled={viewDetailsDisabled}
+                onClick={() => {
+                  setIsOpen(false);
+                  onViewDetails?.();
+                }}
+              >
+                {viewDetailsLabel}
+              </Button>
               <Button
                 type="button"
                 variant="danger"

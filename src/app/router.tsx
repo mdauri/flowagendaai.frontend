@@ -14,6 +14,7 @@ import { ServicesPage } from "@/pages/services-page";
 import { SlotsPage } from "@/pages/slots-page";
 import { SettingsPage } from "@/pages/settings-page";
 import { ApiTokensPage } from "@/pages/api-tokens-page";
+import { BookingsPage } from "@/pages/bookings-page";
 import { SystemAdminTenantProvisionPage } from "@/pages/system-admin-tenant-provision-page";
 import { TermsPage } from "@/pages/terms-page";
 import { ProfessionalServiceManager } from "@/components/professional-service-manager";
@@ -43,6 +44,7 @@ export function AppRouter() {
         >
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<DashboardPage />} />
+          <Route path="bookings" element={<BookingsPage />} />
           <Route path="professionals" element={<ProfessionalsPage />} />
           <Route path="professionals/:professionalId/removal" element={<ProfessionalRemovalPage />} />
           <Route path="services" element={<ServicesPage />} />

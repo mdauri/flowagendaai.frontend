@@ -130,6 +130,9 @@ describe("DashboardPage", () => {
       date: "2026-03-30",
       professionalId: undefined,
       serviceId: undefined,
+      status: undefined,
+      customerName: undefined,
+      customerPhone: undefined,
     });
   });
 
@@ -198,6 +201,9 @@ describe("DashboardPage", () => {
       date: "2026-03-30",
       professionalId: undefined,
       serviceId: undefined,
+      status: undefined,
+      customerName: undefined,
+      customerPhone: undefined,
     });
   });
 });
