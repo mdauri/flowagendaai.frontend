@@ -8,10 +8,12 @@ import { DashboardLoadingState } from "@/components/dashboard/dashboard-loading-
 import { DashboardOccupancyCard } from "@/components/dashboard/dashboard-occupancy-card";
 import { DashboardProfessionalOccupancy } from "@/components/dashboard/dashboard-professional-occupancy";
 import { DashboardUpcomingList } from "@/components/dashboard/dashboard-upcoming-list";
+import { DashboardBookingDetailsDialog } from "@/components/dashboard/dashboard-booking-details-dialog";
 import { CancelBookingDialog } from "@/components/bookings/cancel-booking-dialog";
 import { useDashboardSummaryQuery } from "@/hooks/use-dashboard-summary-query";
 import { useProfessionalsQuery } from "@/hooks/use-professionals-query";
 import { useServicesQuery } from "@/hooks/use-services-query";
+import { useBookingByIdQuery } from "@/hooks/use-booking-by-id-query";
 import { useCancelBookingMutation } from "@/hooks/use-cancel-booking-mutation";
 import type { DashboardSummaryBookingItem } from "@/types/dashboard";
 import { FeedbackBanner } from "@/components/shared/feedback-banner";
@@ -21,22 +23,40 @@ function getInitialDashboardDate() {
   return DateTime.local().toISODate() ?? "";
 }
 
+type DashboardStatusFilter = "" | "PENDING" | "CONFIRMED" | "CANCELLED" | "COMPLETED";
+
 export function DashboardPage() {
   const [date, setDate] = React.useState(getInitialDashboardDate);
   const [professionalId, setProfessionalId] = React.useState("");
   const [serviceId, setServiceId] = React.useState("");
+  const [status, setStatus] = React.useState<DashboardStatusFilter>("");
+  const [customerQuery, setCustomerQuery] = React.useState("");
+  const normalizedCustomerDigits = customerQuery.replace(/\D/g, "");
+  const customerPhone = normalizedCustomerDigits.length >= 6 ? normalizedCustomerDigits : undefined;
+  const customerName = customerPhone
+    ? undefined
+    : customerQuery.trim().length > 0
+      ? customerQuery.trim()
+      : undefined;
   const professionalsQuery = useProfessionalsQuery();
   const servicesQuery = useServicesQuery();
   const dashboardSummaryQuery = useDashboardSummaryQuery({
     date,
     professionalId: professionalId || undefined,
     serviceId: serviceId || undefined,
+    status: status || undefined,
+    customerName,
+    customerPhone,
   });
   const cancelBookingMutation = useCancelBookingMutation();
   const [busyBookingId, setBusyBookingId] = React.useState<string | null>(null);
   const [cancelDialogBooking, setCancelDialogBooking] = React.useState<DashboardSummaryBookingItem | null>(
     null
   );
+  const [detailsBookingId, setDetailsBookingId] = React.useState<string | null>(null);
+  const [detailsBookingSummary, setDetailsBookingSummary] =
+    React.useState<DashboardSummaryBookingItem | null>(null);
+  const bookingDetailsQuery = useBookingByIdQuery(detailsBookingId);
   const [feedback, setFeedback] = React.useState<string | null>(null);
   const [cancelError, setCancelError] = React.useState<string | null>(null);
   const isBootstrapLoading = professionalsQuery.isLoading || servicesQuery.isLoading;
@@ -87,12 +107,19 @@ export function DashboardPage() {
   const handleClearFilters = React.useCallback(() => {
     setProfessionalId("");
     setServiceId("");
+    setStatus("");
+    setCustomerQuery("");
   }, []);
 
   const handleRequestCancelBooking = React.useCallback((booking: DashboardSummaryBookingItem) => {
     setFeedback(null);
     setCancelError(null);
     setCancelDialogBooking(booking);
+  }, []);
+
+  const handleViewBookingDetails = React.useCallback((booking: DashboardSummaryBookingItem) => {
+    setDetailsBookingId(booking.bookingId);
+    setDetailsBookingSummary(booking);
   }, []);
 
   const handleConfirmCancelBooking = React.useCallback(
@@ -171,6 +198,8 @@ export function DashboardPage() {
         tenantTimezone={summary.tenantTimezone}
         professionalId={professionalId}
         serviceId={serviceId}
+        status={status}
+        customerQuery={customerQuery}
         professionals={professionals.map((item) => ({ id: item.id, name: item.name }))}
         services={services.map((item) => ({ id: item.id, name: item.name }))}
         onDateChange={handleDateChange}
@@ -180,6 +209,18 @@ export function DashboardPage() {
         onTomorrow={handleTomorrow}
         onProfessionalChange={setProfessionalId}
         onServiceChange={setServiceId}
+        onStatusChange={(nextStatus) => {
+          if (
+            nextStatus === "" ||
+            nextStatus === "PENDING" ||
+            nextStatus === "CONFIRMED" ||
+            nextStatus === "CANCELLED" ||
+            nextStatus === "COMPLETED"
+          ) {
+            setStatus(nextStatus);
+          }
+        }}
+        onCustomerQueryChange={setCustomerQuery}
         onClearFilters={handleClearFilters}
       />
       <div className="grid gap-6 xl:grid-cols-12">
@@ -198,6 +239,7 @@ export function DashboardPage() {
             tenantTimezone={summary.tenantTimezone}
             busyBookingId={busyBookingId}
             onCancelBooking={handleRequestCancelBooking}
+            onViewBookingDetails={handleViewBookingDetails}
           />
         </div>
 
@@ -207,10 +249,33 @@ export function DashboardPage() {
             tenantTimezone={summary.tenantTimezone}
             busyBookingId={busyBookingId}
             onCancelBooking={handleRequestCancelBooking}
+            onViewBookingDetails={handleViewBookingDetails}
           />
           <DashboardProfessionalOccupancy items={summary.professionalOccupancy} />
         </div>
       </div>
+
+      <DashboardBookingDetailsDialog
+        isOpen={Boolean(detailsBookingId)}
+        booking={bookingDetailsQuery.data?.booking ?? null}
+        fallbackBooking={detailsBookingSummary}
+        tenantTimezone={summary.tenantTimezone}
+        isLoading={bookingDetailsQuery.isLoading}
+        errorMessage={
+          bookingDetailsQuery.error instanceof ApiError
+            ? bookingDetailsQuery.error.message
+            : bookingDetailsQuery.isError
+              ? "Nao foi possivel carregar os dados deste agendamento."
+              : null
+        }
+        onRetry={() => {
+          void bookingDetailsQuery.refetch();
+        }}
+        onClose={() => {
+          setDetailsBookingId(null);
+          setDetailsBookingSummary(null);
+        }}
+      />
 
       <CancelBookingDialog
         isOpen={Boolean(cancelDialogBooking)}

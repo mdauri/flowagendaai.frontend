@@ -10,6 +10,7 @@ interface DashboardAgendaListProps {
   tenantTimezone: string;
   busyBookingId?: string | null;
   onCancelBooking?: (booking: DashboardSummaryBookingItem) => void;
+  onViewBookingDetails?: (booking: DashboardSummaryBookingItem) => void;
 }
 
 function resolveCustomerName(customerName: string | null) {
@@ -35,6 +36,7 @@ export function DashboardAgendaList({
   tenantTimezone,
   busyBookingId,
   onCancelBooking,
+  onViewBookingDetails,
 }: DashboardAgendaListProps) {
   if (bookings.length === 0) {
     return (
@@ -95,7 +97,9 @@ export function DashboardAgendaList({
                 {onCancelBooking ? (
                   <DashboardBookingActionsMenu
                     disabled={busyBookingId === booking.bookingId}
+                    onViewDetails={() => onViewBookingDetails?.(booking)}
                     onCancel={() => onCancelBooking(booking)}
+                    viewDetailsDisabled={false}
                     cancelDisabled={!isEligible || busyBookingId === booking.bookingId}
                     cancelLabel={
                       busyBookingId === booking.bookingId

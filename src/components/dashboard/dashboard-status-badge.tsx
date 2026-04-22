@@ -4,6 +4,13 @@ interface DashboardStatusBadgeProps {
   status: string;
 }
 
+const STATUS_LABELS_PT_BR: Record<string, string> = {
+  CONFIRMED: "Confirmado",
+  PENDING: "Pendente",
+  CANCELLED: "Cancelado",
+  COMPLETED: "Concluido",
+};
+
 function resolveBadgeVariant(status: string) {
   switch (status.toUpperCase()) {
     case "CONFIRMED":
@@ -20,7 +27,8 @@ function resolveBadgeVariant(status: string) {
 }
 
 function formatStatusLabel(status: string) {
-  return status.replace(/_/g, " ");
+  const normalized = status.toUpperCase();
+  return STATUS_LABELS_PT_BR[normalized] ?? status.replace(/_/g, " ");
 }
 
 export function DashboardStatusBadge({ status }: DashboardStatusBadgeProps) {

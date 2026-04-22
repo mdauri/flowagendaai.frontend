@@ -16,6 +16,18 @@ export const dashboardService = {
       searchParams.set("serviceId", input.serviceId);
     }
 
+    if (input.status) {
+      searchParams.set("status", input.status);
+    }
+
+    if (input.customerName) {
+      searchParams.set("customerName", input.customerName);
+    }
+
+    if (input.customerPhone) {
+      searchParams.set("customerPhone", input.customerPhone);
+    }
+
     return httpClient<DashboardSummaryResponse>(
       `/dashboard/summary?${searchParams.toString()}`
     );

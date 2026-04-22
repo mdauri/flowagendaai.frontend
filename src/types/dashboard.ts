@@ -50,4 +50,7 @@ export interface DashboardSummaryQueryParams {
   date: string;
   professionalId?: string;
   serviceId?: string;
+  status?: "PENDING" | "CONFIRMED" | "CANCELLED" | "COMPLETED";
+  customerName?: string;
+  customerPhone?: string;
 }

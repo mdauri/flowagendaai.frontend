@@ -16,6 +16,32 @@ export interface CreateBookingResponse {
 
 export type BookingStatus = "PENDING" | "CONFIRMED" | "CANCELLED" | "COMPLETED";
 
+export interface BookingReadItem {
+  id: string;
+  status: BookingStatus;
+  start: string;
+  end: string;
+  professionalId: string;
+  professionalName: string;
+  serviceId: string;
+  serviceName: string;
+  customerName: string | null;
+  customerPhone: string | null;
+  createdAt: string;
+  cancelledAt: string | null;
+}
+
+export interface GetBookingByIdResponse {
+  booking: BookingReadItem;
+}
+
+export interface ListBookingsResponse {
+  items: BookingReadItem[];
+  page: number;
+  pageSize: number;
+  total: number;
+}
+
 export interface CancelBookingResponse {
   booking: {
     id: string;
