@@ -1,9 +1,11 @@
-import { screen, waitFor } from "@testing-library/react";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, test, vi, beforeEach, afterEach } from "vitest";
 import { DateTime } from "luxon";
 import { DashboardPage } from "@/pages/dashboard-page";
 import { renderWithProviders } from "@/test/render";
 import { dashboardService } from "@/services/dashboard-service";
+import { bookingsService } from "@/services/bookings-service";
 import { useProfessionalsQuery } from "@/hooks/use-professionals-query";
 import { useServicesQuery } from "@/hooks/use-services-query";
 import { ApiError } from "@/types/api";
@@ -11,6 +13,15 @@ import { ApiError } from "@/types/api";
 vi.mock("@/services/dashboard-service", () => ({
   dashboardService: {
     getSummary: vi.fn(),
+  },
+}));
+vi.mock("@/services/bookings-service", () => ({
+  bookingsService: {
+    create: vi.fn(),
+    cancel: vi.fn(),
+    reschedule: vi.fn(),
+    getById: vi.fn(),
+    list: vi.fn(),
   },
 }));
 vi.mock("@/hooks/use-professionals-query", () => ({
@@ -21,6 +32,7 @@ vi.mock("@/hooks/use-services-query", () => ({
 }));
 
 const mockedDashboardService = vi.mocked(dashboardService);
+const mockedBookingsService = vi.mocked(bookingsService);
 const mockedUseProfessionalsQuery = vi.mocked(useProfessionalsQuery);
 const mockedUseServicesQuery = vi.mocked(useServicesQuery);
 
@@ -205,5 +217,95 @@ describe("DashboardPage", () => {
       customerName: undefined,
       customerPhone: undefined,
     });
+  });
+
+  test("reagenda booking confirmado e exibe feedback de sucesso", async () => {
+    mockedDashboardService.getSummary.mockResolvedValue(successResponse);
+    mockedBookingsService.reschedule.mockResolvedValue({
+      booking: {
+        id: "booking-1",
+        status: "CONFIRMED",
+        start: "2026-03-30T13:00:00.000Z",
+        end: "2026-03-30T14:00:00.000Z",
+        rescheduledAt: "2026-03-30T13:05:00.000Z",
+      },
+    });
+
+    renderWithProviders(<DashboardPage />);
+
+    await screen.findByText("Agenda do dia");
+
+    const user = userEvent.setup();
+    const actionButtons = screen.getAllByLabelText("Acoes do agendamento");
+
+    await user.click(actionButtons[0]);
+    await screen.findByRole("menu");
+    await user.click(screen.getByRole("menuitem", { name: "Reagendar" }));
+
+    const startInput = screen.getByLabelText("Novo horario") as HTMLInputElement;
+    fireEvent.change(startInput, { target: { value: "2026-03-30T10:00" } });
+
+    await user.click(screen.getByRole("button", { name: "Confirmar reagendamento" }));
+
+    await waitFor(() => {
+      expect(mockedBookingsService.reschedule).toHaveBeenCalledWith("booking-1", {
+        start: "2026-03-30T13:00:00.000Z",
+        reason: undefined,
+      });
+    });
+
+    expect(await screen.findByText("Agendamento reagendado com sucesso.")).toBeInTheDocument();
+  });
+
+  test("exibe erro especifico quando a API retorna BOOKING_CONFLICT", async () => {
+    mockedDashboardService.getSummary.mockResolvedValue(successResponse);
+    mockedBookingsService.reschedule.mockRejectedValue(
+      new ApiError(409, "BOOKING_CONFLICT", "Time slot is no longer available", "req-1")
+    );
+
+    renderWithProviders(<DashboardPage />);
+
+    await screen.findByText("Agenda do dia");
+
+    const user = userEvent.setup();
+    await user.click(screen.getAllByLabelText("Acoes do agendamento")[0]);
+    await screen.findByRole("menu");
+    await user.click(screen.getByRole("menuitem", { name: "Reagendar" }));
+
+    fireEvent.change(screen.getByLabelText("Novo horario"), { target: { value: "2026-03-30T10:00" } });
+
+    await user.click(screen.getByRole("button", { name: "Confirmar reagendamento" }));
+
+    expect(
+      await screen.findByText(
+        "Este horario nao esta mais disponivel. Escolha outro horario e tente novamente."
+      )
+    ).toBeInTheDocument();
+  });
+
+  test("exibe erro especifico quando a API retorna BOOKING_ALREADY_RESOLVED", async () => {
+    mockedDashboardService.getSummary.mockResolvedValue(successResponse);
+    mockedBookingsService.reschedule.mockRejectedValue(
+      new ApiError(409, "BOOKING_ALREADY_RESOLVED", "O agendamento ja foi resolvido.", "req-1")
+    );
+
+    renderWithProviders(<DashboardPage />);
+
+    await screen.findByText("Agenda do dia");
+
+    const user = userEvent.setup();
+    await user.click(screen.getAllByLabelText("Acoes do agendamento")[0]);
+    await screen.findByRole("menu");
+    await user.click(screen.getByRole("menuitem", { name: "Reagendar" }));
+
+    fireEvent.change(screen.getByLabelText("Novo horario"), { target: { value: "2026-03-30T10:00" } });
+
+    await user.click(screen.getByRole("button", { name: "Confirmar reagendamento" }));
+
+    expect(
+      await screen.findByText(
+        "Este agendamento ja foi resolvido. Atualize a lista e tente novamente."
+      )
+    ).toBeInTheDocument();
   });
 });

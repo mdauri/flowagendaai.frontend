@@ -7,9 +7,12 @@ import { cn } from "@/lib/cn";
 interface DashboardBookingActionsMenuProps {
   disabled?: boolean;
   onViewDetails?: () => void;
+  onReschedule?: () => void;
   onCancel: () => void;
   viewDetailsDisabled?: boolean;
   viewDetailsLabel?: string;
+  rescheduleDisabled?: boolean;
+  rescheduleLabel?: string;
   cancelDisabled?: boolean;
   cancelLabel: string;
 }
@@ -19,9 +22,12 @@ const MENU_WIDTH_PX = 220;
 export function DashboardBookingActionsMenu({
   disabled = false,
   onViewDetails,
+  onReschedule,
   onCancel,
   viewDetailsDisabled = false,
   viewDetailsLabel = "Ver detalhes",
+  rescheduleDisabled = false,
+  rescheduleLabel = "Reagendar",
   cancelDisabled = false,
   cancelLabel,
 }: DashboardBookingActionsMenuProps) {
@@ -116,6 +122,22 @@ export function DashboardBookingActionsMenu({
               >
                 {viewDetailsLabel}
               </Button>
+              {onReschedule ? (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  className="mb-2 w-full justify-start"
+                  role="menuitem"
+                  disabled={rescheduleDisabled}
+                  onClick={() => {
+                    setIsOpen(false);
+                    onReschedule();
+                  }}
+                >
+                  {rescheduleLabel}
+                </Button>
+              ) : null}
               <Button
                 type="button"
                 variant="danger"

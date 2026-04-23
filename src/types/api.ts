@@ -6,6 +6,7 @@ export interface ApiErrorResponse {
 }
 
 export const BOOKING_CONFLICT_ERROR_CODE = "BOOKING_CONFLICT";
+export const BOOKING_ALREADY_RESOLVED_ERROR_CODE = "BOOKING_ALREADY_RESOLVED";
 export const MULTI_DAY_CONFLICT_ERROR_CODE = "MULTI_DAY_CONFLICT";
 
 export class ApiError extends Error {
@@ -27,5 +28,13 @@ export function isBookingConflictApiError(error: unknown): error is ApiError {
     error instanceof ApiError &&
     error.status === 409 &&
     error.code === BOOKING_CONFLICT_ERROR_CODE
+  );
+}
+
+export function isBookingAlreadyResolvedApiError(error: unknown): error is ApiError {
+  return (
+    error instanceof ApiError &&
+    error.status === 409 &&
+    error.code === BOOKING_ALREADY_RESOLVED_ERROR_CODE
   );
 }

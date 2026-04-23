@@ -10,14 +10,16 @@ import { DashboardProfessionalOccupancy } from "@/components/dashboard/dashboard
 import { DashboardUpcomingList } from "@/components/dashboard/dashboard-upcoming-list";
 import { DashboardBookingDetailsDialog } from "@/components/dashboard/dashboard-booking-details-dialog";
 import { CancelBookingDialog } from "@/components/bookings/cancel-booking-dialog";
+import { RescheduleBookingDialog } from "@/components/bookings/reschedule-booking-dialog";
 import { useDashboardSummaryQuery } from "@/hooks/use-dashboard-summary-query";
 import { useProfessionalsQuery } from "@/hooks/use-professionals-query";
 import { useServicesQuery } from "@/hooks/use-services-query";
 import { useBookingByIdQuery } from "@/hooks/use-booking-by-id-query";
 import { useCancelBookingMutation } from "@/hooks/use-cancel-booking-mutation";
+import { useRescheduleBookingMutation } from "@/hooks/use-reschedule-booking-mutation";
 import type { DashboardSummaryBookingItem } from "@/types/dashboard";
 import { FeedbackBanner } from "@/components/shared/feedback-banner";
-import { ApiError } from "@/types/api";
+import { ApiError, isBookingAlreadyResolvedApiError, isBookingConflictApiError } from "@/types/api";
 
 function getInitialDashboardDate() {
   return DateTime.local().toISODate() ?? "";
@@ -49,16 +51,20 @@ export function DashboardPage() {
     customerPhone,
   });
   const cancelBookingMutation = useCancelBookingMutation();
+  const rescheduleBookingMutation = useRescheduleBookingMutation();
   const [busyBookingId, setBusyBookingId] = React.useState<string | null>(null);
   const [cancelDialogBooking, setCancelDialogBooking] = React.useState<DashboardSummaryBookingItem | null>(
     null
   );
+  const [rescheduleDialogBooking, setRescheduleDialogBooking] =
+    React.useState<DashboardSummaryBookingItem | null>(null);
   const [detailsBookingId, setDetailsBookingId] = React.useState<string | null>(null);
   const [detailsBookingSummary, setDetailsBookingSummary] =
     React.useState<DashboardSummaryBookingItem | null>(null);
   const bookingDetailsQuery = useBookingByIdQuery(detailsBookingId);
   const [feedback, setFeedback] = React.useState<string | null>(null);
   const [cancelError, setCancelError] = React.useState<string | null>(null);
+  const [rescheduleError, setRescheduleError] = React.useState<string | null>(null);
   const isBootstrapLoading = professionalsQuery.isLoading || servicesQuery.isLoading;
   const isBootstrapError = professionalsQuery.isError || servicesQuery.isError;
   const professionals = professionalsQuery.data?.professionals ?? [];
@@ -117,6 +123,12 @@ export function DashboardPage() {
     setCancelDialogBooking(booking);
   }, []);
 
+  const handleRequestRescheduleBooking = React.useCallback((booking: DashboardSummaryBookingItem) => {
+    setFeedback(null);
+    setRescheduleError(null);
+    setRescheduleDialogBooking(booking);
+  }, []);
+
   const handleViewBookingDetails = React.useCallback((booking: DashboardSummaryBookingItem) => {
     setDetailsBookingId(booking.bookingId);
     setDetailsBookingSummary(booking);
@@ -154,6 +166,48 @@ export function DashboardPage() {
       }
     },
     [cancelBookingMutation, cancelDialogBooking]
+  );
+
+  const handleConfirmRescheduleBooking = React.useCallback(
+    async (input: { start: string; reason?: string }) => {
+      if (!rescheduleDialogBooking) {
+        return;
+      }
+
+      setRescheduleError(null);
+      setBusyBookingId(rescheduleDialogBooking.bookingId);
+
+      try {
+        await rescheduleBookingMutation.mutateAsync({
+          bookingId: rescheduleDialogBooking.bookingId,
+          start: input.start,
+          reason: input.reason,
+        });
+        setRescheduleDialogBooking(null);
+        setFeedback("Agendamento reagendado com sucesso.");
+      } catch (error) {
+        if (isBookingConflictApiError(error)) {
+          setRescheduleError(
+            "Este horario nao esta mais disponivel. Escolha outro horario e tente novamente."
+          );
+          return;
+        }
+
+        if (isBookingAlreadyResolvedApiError(error)) {
+          setRescheduleError(
+            "Este agendamento ja foi resolvido. Atualize a lista e tente novamente."
+          );
+          return;
+        }
+
+        setRescheduleError(
+          error instanceof ApiError ? error.message : "Nao foi possivel reagendar agora. Tente novamente."
+        );
+      } finally {
+        setBusyBookingId(null);
+      }
+    },
+    [rescheduleBookingMutation, rescheduleDialogBooking]
   );
 
   if (isBootstrapLoading || dashboardSummaryQuery.isLoading) {
@@ -239,6 +293,7 @@ export function DashboardPage() {
             tenantTimezone={summary.tenantTimezone}
             busyBookingId={busyBookingId}
             onCancelBooking={handleRequestCancelBooking}
+            onRescheduleBooking={handleRequestRescheduleBooking}
             onViewBookingDetails={handleViewBookingDetails}
           />
         </div>
@@ -249,6 +304,7 @@ export function DashboardPage() {
             tenantTimezone={summary.tenantTimezone}
             busyBookingId={busyBookingId}
             onCancelBooking={handleRequestCancelBooking}
+            onRescheduleBooking={handleRequestRescheduleBooking}
             onViewBookingDetails={handleViewBookingDetails}
           />
           <DashboardProfessionalOccupancy items={summary.professionalOccupancy} />
@@ -300,6 +356,29 @@ export function DashboardPage() {
           setCancelError(null);
         }}
         onConfirm={handleConfirmCancelBooking}
+      />
+
+      <RescheduleBookingDialog
+        isOpen={Boolean(rescheduleDialogBooking)}
+        bookingSummary={{
+          bookingId: rescheduleDialogBooking?.bookingId ?? "",
+          customerName: rescheduleDialogBooking?.customerName ?? null,
+          professionalName: rescheduleDialogBooking?.professionalName ?? null,
+          serviceName: rescheduleDialogBooking?.serviceName ?? null,
+          start: rescheduleDialogBooking?.start ?? null,
+          end: rescheduleDialogBooking?.end ?? null,
+          tenantTimezone: summary.tenantTimezone,
+        }}
+        isSubmitting={rescheduleBookingMutation.isPending}
+        errorMessage={rescheduleError}
+        onClose={() => {
+          if (rescheduleBookingMutation.isPending) {
+            return;
+          }
+          setRescheduleDialogBooking(null);
+          setRescheduleError(null);
+        }}
+        onConfirm={handleConfirmRescheduleBooking}
       />
     </div>
   );

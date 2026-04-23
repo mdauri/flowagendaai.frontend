@@ -5,6 +5,7 @@ import type {
   CreateBookingResponse,
   GetBookingByIdResponse,
   ListBookingsResponse,
+  RescheduleBookingResponse,
 } from "@/types/booking";
 
 export const bookingsService = {
@@ -24,6 +25,16 @@ export const bookingsService = {
 
   async cancel(bookingId: string, input: { reason?: string }): Promise<CancelBookingResponse> {
     return httpClient<CancelBookingResponse>(`/bookings/${bookingId}/cancel`, {
+      method: "POST",
+      body: JSON.stringify(input),
+    });
+  },
+
+  async reschedule(
+    bookingId: string,
+    input: { start: string; reason?: string }
+  ): Promise<RescheduleBookingResponse> {
+    return httpClient<RescheduleBookingResponse>(`/bookings/${bookingId}/reschedule`, {
       method: "POST",
       body: JSON.stringify(input),
     });

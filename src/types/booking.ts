@@ -51,3 +51,13 @@ export interface CancelBookingResponse {
     cancelReason?: string | null;
   };
 }
+
+export interface RescheduleBookingResponse {
+  booking: {
+    id: string;
+    status: "CONFIRMED";
+    start: string;
+    end: string;
+    rescheduledAt: string;
+  };
+}

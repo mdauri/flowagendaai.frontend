@@ -10,6 +10,7 @@ interface DashboardUpcomingListProps {
   tenantTimezone: string;
   busyBookingId?: string | null;
   onCancelBooking?: (booking: DashboardSummaryBookingItem) => void;
+  onRescheduleBooking?: (booking: DashboardSummaryBookingItem) => void;
   onViewBookingDetails?: (booking: DashboardSummaryBookingItem) => void;
 }
 
@@ -36,6 +37,7 @@ export function DashboardUpcomingList({
   tenantTimezone,
   busyBookingId,
   onCancelBooking,
+  onRescheduleBooking,
   onViewBookingDetails,
 }: DashboardUpcomingListProps) {
   if (bookings.length === 0) {
@@ -58,6 +60,7 @@ export function DashboardUpcomingList({
         {bookings.map((booking) => {
           const customerContacts = resolveCustomerContacts(booking);
           const isEligible = booking.status === "CONFIRMED" || booking.status === "PENDING";
+          const isEligibleForReschedule = booking.status === "CONFIRMED";
           const isCancelled = booking.status === "CANCELLED";
           const isCompleted = booking.status === "COMPLETED";
 
@@ -87,8 +90,23 @@ export function DashboardUpcomingList({
                   <DashboardBookingActionsMenu
                     disabled={busyBookingId === booking.bookingId}
                     onViewDetails={() => onViewBookingDetails?.(booking)}
+                    onReschedule={onRescheduleBooking ? () => onRescheduleBooking(booking) : undefined}
                     onCancel={() => onCancelBooking(booking)}
                     viewDetailsDisabled={false}
+                    rescheduleDisabled={!isEligibleForReschedule || busyBookingId === booking.bookingId}
+                    rescheduleLabel={
+                      busyBookingId === booking.bookingId
+                        ? "Reagendando..."
+                        : isEligibleForReschedule
+                          ? "Reagendar"
+                          : booking.status === "PENDING"
+                            ? "Aguardando confirmacao"
+                            : isCancelled
+                              ? "Ja cancelado"
+                              : isCompleted
+                                ? "Concluido"
+                                : "Indisponivel"
+                    }
                     cancelDisabled={!isEligible || busyBookingId === booking.bookingId}
                     cancelLabel={
                       busyBookingId === booking.bookingId
@@ -97,7 +115,7 @@ export function DashboardUpcomingList({
                           ? "Ja cancelado"
                           : isCompleted
                             ? "Concluido"
-                            : "Cancelar agendamento"
+                          : "Cancelar agendamento"
                     }
                   />
                 ) : null}
