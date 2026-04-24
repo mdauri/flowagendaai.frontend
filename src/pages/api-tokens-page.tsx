@@ -15,7 +15,11 @@ import { useRevokeApiTokenMutation } from "@/hooks/use-revoke-api-token-mutation
 import { ApiError } from "@/types/api";
 import type { ApiTokenScope, CreateApiTokenInput } from "@/types/api-token";
 
-const DEFAULT_SCOPE_OPTIONS: Array<{ value: ApiTokenScope; label: string; description: string }> = [
+const DEFAULT_SCOPE_OPTIONS: Array<{
+  value: ApiTokenScope;
+  label: string;
+  description: string;
+}> = [
   {
     value: "messages:read",
     label: "messages:read",
@@ -30,6 +34,16 @@ const DEFAULT_SCOPE_OPTIONS: Array<{ value: ApiTokenScope; label: string; descri
     value: "customers:read",
     label: "customers:read",
     description: "Permite leitura de clientes.",
+  },
+  {
+    value: "bookings:read",
+    label: "bookings:read",
+    description: "Permite leitura de agendamentos.",
+  },
+  {
+    value: "bookings:write",
+    label: "bookings:write",
+    description: "Permite escrita de agendamentos.",
   },
   {
     value: "ai:respond",
@@ -103,7 +117,7 @@ export function ApiTokensPage() {
 
   const isAllowed = useMemo(
     () => auth.user?.role === "system-admin",
-    [auth.user?.role]
+    [auth.user?.role],
   );
 
   const allowedScopes = useMemo(() => {
@@ -168,7 +182,10 @@ export function ApiTokensPage() {
     }
 
     const expiresAtDate = new Date(form.expiresAt);
-    if (Number.isNaN(expiresAtDate.getTime()) || expiresAtDate.getTime() <= Date.now()) {
+    if (
+      Number.isNaN(expiresAtDate.getTime()) ||
+      expiresAtDate.getTime() <= Date.now()
+    ) {
       toast({
         title: "Expiracao invalida",
         description: "A expiracao deve ser uma data futura.",
@@ -288,7 +305,8 @@ export function ApiTokensPage() {
       <Card variant="premium" padding="lg">
         <CardTitle>API Tokens M2M</CardTitle>
         <CardDescription className="mt-3">
-          Crie e gerencie tokens para mandantes especificos com menor privilegio.
+          Crie e gerencie tokens para mandantes especificos com menor
+          privilegio.
         </CardDescription>
       </Card>
 
@@ -311,7 +329,10 @@ export function ApiTokensPage() {
           />
         ) : (
           <div className="mt-4 grid gap-2">
-            <label className="text-sm font-semibold text-white" htmlFor="api-token-tenant">
+            <label
+              className="text-sm font-semibold text-white"
+              htmlFor="api-token-tenant"
+            >
               Mandante
             </label>
             <Select
@@ -329,38 +350,56 @@ export function ApiTokensPage() {
         <CardTitle>Criar novo token</CardTitle>
         <CardDescription className="mt-2">
           O token sera exibido uma unica vez. Exemplo n8n: configure header
-          <span className="font-semibold text-white"> Authorization: Bearer {'<TOKEN>'}</span> no HTTP Request node.
+          <span className="font-semibold text-white">
+            {" "}
+            Authorization: Bearer {"<TOKEN>"}
+          </span>{" "}
+          no HTTP Request node.
         </CardDescription>
         <form className="mt-5 grid gap-4" onSubmit={handleCreate}>
           <div className="grid gap-2">
-            <label className="text-sm font-semibold text-white" htmlFor="api-token-name">
+            <label
+              className="text-sm font-semibold text-white"
+              htmlFor="api-token-name"
+            >
               Nome do token
             </label>
             <Input
               id="api-token-name"
               value={form.name}
-              onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
+              onChange={(event) =>
+                setForm((current) => ({ ...current, name: event.target.value }))
+              }
               placeholder="Token n8n automacoes"
             />
           </div>
 
           <div className="grid gap-2 md:grid-cols-2 md:gap-4">
             <div className="grid gap-2">
-              <label className="text-sm font-semibold text-white" htmlFor="api-token-prefix">
+              <label
+                className="text-sm font-semibold text-white"
+                htmlFor="api-token-prefix"
+              >
                 Prefixo
               </label>
               <Input
                 id="api-token-prefix"
                 value={form.prefix}
                 onChange={(event) =>
-                  setForm((current) => ({ ...current, prefix: event.target.value }))
+                  setForm((current) => ({
+                    ...current,
+                    prefix: event.target.value,
+                  }))
                 }
                 placeholder="n8n"
               />
             </div>
 
             <div className="grid gap-2">
-              <label className="text-sm font-semibold text-white" htmlFor="api-token-expires-at">
+              <label
+                className="text-sm font-semibold text-white"
+                htmlFor="api-token-expires-at"
+              >
                 Expira em
               </label>
               <Input
@@ -368,7 +407,10 @@ export function ApiTokensPage() {
                 type="datetime-local"
                 value={form.expiresAt}
                 onChange={(event) =>
-                  setForm((current) => ({ ...current, expiresAt: event.target.value }))
+                  setForm((current) => ({
+                    ...current,
+                    expiresAt: event.target.value,
+                  }))
                 }
               />
             </div>
@@ -377,18 +419,26 @@ export function ApiTokensPage() {
           <div className="grid gap-2">
             <p className="text-sm font-semibold text-white">Escopos</p>
             <div className="grid gap-2">
-              {DEFAULT_SCOPE_OPTIONS.filter((scope) => allowedScopes.includes(scope.value)).map((scope) => (
+              {DEFAULT_SCOPE_OPTIONS.filter((scope) =>
+                allowedScopes.includes(scope.value),
+              ).map((scope) => (
                 <label
                   key={scope.value}
                   className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/5 p-3"
                 >
                   <Checkbox
                     checked={form.scopes.includes(scope.value)}
-                    onCheckedChange={(checked) => toggleScope(scope.value, checked)}
+                    onCheckedChange={(checked) =>
+                      toggleScope(scope.value, checked)
+                    }
                   />
                   <span className="grid gap-1">
-                    <span className="text-sm font-semibold text-white">{scope.label}</span>
-                    <span className="text-xs text-text-soft">{scope.description}</span>
+                    <span className="text-sm font-semibold text-white">
+                      {scope.label}
+                    </span>
+                    <span className="text-xs text-text-soft">
+                      {scope.description}
+                    </span>
                   </span>
                 </label>
               ))}
@@ -399,7 +449,11 @@ export function ApiTokensPage() {
             <Button
               type="submit"
               size="md"
-              disabled={createMutation.isPending || !selectedTenantId || tenantsQuery.isLoading}
+              disabled={
+                createMutation.isPending ||
+                !selectedTenantId ||
+                tenantsQuery.isLoading
+              }
             >
               {createMutation.isPending ? (
                 <>
@@ -426,7 +480,12 @@ export function ApiTokensPage() {
               <Copy size={16} />
               Copiar token
             </Button>
-            <Button type="button" size="md" variant="secondary" onClick={() => setOneTimeToken(null)}>
+            <Button
+              type="button"
+              size="md"
+              variant="secondary"
+              onClick={() => setOneTimeToken(null)}
+            >
               Entendi
             </Button>
           </div>
@@ -460,10 +519,17 @@ export function ApiTokensPage() {
         ) : (
           <div className="mt-4 grid gap-3">
             {listQuery.data?.items.map((item) => (
-              <Card key={item.id} variant="surface" padding="md" className="grid gap-3">
+              <Card
+                key={item.id}
+                variant="surface"
+                padding="md"
+                className="grid gap-3"
+              >
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div>
-                    <p className="text-sm font-semibold text-white">{item.name}</p>
+                    <p className="text-sm font-semibold text-white">
+                      {item.name}
+                    </p>
                     <p className="text-xs text-text-soft">
                       Prefixo: {item.prefix}_ | Status: {item.status}
                     </p>
@@ -472,19 +538,26 @@ export function ApiTokensPage() {
                     type="button"
                     size="sm"
                     variant="secondary"
-                    disabled={item.status === "revoked" || revokeMutation.isPending}
+                    disabled={
+                      item.status === "revoked" || revokeMutation.isPending
+                    }
                     onClick={() => void handleRevoke(item.id)}
                   >
                     <Trash2 size={14} />
                     Revogar
                   </Button>
                 </div>
-                <p className="text-xs text-text-soft">Escopos: {item.scopes.join(", ")}</p>
+                <p className="text-xs text-text-soft">
+                  Escopos: {item.scopes.join(", ")}
+                </p>
                 <p className="text-xs text-text-soft">
                   Expira em: {formatDateTimeBr(item.expiresAt)}
                 </p>
                 <p className="text-xs text-text-soft">
-                  Ultimo uso: {item.lastUsedAt ? formatDateTimeBr(item.lastUsedAt) : "Nunca"}
+                  Ultimo uso:{" "}
+                  {item.lastUsedAt
+                    ? formatDateTimeBr(item.lastUsedAt)
+                    : "Nunca"}
                 </p>
               </Card>
             ))}

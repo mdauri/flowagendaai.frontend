@@ -61,3 +61,26 @@ export interface RescheduleBookingResponse {
     rescheduledAt: string;
   };
 }
+
+export interface CreatePendingBookingInput {
+  professionalId: string;
+  serviceId: string;
+  start: string;
+}
+
+export interface CreatePendingBookingResponse {
+  booking: {
+    id: string;
+    status: "PENDING";
+    start: string;
+    end: string;
+    pendingExpiresAt: string;
+  };
+}
+
+export interface ConfirmPendingBookingResponse {
+  booking: {
+    id: string;
+    status: "CONFIRMED";
+  };
+}

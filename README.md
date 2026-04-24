@@ -4,6 +4,29 @@
 
 - `npm run test`: executa a suite uma vez
 - `npm run test:watch`: executa em watch mode
+- `npm run e2e`: smoke E2E do dashboard com Playwright (headless por padrao)
+- `npm run e2e:ui`: runner interativo do Playwright
+- `npm run e2e:report`: abre o report HTML do Playwright
+
+## Playwright (E2E)
+
+### Instalar
+
+1. `npm i -D @playwright/test`
+2. `npx playwright install`
+
+### Variaveis de ambiente
+
+Defina no shell antes de rodar:
+
+- `E2E_EMAIL` (ex.: `admin@agendoro.com`)
+- `E2E_PASSWORD`
+- `E2E_BASE_URL` (opcional; default `http://localhost:5173`)
+
+### Rodar
+
+- Com frontend ja rodando: `npm run e2e`
+- Sem frontend rodando: `npm run e2e` (o `webServer` do Playwright sobe o Vite automaticamente)
 
 ## Quando usar `renderWithProviders`
 

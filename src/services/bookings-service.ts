@@ -1,8 +1,11 @@
 import { httpClient } from "@/lib/http-client";
 import type {
   CancelBookingResponse,
+  ConfirmPendingBookingResponse,
   CreateBookingInput,
   CreateBookingResponse,
+  CreatePendingBookingInput,
+  CreatePendingBookingResponse,
   GetBookingByIdResponse,
   ListBookingsResponse,
   RescheduleBookingResponse,
@@ -37,6 +40,19 @@ export const bookingsService = {
     return httpClient<RescheduleBookingResponse>(`/bookings/${bookingId}/reschedule`, {
       method: "POST",
       body: JSON.stringify(input),
+    });
+  },
+
+  async createPending(input: CreatePendingBookingInput): Promise<CreatePendingBookingResponse> {
+    return httpClient<CreatePendingBookingResponse>("/bookings/pending", {
+      method: "POST",
+      body: JSON.stringify(input),
+    });
+  },
+
+  async confirmPending(bookingId: string): Promise<ConfirmPendingBookingResponse> {
+    return httpClient<ConfirmPendingBookingResponse>(`/bookings/${bookingId}/confirm`, {
+      method: "POST",
     });
   },
 

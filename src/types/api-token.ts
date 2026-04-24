@@ -2,6 +2,10 @@ export type ApiTokenScope =
   | "messages:read"
   | "messages:send"
   | "customers:read"
+  | "bookings:read"
+  | "bookings:write"
+  | "ai:respond"
+  | "webhooks:receive"
   | "ai:respond"
   | "webhooks:receive";
 

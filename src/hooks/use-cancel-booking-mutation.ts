@@ -14,7 +14,10 @@ export function useCancelBookingMutation() {
       bookingsService.cancel(bookingId, { reason }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["dashboard-summary"] });
+      queryClient.invalidateQueries({ queryKey: ["available-slots"] });
+      queryClient.invalidateQueries({ queryKey: ["available-dates"] });
+      queryClient.invalidateQueries({ queryKey: ["bookings"] });
+      queryClient.invalidateQueries({ queryKey: ["booking"] });
     },
   });
 }
-
