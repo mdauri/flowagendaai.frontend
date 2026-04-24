@@ -237,18 +237,22 @@ export function HolidaysPage() {
         <CardTitle>Filtro por periodo</CardTitle>
         <CardDescription>Use dd/mm/aaaa (Brasil). A API recebe YYYY-MM-DD.</CardDescription>
         <div className="mt-4 grid gap-3 md:grid-cols-2">
-          <Input
-            label="Inicio"
-            value={startDateBr}
-            onChange={(event) => setStartDateBr(event.target.value)}
-            placeholder="01/04/2026"
-          />
-          <Input
-            label="Fim"
-            value={endDateBr}
-            onChange={(event) => setEndDateBr(event.target.value)}
-            placeholder="30/04/2026"
-          />
+          <label className="grid gap-2 text-sm font-semibold text-white">
+            Inicio
+            <Input
+              value={startDateBr}
+              onChange={(event) => setStartDateBr(event.target.value)}
+              placeholder="01/04/2026"
+            />
+          </label>
+          <label className="grid gap-2 text-sm font-semibold text-white">
+            Fim
+            <Input
+              value={endDateBr}
+              onChange={(event) => setEndDateBr(event.target.value)}
+              placeholder="30/04/2026"
+            />
+          </label>
         </div>
         <p className="mt-3 text-xs text-text-soft">
           Data de referencia do tenant: <span className="text-white">{timezone}</span>.
@@ -261,52 +265,64 @@ export function HolidaysPage() {
 
         <form className="mt-4 grid gap-4" onSubmit={handleSubmit}>
           <div className="grid gap-3 md:grid-cols-2">
-            <Input
-              label="Data (dd/mm/aaaa)"
-              value={form.dateBr}
-              onChange={(event) => setForm((prev) => ({ ...prev, dateBr: event.target.value }))}
-              placeholder="24/04/2026"
-            />
-            <Input
-              label="Nome"
-              value={form.name}
-              onChange={(event) => setForm((prev) => ({ ...prev, name: event.target.value }))}
-              placeholder="Feriado municipal"
-            />
+            <label className="grid gap-2 text-sm font-semibold text-white">
+              Data (dd/mm/aaaa)
+              <Input
+                value={form.dateBr}
+                onChange={(event) => setForm((prev) => ({ ...prev, dateBr: event.target.value }))}
+                placeholder="24/04/2026"
+              />
+            </label>
+            <label className="grid gap-2 text-sm font-semibold text-white">
+              Nome
+              <Input
+                value={form.name}
+                onChange={(event) => setForm((prev) => ({ ...prev, name: event.target.value }))}
+                placeholder="Feriado municipal"
+              />
+            </label>
           </div>
 
-          <Input
-            label="Descricao / motivo (opcional)"
-            value={form.description}
-            onChange={(event) => setForm((prev) => ({ ...prev, description: event.target.value }))}
-            placeholder="Ex.: sem atendimento"
-          />
+          <label className="grid gap-2 text-sm font-semibold text-white">
+            Descricao / motivo (opcional)
+            <Input
+              value={form.description}
+              onChange={(event) => setForm((prev) => ({ ...prev, description: event.target.value }))}
+              placeholder="Ex.: sem atendimento"
+            />
+          </label>
 
           <div className="flex flex-wrap items-center gap-4">
-            <Checkbox
-              checked={form.isFullDay}
-              onCheckedChange={(checked) =>
-                setForm((prev) => ({
-                  ...prev,
-                  isFullDay: Boolean(checked),
-                }))
-              }
-              label="Dia inteiro"
-            />
+            <label className="inline-flex items-center gap-3 text-sm font-semibold text-white">
+              <Checkbox
+                checked={form.isFullDay}
+                onCheckedChange={(checked) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    isFullDay: Boolean(checked),
+                  }))
+                }
+              />
+              Dia inteiro
+            </label>
             {!form.isFullDay ? (
               <div className="grid gap-3 sm:grid-cols-2">
-                <Input
-                  label="Inicio (HH:MM)"
-                  value={form.startTime}
-                  onChange={(event) => setForm((prev) => ({ ...prev, startTime: event.target.value }))}
-                  placeholder="09:00"
-                />
-                <Input
-                  label="Fim (HH:MM)"
-                  value={form.endTime}
-                  onChange={(event) => setForm((prev) => ({ ...prev, endTime: event.target.value }))}
-                  placeholder="12:00"
-                />
+                <label className="grid gap-2 text-sm font-semibold text-white">
+                  Inicio (HH:MM)
+                  <Input
+                    value={form.startTime}
+                    onChange={(event) => setForm((prev) => ({ ...prev, startTime: event.target.value }))}
+                    placeholder="09:00"
+                  />
+                </label>
+                <label className="grid gap-2 text-sm font-semibold text-white">
+                  Fim (HH:MM)
+                  <Input
+                    value={form.endTime}
+                    onChange={(event) => setForm((prev) => ({ ...prev, endTime: event.target.value }))}
+                    placeholder="12:00"
+                  />
+                </label>
               </div>
             ) : null}
           </div>
@@ -414,4 +430,3 @@ export function HolidaysPage() {
     </div>
   );
 }
-

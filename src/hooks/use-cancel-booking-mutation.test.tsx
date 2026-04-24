@@ -31,6 +31,7 @@ describe("useCancelBookingMutation", () => {
         id: "booking-1",
         status: "CANCELLED",
         cancelledAt: "2026-04-23T11:00:00.000Z",
+        cancelledByType: "TENANT_USER",
         cancelReason: "user",
       },
     });
@@ -49,4 +50,3 @@ describe("useCancelBookingMutation", () => {
     expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ["booking"] });
   });
 });
-
