@@ -66,6 +66,8 @@ export interface CreatePendingBookingInput {
   professionalId: string;
   serviceId: string;
   start: string;
+  customerName?: string;
+  customerPhone?: string;
 }
 
 export interface CreatePendingBookingResponse {
