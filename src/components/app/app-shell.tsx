@@ -19,6 +19,8 @@ export function AppShell({
   onLogout,
   children,
 }: AppShellProps) {
+  const isProfessional = user.role === "professional";
+
   return (
     <div className="min-h-screen px-6 py-6 md:px-10 lg:px-16">
       <header className="mx-auto grid max-w-7xl gap-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-start">
@@ -37,98 +39,118 @@ export function AppShell({
             aria-label="Navegacao principal da operacao"
             className="mt-5 flex flex-wrap gap-3"
           >
-            <NavLink
-              to="/app/dashboard"
-              className={({ isActive }) =>
-                cn(
-                  "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
-                  isActive
-                    ? "border-primary bg-primary text-black"
-                    : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white"
-                )
-              }
-            >
-              Dashboard
-            </NavLink>
-            <NavLink
-              to="/app/professionals"
-              className={({ isActive }) =>
-                cn(
-                  "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
-                  isActive
-                    ? "border-primary bg-primary text-black"
-                    : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white"
-                )
-              }
-            >
-              Profissionais
-            </NavLink>
-            <NavLink
-              to="/app/services"
-              className={({ isActive }) =>
-                cn(
-                  "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
-                  isActive
-                    ? "border-primary bg-primary text-black"
-                    : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white"
-                )
-              }
-            >
-              Servicos
-            </NavLink>
-            <NavLink
-              to="/app/availability"
-              className={({ isActive }) =>
-                cn(
-                  "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
-                  isActive
-                    ? "border-primary bg-primary text-black"
-                    : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white"
-                )
-              }
-            >
-              Disponibilidade
-            </NavLink>
-            <NavLink
-              to="/app/slots"
-              className={({ isActive }) =>
-                cn(
-                  "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
-                  isActive
-                    ? "border-primary bg-primary text-black"
-                    : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white"
-                )
-              }
-            >
-              Slots
-            </NavLink>
-            <NavLink
-              to="/app/holidays"
-              className={({ isActive }) =>
-                cn(
-                  "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
-                  isActive
-                    ? "border-primary bg-primary text-black"
-                    : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white"
-                )
-              }
-            >
-              Bloqueios
-            </NavLink>
-            <NavLink
-              to="/app/settings"
-              className={({ isActive }) =>
-                cn(
-                  "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
-                  isActive
-                    ? "border-primary bg-primary text-black"
-                    : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white"
-                )
-              }
-            >
-              Configuracoes
-            </NavLink>
-            {user.role === "system-admin" ? (
+            {isProfessional ? (
+              <NavLink
+                to="/app/minha-agenda"
+                className={({ isActive }) =>
+                  cn(
+                    "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
+                    isActive
+                      ? "border-primary bg-primary text-black"
+                      : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white"
+                  )
+                }
+              >
+                Minha agenda
+              </NavLink>
+            ) : (
+              <>
+                <NavLink
+                  to="/app/dashboard"
+                  className={({ isActive }) =>
+                    cn(
+                      "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
+                      isActive
+                        ? "border-primary bg-primary text-black"
+                        : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white"
+                    )
+                  }
+                >
+                  Dashboard
+                </NavLink>
+                <NavLink
+                  to="/app/professionals"
+                  className={({ isActive }) =>
+                    cn(
+                      "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
+                      isActive
+                        ? "border-primary bg-primary text-black"
+                        : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white"
+                    )
+                  }
+                >
+                  Profissionais
+                </NavLink>
+                <NavLink
+                  to="/app/services"
+                  className={({ isActive }) =>
+                    cn(
+                      "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
+                      isActive
+                        ? "border-primary bg-primary text-black"
+                        : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white"
+                    )
+                  }
+                >
+                  Servicos
+                </NavLink>
+                <NavLink
+                  to="/app/availability"
+                  className={({ isActive }) =>
+                    cn(
+                      "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
+                      isActive
+                        ? "border-primary bg-primary text-black"
+                        : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white"
+                    )
+                  }
+                >
+                  Disponibilidade
+                </NavLink>
+                <NavLink
+                  to="/app/slots"
+                  className={({ isActive }) =>
+                    cn(
+                      "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
+                      isActive
+                        ? "border-primary bg-primary text-black"
+                        : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white"
+                    )
+                  }
+                >
+                  Slots
+                </NavLink>
+                <NavLink
+                  to="/app/holidays"
+                  className={({ isActive }) =>
+                    cn(
+                      "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
+                      isActive
+                        ? "border-primary bg-primary text-black"
+                        : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white"
+                    )
+                  }
+                >
+                  Bloqueios
+                </NavLink>
+              </>
+            )}
+            {!isProfessional ? (
+              <NavLink
+                to="/app/settings"
+                className={({ isActive }) =>
+                  cn(
+                    "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
+                    isActive
+                      ? "border-primary bg-primary text-black"
+                      : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white"
+                  )
+                }
+              >
+                Configuracoes
+              </NavLink>
+            ) : null}
+            {user.role === "system-admin" && !isProfessional ? (
               <NavLink
                 to="/app/api-tokens"
                 className={({ isActive }) =>
@@ -143,7 +165,7 @@ export function AppShell({
                 API Tokens
               </NavLink>
             ) : null}
-            {user.role === "system-admin" ? (
+            {user.role === "system-admin" && !isProfessional ? (
               <NavLink
                 to="/app/system-admin/tenants/provision"
                 className={({ isActive }) =>

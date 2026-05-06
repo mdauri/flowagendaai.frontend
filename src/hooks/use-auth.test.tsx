@@ -15,6 +15,7 @@ const currentUserQueryState = {
       name: "Maria Souza",
       email: "maria@agendoro.com",
       role: "ADMIN",
+      professionalId: null,
     },
     tenant: {
       id: "tenant-1",
@@ -66,6 +67,7 @@ describe("useAuth", () => {
         name: "Maria Souza",
         email: "maria@agendoro.com",
         role: "ADMIN",
+        professionalId: null,
       },
       tenant: {
         id: "tenant-1",

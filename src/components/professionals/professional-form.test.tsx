@@ -16,6 +16,7 @@ describe("ProfessionalForm", () => {
     );
 
     expect(screen.getByRole("heading", { name: "Novo profissional" })).toBeInTheDocument();
+    expect(screen.getByLabelText("Email do profissional")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Criar profissional" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Limpar" })).toBeInTheDocument();
   });

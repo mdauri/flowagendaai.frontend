@@ -27,6 +27,7 @@ export interface BookingReadItem {
   serviceName: string;
   customerName: string | null;
   customerPhone: string | null;
+  customerEmail: string | null;
   createdAt: string;
   cancelledAt: string | null;
 }

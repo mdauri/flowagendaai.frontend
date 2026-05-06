@@ -16,6 +16,7 @@ export interface ListProfessionalsResponse {
 
 export interface CreateProfessionalInput {
   name: string;
+  email: string;
   description?: string | null;
 }
 

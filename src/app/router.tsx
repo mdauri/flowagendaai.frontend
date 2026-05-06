@@ -16,11 +16,37 @@ import { SettingsPage } from "@/pages/settings-page";
 import { ApiTokensPage } from "@/pages/api-tokens-page";
 import { BookingsPage } from "@/pages/bookings-page";
 import { HolidaysPage } from "@/pages/holidays-page";
+import { MinhaAgendaPage } from "@/pages/minha-agenda-page";
 import { SystemAdminTenantProvisionPage } from "@/pages/system-admin-tenant-provision-page";
 import { TermsPage } from "@/pages/terms-page";
 import { ProfessionalServiceManager } from "@/components/professional-service-manager";
 import { ProtectedRoute } from "@/components/app/protected-route";
 import { ForgotPage } from "../pages/forgot-password-page";
+import { useAuth } from "@/hooks/use-auth";
+
+function AppIndexRedirect() {
+  const auth = useAuth();
+
+  if (!auth.user) {
+    return <Navigate to="dashboard" replace />;
+  }
+
+  return auth.user.role === "professional" ? (
+    <Navigate to="minha-agenda" replace />
+  ) : (
+    <Navigate to="dashboard" replace />
+  );
+}
+
+function BlockProfessionalRoute({ children }: { children: React.ReactNode }) {
+  const auth = useAuth();
+
+  if (auth.user?.role === "professional") {
+    return <Navigate to="/app/minha-agenda" replace />;
+  }
+
+  return <>{children}</>;
+}
 
 export function AppRouter() {
   return (
@@ -43,9 +69,10 @@ export function AppRouter() {
             </ProtectedRoute>
           }
         >
-          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route index element={<AppIndexRedirect />} />
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="bookings" element={<BookingsPage />} />
+          <Route path="minha-agenda" element={<MinhaAgendaPage />} />
           <Route path="professionals" element={<ProfessionalsPage />} />
           <Route path="professionals/:professionalId/removal" element={<ProfessionalRemovalPage />} />
           <Route path="services" element={<ServicesPage />} />
@@ -60,10 +87,17 @@ export function AppRouter() {
           <Route path="availability" element={<AvailabilityPage />} />
           <Route path="slots" element={<SlotsPage />} />
           <Route path="holidays" element={<HolidaysPage />} />
-          <Route path="settings" element={<SettingsPage />} />
+          <Route
+            path="settings"
+            element={
+              <BlockProfessionalRoute>
+                <SettingsPage />
+              </BlockProfessionalRoute>
+            }
+          />
           <Route path="api-tokens" element={<ApiTokensPage />} />
           <Route path="system-admin/tenants/provision" element={<SystemAdminTenantProvisionPage />} />
-          <Route path="*" element={<Navigate to="dashboard" replace />} />
+          <Route path="*" element={<AppIndexRedirect />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

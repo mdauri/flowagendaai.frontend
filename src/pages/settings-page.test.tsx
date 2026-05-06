@@ -8,7 +8,7 @@ const mockRefetchCurrentUser = vi.fn();
 
 vi.mock("@/hooks/use-auth", () => ({
   useAuth: () => ({
-    user: { id: "user-1", name: "Admin", email: "admin@test.com", role: "admin" },
+    user: { id: "user-1", name: "Admin", email: "admin@test.com", role: "admin", professionalId: null },
     tenant: {
       id: "tenant-1",
       name: "Test Studio",

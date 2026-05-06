@@ -42,6 +42,7 @@ interface ProfessionalFormProps {
 
 const initialForm = {
   name: "",
+  email: "",
   description: "",
 };
 
@@ -88,6 +89,7 @@ export function ProfessionalForm({
   const imagePreviewUrlRef = useRef<string | null>(null);
 
   const nameId = useId();
+  const emailId = useId();
   const descriptionId = useId();
   const isEditMode = mode === "edit";
 
@@ -112,6 +114,7 @@ export function ProfessionalForm({
     if (isEditMode && initialValues) {
       setForm({
         name: initialValues.name ?? "",
+        email: "",
         description: initialValues.description ?? "",
       });
       setCharCount((initialValues.description ?? "").length);
@@ -132,6 +135,13 @@ export function ProfessionalForm({
     setImageUploadError(null);
     handleImageSelection(null);
   }, [initialValues, isEditMode, handleImageSelection]);
+
+  const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setForm((current) => ({
+      ...current,
+      email: event.target.value,
+    }));
+  };
 
   useEffect(() => {
     imagePreviewUrlRef.current = imagePreviewUrl;
@@ -280,10 +290,17 @@ export function ProfessionalForm({
     }
 
     const pendingImage = selectedImageFile;
+    const normalizedEmail = form.email.trim().toLowerCase();
+
+    if (!normalizedEmail || !normalizedEmail.includes("@")) {
+      setErrorMessage("Informe um email valido para o profissional.");
+      return;
+    }
 
     try {
       const createResult = await onCreateSubmit({
         name: form.name,
+        email: normalizedEmail,
         description: form.description.trim() === "" ? null : form.description,
       });
 
@@ -384,6 +401,23 @@ export function ProfessionalForm({
             disabled={submitDisabled}
           />
         </label>
+
+        {!isEditMode ? (
+          <label className="grid gap-2" htmlFor={emailId}>
+            <span className="text-sm font-semibold text-white">Email do profissional</span>
+            <Input
+              id={emailId}
+              name="email"
+              inputSize="md"
+              type="email"
+              value={form.email}
+              onChange={handleEmailChange}
+              placeholder="ex.: profissional@empresa.com"
+              required
+              disabled={submitDisabled}
+            />
+          </label>
+        ) : null}
 
         <label className="grid gap-2" htmlFor={descriptionId}>
           <div className="flex items-end justify-between gap-4">

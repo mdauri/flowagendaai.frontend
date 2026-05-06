@@ -14,6 +14,7 @@ const authState = {
     name: "Maria Souza",
     email: "maria@agendoro.com",
     role: "ADMIN",
+    professionalId: null,
   },
   tenant: {
     id: "tenant-1",

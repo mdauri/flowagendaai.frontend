@@ -20,6 +20,7 @@ function renderShell(role: string) {
     name: "User Test",
     email: "user@test.com",
     role,
+    professionalId: null,
   };
 
   return renderWithProviders(
@@ -55,5 +56,16 @@ describe("AppShell", () => {
     renderShell("admin");
 
     expect(screen.queryByRole("link", { name: "API Tokens" })).not.toBeInTheDocument();
+  });
+
+  test("role professional exibe Minha agenda e oculta links operacionais", () => {
+    renderShell("professional");
+
+    expect(screen.getByRole("link", { name: "Minha agenda" })).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Bookings" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Dashboard" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Profissionais" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Servicos" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Configuracoes" })).not.toBeInTheDocument();
   });
 });
