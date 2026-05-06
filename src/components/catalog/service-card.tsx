@@ -5,13 +5,17 @@ import { colors, typography, radius, semanticTokens, shadows } from "@/design-sy
 import { ServiceImageFallback } from "./service-image-fallback";
 import type { PublicCatalogService } from "@/types/service";
 
+type ServiceCardModel = Omit<PublicCatalogService, "price"> & { price?: number };
+
 interface ServiceCardProps {
-  service: PublicCatalogService;
-  tenantSlug: string;
+  service: ServiceCardModel;
+  tenantSlug?: string;
   onBook: (serviceId: string) => void;
+  actionLabel?: string;
+  selected?: boolean;
 }
 
-export function ServiceCard({ service, tenantSlug, onBook }: ServiceCardProps) {
+export function ServiceCard({ service, tenantSlug, onBook, actionLabel = "Agendar", selected = false }: ServiceCardProps) {
   const imageSrc = service.thumbnailUrl ?? service.imageUrl ?? undefined;
   const hasImage = Boolean(imageSrc);
   
@@ -51,6 +55,8 @@ export function ServiceCard({ service, tenantSlug, onBook }: ServiceCardProps) {
       style={{
         minHeight: "420px",
         "--border-hover": semanticTokens.border.default,
+        borderColor: selected ? colors.brand.primary : undefined,
+        boxShadow: selected ? `0 0 0 1px ${colors.brand.primary}` : undefined,
       } as React.CSSProperties}
     >
       {/* Image Section */}
@@ -104,18 +110,20 @@ export function ServiceCard({ service, tenantSlug, onBook }: ServiceCardProps) {
           >
             {service.name}
           </CardTitle>
-          <span
-            className="text-base font-bold"
-            style={{
-              color: colors.brand.primary,
-              fontFamily: typography.family.sans,
-              fontWeight: typography.weight.bold,
-              whiteSpace: "nowrap",
-            }}
-            aria-label={`Preço: ${formatPrice(service.price)}`}
-          >
-            {formatPrice(service.price)}
-          </span>
+          {typeof service.price === "number" ? (
+            <span
+              className="text-base font-bold"
+              style={{
+                color: colors.brand.primary,
+                fontFamily: typography.family.sans,
+                fontWeight: typography.weight.bold,
+                whiteSpace: "nowrap",
+              }}
+              aria-label={`Preço: ${formatPrice(service.price)}`}
+            >
+              {formatPrice(service.price)}
+            </span>
+          ) : null}
         </div>
 
         {/* Duration */}
@@ -167,13 +175,13 @@ export function ServiceCard({ service, tenantSlug, onBook }: ServiceCardProps) {
             onClick={() => onBook(service.id)}
             className="w-full"
             size="md"
-            aria-label={`Agendar ${service.name}`}
+            aria-label={`${actionLabel} ${service.name}`}
             style={{
               fontFamily: typography.family.sans,
               fontWeight: typography.weight.semibold,
             }}
           >
-            Agendar
+            {actionLabel}
           </Button>
         </div>
       </div>

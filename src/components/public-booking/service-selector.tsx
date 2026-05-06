@@ -1,113 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/flow/button";
-import { Card } from "@/components/flow/card";
+import { ServiceCard } from "@/components/catalog/service-card";
 import { FeedbackBanner } from "@/components/shared/feedback-banner";
-import { MultiDayBadge } from "@/components/slots/multi-day-badge";
-import { DurationHelper } from "@/components/services/duration-helper";
 import type { PublicServiceItem } from "@/types/public-booking";
-import { colors, semanticTokens } from "@/design-system";
-
-const MAX_SERVICE_DURATION = 960;
-
-interface ServiceCardProps {
-  service: PublicServiceItem;
-  selected: boolean;
-  onSelect: (service: PublicServiceItem) => void;
-}
-
-function ServiceCard({ service, selected, onSelect }: ServiceCardProps) {
-  const imageSrc = useMemo(
-    () => service.thumbnailUrl ?? service.imageUrl ?? null,
-    [service.thumbnailUrl, service.imageUrl],
-  );
-  const [showImageFallback, setShowImageFallback] = useState(!imageSrc);
-
-  useEffect(() => {
-    setShowImageFallback(!imageSrc);
-  }, [imageSrc]);
-
-  const serviceInitials = useMemo(() => {
-    return service.name
-      .split(" ")
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((part) => part[0]?.toUpperCase() ?? "")
-      .join("");
-  }, [service.name]);
-
-  return (
-    <button
-      type="button"
-      className="flex w-full flex-col text-left outline-none transition-all focus-visible:outline-none focus-visible:[box-shadow:var(--control-focus-ring)]"
-      style={{
-        "--control-focus-ring": semanticTokens.interaction.focus.ring
-      } as React.CSSProperties}
-      onClick={() => onSelect(service)}
-      aria-pressed={selected}
-    >
-      <Card
-        variant="glass"
-        className="w-full transition-all"
-        style={{
-          borderColor: selected ? colors.brand.primary : semanticTokens.border.subtle,
-          boxShadow: selected ? `0 0 0 1px ${colors.brand.primary}` : undefined,
-          backgroundColor: selected ? semanticTokens.surface.glassHover : semanticTokens.surface.glass
-        }}
-      >
-        <div className="mb-3">
-          {!showImageFallback && imageSrc ? (
-            <img
-              src={imageSrc}
-              alt={`Imagem do serviço ${service.name}`}
-              className="h-28 w-full rounded-2xl object-cover"
-              loading="lazy"
-              onError={() => setShowImageFallback(true)}
-            />
-          ) : (
-            <div
-              className="flex h-28 w-full items-center justify-center rounded-2xl text-lg font-black"
-              style={{ backgroundColor: colors.background.glassSubtle, color: colors.text.primary }}
-              aria-hidden="true"
-            >
-              {serviceInitials}
-            </div>
-          )}
-        </div>
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-base font-semibold" style={{ color: colors.text.primary }}>
-            {service.name}
-          </span>
-          {selected && (
-            <span className="flex h-5 w-5 items-center justify-center rounded-full text-xs" style={{ backgroundColor: colors.brand.primary, color: colors.text.dark }} aria-hidden>
-              ✓
-            </span>
-          )}
-        </div>
-        <p className="mt-1.5 text-sm font-medium" style={{ color: colors.text.soft }}>
-          {service.durationInMinutes} minutos
-        </p>
-        {service.durationInMinutes > MAX_SERVICE_DURATION && (
-          <div className="mt-2">
-            <MultiDayBadge
-              daysCount={Math.ceil(service.durationInMinutes / (10 * 60))}
-              variant="compact"
-            />
-          </div>
-        )}
-        {service.description && (
-          <p
-            className="mt-2 text-sm"
-            style={{ color: colors.text.soft, whiteSpace: "pre-wrap" }}
-          >
-            {service.description.length > 150
-              ? `${service.description.substring(0, 150)}...`
-              : service.description}
-          </p>
-        )}
-      </Card>
-    </button>
-  );
-}
 
 export interface ServiceSelectorProps {
   services: PublicServiceItem[];
@@ -128,9 +22,9 @@ export function ServiceSelector({
 }: ServiceSelectorProps) {
   if (isLoading) {
     return (
-      <div className="space-y-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {[1, 2, 3].map((index) => (
-          <div key={index} className="h-20 animate-pulse rounded-3xl bg-white/5" />
+          <div key={index} className="h-72 animate-pulse rounded-3xl bg-white/5" />
         ))}
       </div>
     );
@@ -162,13 +56,14 @@ export function ServiceSelector({
   }
 
   return (
-    <div className="space-y-3">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
       {services.map((service) => (
         <ServiceCard
           key={service.id}
           service={service}
           selected={selectedServiceId === service.id}
-          onSelect={onSelect}
+          onBook={() => onSelect(service)}
+          actionLabel={selectedServiceId === service.id ? "Selecionado" : "Selecionar"}
         />
       ))}
     </div>
