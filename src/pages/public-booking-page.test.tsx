@@ -148,7 +148,7 @@ beforeEach(() => {
 });
 
 async function progressToSlotStep(user: ReturnType<typeof userEvent.setup>) {
-  await user.click(screen.getByText(/Corte Feminino/i));
+  await user.click(screen.getByRole("button", { name: /Selecionar Corte Feminino/i }));
   const continueButton = screen.getByRole("button", { name: /Continuar/i });
   await user.click(continueButton);
 
@@ -205,8 +205,7 @@ describe("PublicBookingPage", () => {
     renderPage();
     const user = userEvent.setup();
 
-    const serviceCard = screen.getByText(/Corte Feminino/i);
-    await user.click(serviceCard);
+    await user.click(screen.getByRole("button", { name: /Selecionar Corte Feminino/i }));
 
     const continueButton = screen.getByRole("button", { name: /Continuar/i });
     expect(continueButton).toBeEnabled();
@@ -237,7 +236,7 @@ describe("PublicBookingPage", () => {
     renderPage();
     const user = userEvent.setup();
 
-    await user.click(screen.getByText(/Corte Feminino/i));
+    await user.click(screen.getByRole("button", { name: /Selecionar Corte Feminino/i }));
     await user.click(screen.getByRole("button", { name: /Continuar/i }));
 
     const todayLabel = DateTime.now().setZone(mockProfessional.tenantTimezone).day.toString();
