@@ -149,8 +149,6 @@ beforeEach(() => {
 
 async function progressToSlotStep(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole("button", { name: /Selecionar Corte Feminino/i }));
-  const continueButton = screen.getByRole("button", { name: /Continuar/i });
-  await user.click(continueButton);
 
   const todayLabel = DateTime.now().setZone(mockProfessional.tenantTimezone).day.toString();
   const dayButtons = await screen.findAllByRole("button", {
@@ -206,10 +204,7 @@ describe("PublicBookingPage", () => {
     const user = userEvent.setup();
 
     await user.click(screen.getByRole("button", { name: /Selecionar Corte Feminino/i }));
-
-    const continueButton = screen.getByRole("button", { name: /Continuar/i });
-    expect(continueButton).toBeEnabled();
-    await user.click(continueButton);
+    expect(screen.queryByRole("button", { name: /Continuar/i })).not.toBeInTheDocument();
 
     expect(screen.getByText(/Escolha a data/i)).toBeInTheDocument();
     expect(screen.getByText(/Horários em/i)).toBeInTheDocument();
@@ -237,7 +232,6 @@ describe("PublicBookingPage", () => {
     const user = userEvent.setup();
 
     await user.click(screen.getByRole("button", { name: /Selecionar Corte Feminino/i }));
-    await user.click(screen.getByRole("button", { name: /Continuar/i }));
 
     const todayLabel = DateTime.now().setZone(mockProfessional.tenantTimezone).day.toString();
     const dayButtons = await screen.findAllByRole("button", {

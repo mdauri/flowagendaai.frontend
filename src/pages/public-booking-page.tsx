@@ -188,12 +188,16 @@ export function PublicBookingPage() {
   const displayedStep = stepIndex >= 0 ? stepIndex + 1 : stepOrder.length;
 
   const handleServiceSelect = (service: PublicServiceItem) => {
-    if (selectedService?.id === service.id) return;
-    setSelectedService(service);
-    setSelectedDate(null);
-    setSelectedSlot(null);
-    setCalendarMonth(minDate.startOf("month"));
-    setBookingNotification(null);
+    if (selectedService?.id !== service.id) {
+      setSelectedService(service);
+      setSelectedDate(null);
+      setSelectedSlot(null);
+      setCalendarMonth(minDate.startOf("month"));
+      setBookingNotification(null);
+    }
+    if (currentStep === "service") {
+      setCurrentStep("date");
+    }
   };
 
   const handleDateSelect = (date: DateTime) => {
@@ -334,11 +338,10 @@ export function PublicBookingPage() {
     }
   };
 
-  const bookingButtons = currentStep !== "success" && currentStep !== "confirm";
+  const bookingButtons =
+    currentStep !== "service" && currentStep !== "success" && currentStep !== "confirm";
   const primaryButtonLabel =
-    currentStep === "service"
-      ? "Continuar"
-      : currentStep === "date"
+    currentStep === "date"
       ? "Ver horários"
       : currentStep === "slot"
       ? "Continuar"
@@ -347,9 +350,7 @@ export function PublicBookingPage() {
       : "";
 
   const primaryDisabled =
-    currentStep === "service"
-      ? !selectedService
-      : currentStep === "date"
+    currentStep === "date"
       ? !selectedDate
       : currentStep === "slot"
       ? !selectedSlot
