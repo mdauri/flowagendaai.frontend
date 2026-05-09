@@ -14,7 +14,11 @@ import { useDeleteProfessionalMutation } from "@/hooks/use-delete-professional-m
 import { useProfessionalsQuery } from "@/hooks/use-professionals-query";
 import { useUpdateProfessionalMutation } from "@/hooks/use-update-professional-mutation";
 import { ApiError } from "@/types/api";
-import type { CreateProfessionalInput, CreateProfessionalResponse, Professional } from "@/types/professional";
+import type {
+  CreateProfessionalInput,
+  CreateProfessionalResponse,
+  Professional,
+} from "@/types/professional";
 
 export function ProfessionalsPage() {
   const navigate = useNavigate();
@@ -24,12 +28,20 @@ export function ProfessionalsPage() {
   const createProfessionalMutation = useCreateProfessionalMutation();
   const updateProfessionalMutation = useUpdateProfessionalMutation();
   const deleteProfessionalMutation = useDeleteProfessionalMutation();
-  const [editingProfessional, setEditingProfessional] = useState<Professional | null>(null);
-  const [deletingProfessional, setDeletingProfessional] = useState<Professional | null>(null);
-  const [deleteErrorMessage, setDeleteErrorMessage] = useState<string | null>(null);
-  const [pendingImageUploads, setPendingImageUploads] = useState<Record<string, { file: File; message: string }>>({});
+  const [editingProfessional, setEditingProfessional] =
+    useState<Professional | null>(null);
+  const [deletingProfessional, setDeletingProfessional] =
+    useState<Professional | null>(null);
+  const [deleteErrorMessage, setDeleteErrorMessage] = useState<string | null>(
+    null,
+  );
+  const [pendingImageUploads, setPendingImageUploads] = useState<
+    Record<string, { file: File; message: string }>
+  >({});
 
-  async function handleCreateProfessional(input: CreateProfessionalInput): Promise<CreateProfessionalResponse> {
+  async function handleCreateProfessional(
+    input: CreateProfessionalInput,
+  ): Promise<CreateProfessionalResponse> {
     return createProfessionalMutation.mutateAsync(input);
   }
 
@@ -61,7 +73,7 @@ export function ProfessionalsPage() {
         return next;
       });
       setEditingProfessional((current) =>
-        current?.id === deletingProfessional.id ? null : current
+        current?.id === deletingProfessional.id ? null : current,
       );
       setDeletingProfessional(null);
     } catch (error) {
@@ -71,7 +83,7 @@ export function ProfessionalsPage() {
         error.code === "PROFESSIONAL_HAS_IMPACTED_BOOKINGS"
       ) {
         setEditingProfessional((current) =>
-          current?.id === deletingProfessional.id ? null : current
+          current?.id === deletingProfessional.id ? null : current,
         );
         setDeletingProfessional(null);
         navigate(`/app/professionals/${deletingProfessional.id}/removal`);
@@ -79,7 +91,9 @@ export function ProfessionalsPage() {
       }
 
       setDeleteErrorMessage(
-        error instanceof ApiError ? error.message : "Nao foi possivel remover o profissional."
+        error instanceof ApiError
+          ? error.message
+          : "Nao foi possivel remover o profissional.",
       );
     }
   }
@@ -88,7 +102,7 @@ export function ProfessionalsPage() {
   const isEditingProfessional = editingProfessional !== null;
   const canManageProfessionals = useMemo(
     () => ["admin"].includes(auth.user?.role ?? ""),
-    [auth.user?.role]
+    [auth.user?.role],
   );
 
   const handleEditProfessional = (professional: Professional) => {
@@ -102,9 +116,9 @@ export function ProfessionalsPage() {
   return (
     <>
       <SectionHeading
-        eyebrow="Operational Core"
+        eyebrow=""
         title="Profissionais"
-        description="Gerencie o cadastro inicial dos profissionais usando o contrato real do backend, sem acoplar regra de agenda no frontend."
+        description="Equipe e acesso ao sistema"
       />
 
       <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,26rem)_minmax(0,1fr)]">
@@ -114,13 +128,15 @@ export function ProfessionalsPage() {
               mode={isEditingProfessional ? "edit" : "create"}
               initialValues={editingProfessional}
               isSubmitting={
-                createProfessionalMutation.isPending || updateProfessionalMutation.isPending
+                createProfessionalMutation.isPending ||
+                updateProfessionalMutation.isPending
               }
               onCreateSubmit={handleCreateProfessional}
               onEditSubmit={handleUpdateProfessional}
               onCancelEdit={() => setEditingProfessional(null)}
               pendingImageRetry={
-                editingProfessional && pendingImageUploads[editingProfessional.id]
+                editingProfessional &&
+                pendingImageUploads[editingProfessional.id]
                   ? pendingImageUploads[editingProfessional.id]
                   : null
               }
@@ -152,33 +168,25 @@ export function ProfessionalsPage() {
           </Card>
         )}
 
-        <div className="grid gap-6">
-          <Card variant="glass" padding="lg">
+        <div className="grid gap-6 content-start">
+          <Card variant="glass" padding="md">
             <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
               <div>
-                <CardTitle>Listagem operacional</CardTitle>
-                <CardDescription className="mt-3">
-                  A listagem agora concentra create, edicao, remocao logica e o encaminhamento para
-                  a resolucao de agendamentos impactados.
-                </CardDescription>
+                <CardTitle>Profissionais ({professionals.length})</CardTitle>
               </div>
 
               <div className="flex items-center gap-3">
-                <div className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-text-soft">
-                  {professionals.length}{" "}
-                  {professionals.length === 1
-                    ? "profissional listado"
-                    : "profissionais listados"}
-                </div>
                 <Button
                   variant="secondary"
-                  size="md"
+                  size="sm"
                   onClick={() => {
                     void professionalsQuery.refetch();
                   }}
                   disabled={professionalsQuery.isFetching}
                 >
-                  {professionalsQuery.isFetching ? "Atualizando..." : "Atualizar"}
+                  {professionalsQuery.isFetching
+                    ? "Atualizando..."
+                    : "Atualizar"}
                 </Button>
               </div>
             </div>
@@ -187,15 +195,15 @@ export function ProfessionalsPage() {
           {professionalsQuery.isLoading ? (
             <PageState
               title="Carregando profissionais"
-              description="Estamos preparando a listagem operacional para este tenant."
+              description="Estamos preparando a lista de profissionais."
             />
           ) : null}
 
           {professionalsQuery.isError ? (
             <div className="grid gap-4">
               <FeedbackBanner
-                title="Nao foi possivel carregar a listagem"
-                description="Revise a conectividade da API e o contexto autenticado do tenant antes de tentar novamente."
+                title="Nao foi possivel carregar os profissionais"
+                description="Verifique a conexao e tente novamente."
               />
               <div>
                 <Button
@@ -216,7 +224,7 @@ export function ProfessionalsPage() {
           professionals.length === 0 ? (
             <PageState
               title="Nenhum profissional cadastrado"
-              description="Comece pelo formulario ao lado para criar o primeiro profissional desta operacao."
+              description="Cadastre o primeiro profissional para comecar."
               actionLabel="Ir para o formulario"
               onAction={() => {
                 formSectionRef.current?.scrollIntoView?.({
@@ -232,7 +240,6 @@ export function ProfessionalsPage() {
           professionals.length > 0 ? (
             <ProfessionalsList
               professionals={professionals}
-              tenantTimezone={auth.tenant?.timezone ?? "UTC"}
               canManageProfessionals={canManageProfessionals}
               onEditProfessional={handleEditProfessional}
               pendingImageUploads={pendingImageUploads}
@@ -243,6 +250,7 @@ export function ProfessionalsPage() {
                 setDeleteErrorMessage(null);
                 setDeletingProfessional(professional);
               }}
+              tenantTimezone={""}
             />
           ) : null}
         </div>

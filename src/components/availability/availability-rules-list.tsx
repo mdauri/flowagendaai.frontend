@@ -24,7 +24,7 @@ const dayLabels = {
 
 export function AvailabilityRulesList({
   availability,
-  professionalName,
+  professionalName: _professionalName,
   tenantTimezone,
   isDeleting,
   onEdit,
@@ -32,18 +32,10 @@ export function AvailabilityRulesList({
 }: AvailabilityRulesListProps) {
   return (
     <div className="grid gap-4">
-      <Card variant="glass" padding="lg">
+      <Card variant="glass" padding="md">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <CardTitle>Disponibilidade base</CardTitle>
-            <CardDescription className="mt-3">
-              Regras recorrentes configuradas para{" "}
-              <span className="font-semibold text-white">{professionalName}</span>.
-            </CardDescription>
-          </div>
-
-          <div className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-text-soft">
-            {availability.length} {availability.length === 1 ? "regra ativa" : "regras ativas"}
+            <CardTitle>Horarios ({availability.length})</CardTitle>
           </div>
         </div>
       </Card>
@@ -54,7 +46,6 @@ export function AvailabilityRulesList({
             <div>
               <CardTitle>{dayLabels[item.dayOfWeek]}</CardTitle>
               <CardDescription className="mt-2">
-                Horario operacional no timezone do tenant:{" "}
                 <span className="font-semibold text-white">
                   {formatUtcTimeInTenantTimezone(item.dayOfWeek, item.startTimeUtc, tenantTimezone)} -{" "}
                   {formatUtcTimeInTenantTimezone(item.dayOfWeek, item.endTimeUtc, tenantTimezone)}
@@ -63,10 +54,10 @@ export function AvailabilityRulesList({
             </div>
 
             <div className="flex flex-wrap gap-3">
-              <Button variant="secondary" size="sm" onClick={() => onEdit(item)}>
+              <Button variant="secondary" size="sm" className="h-8 px-3 text-xs" onClick={() => onEdit(item)}>
                 Editar
               </Button>
-              <Button variant="secondary" size="sm" disabled={isDeleting} onClick={() => onDelete(item)}>
+              <Button variant="secondary" size="sm" className="h-8 px-3 text-xs" disabled={isDeleting} onClick={() => onDelete(item)}>
                 {isDeleting ? "Removendo..." : "Remover"}
               </Button>
             </div>

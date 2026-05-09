@@ -32,8 +32,8 @@ const FEEDBACK_MESSAGES: Record<GeolocationState, string | null> = {
   detecting: null,
   success: null,
   "permission-denied":
-    "Location access denied. Enable location in your browser settings, or type your address manually.",
-  error: "Could not determine your address. Type manually.",
+    "Permissao de localizacao negada. Ative no navegador ou preencha manualmente.",
+  error: "Nao foi possivel identificar o endereco. Preencha manualmente.",
   "not-supported": null,
 };
 
@@ -46,8 +46,8 @@ export function GeolocationAddressInput({
   onChange,
   disabled,
   onError,
-  placeholder = "Type your address or use location detection",
-  label = "Public Address",
+  placeholder = "Digite o endereco ou use sua localizacao",
+  label = "Endereco",
 }: GeolocationAddressInputProps) {
   const [geoState, setGeoState] = useState<GeolocationState>("idle");
   const [isGeocoding, setIsGeocoding] = useState(false);
@@ -122,7 +122,7 @@ export function GeolocationAddressInput({
             setGeoState("idle");
           }
         }}
-        placeholder={isNotSupported ? "Type your address" : placeholder}
+        placeholder={isNotSupported ? "Digite o endereco" : placeholder}
         disabled={disabled || isDetecting}
         maxLength={300}
         aria-describedby={feedbackMessage ? "geolocation-feedback" : undefined}
@@ -158,19 +158,19 @@ export function GeolocationAddressInput({
           disabled={disabled || isGeocoding}
           aria-label={
             geoState === "success"
-              ? "Update my current location"
-              : "Detect my current location to fill the address"
+              ? "Atualizar localizacao"
+              : "Usar localizacao atual para preencher o endereco"
           }
         >
           {isGeocoding ? (
             <>
               <Loader2 size={16} className="animate-spin" aria-hidden="true" />
-              Detecting...
+              Localizando...
             </>
           ) : (
             <>
               <MapPin size={16} aria-hidden="true" />
-              {geoState === "success" ? "Update location" : "Use my location"}
+              {geoState === "success" ? "Atualizar localizacao" : "Usar minha localizacao"}
             </>
           )}
         </Button>

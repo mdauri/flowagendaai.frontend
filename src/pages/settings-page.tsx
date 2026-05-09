@@ -103,21 +103,21 @@ export function SettingsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8">
+    <div className="mx-auto max-w-2xl space-y-6">
       <div>
         <h1
           className="text-2xl font-black text-white"
           style={{ letterSpacing: "-0.025em" }}
         >
-          Configuracoes do Tenant
+          Configuracoes
         </h1>
         <p className="mt-1 text-sm text-white/55">
-          Gerencie as informacoes publicas do seu tenant.
+          Informacoes exibidas no catalogo.
         </p>
       </div>
 
       {/* Tenant Profile Section */}
-      <section className="space-y-6 rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+      <section className="space-y-4 rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
         <h2 className="text-lg font-bold text-white">Perfil Publico</h2>
 
         {/* Tenant Name */}
@@ -126,14 +126,14 @@ export function SettingsPage() {
             htmlFor="tenant-name"
             className="block text-sm font-medium text-white/70"
           >
-            Nome do Tenant
+            Nome do estabelecimento
           </label>
           <Input
             id="tenant-name"
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Nome do seu tenant"
+            placeholder="Nome do seu negocio"
             disabled={saveState === "saving"}
             maxLength={200}
           />
@@ -142,7 +142,7 @@ export function SettingsPage() {
         {/* Logo Upload */}
         <div className="space-y-2">
           <label className="block text-sm font-medium text-white/70">
-            Logo do Tenant
+            Logo
           </label>
           <LogoUpload
             logoUrl={logoUrl}
@@ -212,7 +212,7 @@ export function SettingsPage() {
               Salvando...
             </>
           ) : (
-            "Salvar"
+            "Salvar perfil"
           )}
         </Button>
 

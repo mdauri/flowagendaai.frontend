@@ -95,9 +95,9 @@ export function AvailabilityPage() {
   return (
     <>
       <SectionHeading
-        eyebrow="Availability Base"
-        title="Disponibilidade base"
-        description="Configure a disponibilidade base por profissional usando o contrato real do backend, sem calcular agenda no frontend."
+        eyebrow=""
+        title="Horarios de atendimento"
+        description=""
       />
 
       <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,24rem)_minmax(0,1fr)]">
@@ -105,14 +105,14 @@ export function AvailabilityPage() {
           {professionalsQuery.isLoading ? (
             <PageState
               title="Carregando profissionais"
-              description="Precisamos do cadastro operacional de profissionais antes de representar a disponibilidade base."
+              description="Estamos preparando a lista de profissionais."
             />
           ) : null}
 
           {professionalsQuery.isError ? (
             <FeedbackBanner
               title="Nao foi possivel carregar os profissionais"
-              description="A selecao do profissional depende do fluxo operacional ja existente. Revise o backend de professionals antes de seguir."
+              description="Verifique a conexao e tente novamente."
             />
           ) : null}
 
@@ -165,7 +165,7 @@ export function AvailabilityPage() {
           professionals.length === 0 ? (
             <PageState
               title="Nenhum profissional disponivel para configuracao"
-              description="Cadastre ao menos um profissional antes de preparar a disponibilidade base."
+              description="Cadastre ao menos um profissional para configurar horarios."
             />
           ) : null}
 
@@ -175,14 +175,14 @@ export function AvailabilityPage() {
           !selectedProfessional ? (
             <PageState
               title="Selecione um profissional"
-              description="A tela so exibe estados de disponibilidade depois que um profissional e escolhido."
+              description="Escolha um profissional para ver os horarios."
             />
           ) : null}
 
           {selectedProfessional && availabilityQuery.isLoading ? (
             <PageState
               title="Carregando disponibilidade"
-              description="Estamos consultando a disponibilidade base do profissional selecionado."
+              description="Estamos carregando os horarios."
             />
           ) : null}
 
@@ -190,7 +190,7 @@ export function AvailabilityPage() {
             <div className="grid gap-4">
               <FeedbackBanner
                 title="Nao foi possivel carregar a disponibilidade"
-                description="Revise o contrato da API e tente novamente para o profissional selecionado."
+                description="Tente novamente em instantes."
               />
             </div>
           ) : null}
@@ -209,7 +209,7 @@ export function AvailabilityPage() {
           availabilityQuery.data.availability.length === 0 ? (
             <PageState
               title="Nenhuma disponibilidade configurada"
-              description="O profissional selecionado ainda nao possui regras de disponibilidade base."
+              description="Este profissional ainda nao possui horarios cadastrados."
             />
           ) : null}
 

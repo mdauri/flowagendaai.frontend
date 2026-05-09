@@ -9,7 +9,10 @@ import { FeedbackBanner } from "@/components/shared/feedback-banner";
 import { PageState } from "@/components/shared/page-state";
 import { useAuth } from "@/hooks/use-auth";
 import { useCreateServiceMutation } from "@/hooks/use-create-service-mutation";
-import { useDeleteServiceMutation, useUpdateServiceMutation } from "@/hooks/use-service-mutations";
+import {
+  useDeleteServiceMutation,
+  useUpdateServiceMutation,
+} from "@/hooks/use-service-mutations";
 import { useServicesQuery } from "@/hooks/use-services-query";
 import { ApiError } from "@/types/api";
 import type { Service } from "@/types/service";
@@ -24,7 +27,9 @@ export function ServicesPage() {
   const deleteServiceMutation = useDeleteServiceMutation();
   const [editingService, setEditingService] = useState<Service | null>(null);
   const [deletingService, setDeletingService] = useState<Service | null>(null);
-  const [deleteErrorMessage, setDeleteErrorMessage] = useState<string | null>(null);
+  const [deleteErrorMessage, setDeleteErrorMessage] = useState<string | null>(
+    null,
+  );
 
   function handleCreateService(input: CreateServiceInput) {
     return createServiceMutation.mutateAsync(input);
@@ -50,7 +55,9 @@ export function ServicesPage() {
       setDeletingService(null);
     } catch (error) {
       setDeleteErrorMessage(
-        error instanceof ApiError ? error.message : "Nao foi possivel desativar o servico."
+        error instanceof ApiError
+          ? error.message
+          : "Nao foi possivel desativar o servico.",
       );
     }
   }
@@ -64,9 +71,9 @@ export function ServicesPage() {
   return (
     <>
       <SectionHeading
-        eyebrow="Operational Core"
+        eyebrow=""
         title="Servicos"
-        description="Gerencie o catalogo inicial de servicos usando o contrato real do backend, sem antecipar scheduling."
+        description="Catalogo do estabelecimento"
       />
 
       <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,26rem)_minmax(0,1fr)]">
@@ -93,29 +100,23 @@ export function ServicesPage() {
           <Card variant="premium" padding="lg" className="h-full">
             <CardTitle>Acesso de leitura</CardTitle>
             <CardDescription className="mt-3">
-              Apenas usuarios com role `admin` podem criar, alterar ou remover servicos.
+              Apenas usuarios com role `admin` podem criar, alterar ou remover
+              servicos.
             </CardDescription>
           </Card>
         )}
 
-        <div className="grid gap-6">
-          <Card variant="glass" padding="lg">
+        <div className="grid gap-6 content-start">
+          <Card variant="glass" padding="md">
             <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
               <div>
-                <CardTitle>Catalogo operacional</CardTitle>
-                <CardDescription className="mt-3">
-                  Este modulo ja opera com `GET /services` e `POST /services`,
-                  mantendo create, list e feedback visual no frontend.
-                </CardDescription>
+                <CardTitle>Servicos ({services.length})</CardTitle>
               </div>
 
               <div className="flex items-center gap-3">
-                <div className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-text-soft">
-                  {services.length} {services.length === 1 ? "servico listado" : "servicos listados"}
-                </div>
                 <Button
                   variant="secondary"
-                  size="md"
+                  size="sm"
                   onClick={() => {
                     void servicesQuery.refetch();
                   }}
@@ -130,7 +131,7 @@ export function ServicesPage() {
           {servicesQuery.isLoading ? (
             <PageState
               title="Carregando servicos"
-              description="Estamos preparando a listagem operacional deste tenant."
+              description="Estamos preparando o catalogo de servicos."
             />
           ) : null}
 
@@ -138,7 +139,7 @@ export function ServicesPage() {
             <div className="grid gap-4">
               <FeedbackBanner
                 title="Nao foi possivel carregar os servicos"
-                description="Revise a conectividade da API e o contexto autenticado antes de tentar novamente."
+                description="Verifique a conexao e tente novamente."
               />
               <div>
                 <Button
@@ -159,7 +160,7 @@ export function ServicesPage() {
           services.length === 0 ? (
             <PageState
               title="Nenhum servico cadastrado"
-              description="Comece pelo formulario ao lado para criar o primeiro servico operacional."
+              description="Cadastre o primeiro servico para comecar."
               actionLabel="Ir para o formulario"
               onAction={() => {
                 formSectionRef.current?.scrollIntoView({

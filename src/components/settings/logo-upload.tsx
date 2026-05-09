@@ -27,13 +27,13 @@ export function LogoUpload({
     async (file: File) => {
       if (!ALLOWED_TYPES.includes(file.type)) {
         setError(
-          "Invalid file type. Only JPG, PNG, and WebP are allowed.",
+          "Formato invalido. Use JPG, PNG ou WebP.",
         );
         return;
       }
 
       if (file.size > MAX_FILE_SIZE) {
-        setError("File size exceeds 2MB limit.");
+        setError("Arquivo maior que 2MB.");
         return;
       }
 
@@ -58,7 +58,7 @@ export function LogoUpload({
         });
 
         if (!uploadResponse.ok) {
-          throw new Error("Failed to upload logo to storage.");
+          throw new Error("Falha ao enviar a logo.");
         }
 
         // Step 3: Confirm upload
@@ -68,7 +68,7 @@ export function LogoUpload({
         onUploadComplete(confirmedUrl);
       } catch (err) {
         const message =
-          err instanceof Error ? err.message : "Failed to upload logo.";
+          err instanceof Error ? err.message : "Falha ao enviar a logo.";
         setError(message);
       } finally {
         setIsUploading(false);
@@ -126,7 +126,7 @@ export function LogoUpload({
               size="sm"
               onClick={handleClickUpload}
               disabled={disabled || isUploading}
-              aria-label="Replace logo"
+              aria-label="Trocar logo"
             >
               {isUploading ? (
                 <>
@@ -135,12 +135,12 @@ export function LogoUpload({
                     className="animate-spin"
                     aria-hidden="true"
                   />
-                  Uploading...
+                  Enviando...
                 </>
               ) : (
                 <>
                   <Upload size={16} aria-hidden="true" />
-                  Replace logo
+                  Trocar logo
                 </>
               )}
             </Button>
@@ -150,10 +150,10 @@ export function LogoUpload({
               size="sm"
               onClick={handleRemove}
               disabled={disabled || isUploading}
-              aria-label="Remove logo"
+              aria-label="Remover logo"
               className="text-white/55 transition-colors duration-150 hover:text-[#F87171]"
             >
-              Remove logo
+              Remover
             </Button>
           </div>
         </div>
@@ -161,7 +161,7 @@ export function LogoUpload({
         <div className="space-y-2">
           <div
             className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-dashed border-[rgba(255,255,255,0.15)] bg-[rgba(255,255,255,0.05)] sm:h-16 sm:w-16"
-            aria-label="No logo configured"
+            aria-label="Nenhuma logo cadastrada"
           >
             <Upload size={20} className="text-white/30" aria-hidden="true" />
           </div>
@@ -171,7 +171,7 @@ export function LogoUpload({
             size="sm"
             onClick={handleClickUpload}
             disabled={disabled || isUploading}
-            aria-label="Upload logo"
+            aria-label="Enviar logo"
           >
             {isUploading ? (
               <>
@@ -180,18 +180,16 @@ export function LogoUpload({
                   className="animate-spin"
                   aria-hidden="true"
                 />
-                Uploading...
+                Enviando...
               </>
             ) : (
               <>
                 <Upload size={16} aria-hidden="true" />
-                Upload logo
+                Enviar logo
               </>
             )}
           </Button>
-          <p className="text-xs text-white/55">
-            JPG, PNG, or WebP. Max 2MB. Recommended: 512x512px.
-          </p>
+          <p className="text-xs text-white/55">JPG, PNG ou WebP. Max 2MB.</p>
         </div>
       )}
 

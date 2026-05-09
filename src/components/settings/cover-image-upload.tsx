@@ -28,12 +28,12 @@ export function CoverImageUpload({
   const handleFileSelect = useCallback(
     async (file: File) => {
       if (!ALLOWED_TYPES.includes(file.type)) {
-        setError("Invalid file type. Only JPG, PNG, and WebP are allowed.");
+        setError("Formato invalido. Use JPG, PNG ou WebP.");
         return;
       }
 
       if (file.size > MAX_FILE_SIZE) {
-        setError("File size exceeds 5MB limit.");
+        setError("Arquivo maior que 5MB.");
         return;
       }
 
@@ -57,7 +57,7 @@ export function CoverImageUpload({
         });
 
         if (!uploadResponse.ok) {
-          throw new Error("Failed to upload image to storage.");
+          throw new Error("Falha ao enviar imagem.");
         }
 
         // Step 3: Confirm upload
@@ -67,7 +67,7 @@ export function CoverImageUpload({
         onUploadComplete(confirmedUrl, thumbUrl);
       } catch (err) {
         const message =
-          err instanceof Error ? err.message : "Failed to upload cover image.";
+          err instanceof Error ? err.message : "Falha ao enviar a capa.";
         setError(message);
       } finally {
         setIsUploading(false);
@@ -117,7 +117,7 @@ export function CoverImageUpload({
             <img
               src={coverThumbnailUrl || coverImageUrl}
               alt="Current cover image"
-              className="h-[120px] w-full object-cover sm:h-[160px]"
+              className="h-[100px] w-full object-cover sm:h-[132px]"
               style={{ objectPosition: "center" }}
             />
           </div>
@@ -132,12 +132,12 @@ export function CoverImageUpload({
               {isUploading ? (
                 <>
                   <Loader2 size={16} className="animate-spin" aria-hidden="true" />
-                  Uploading...
+                  Enviando...
                 </>
               ) : (
                 <>
                   <Upload size={16} aria-hidden="true" />
-                  Replace cover
+                  Trocar capa
                 </>
               )}
             </Button>
@@ -149,7 +149,7 @@ export function CoverImageUpload({
               disabled={disabled || isUploading}
             >
               <Trash2 size={16} aria-hidden="true" />
-              Remove
+              Remover
             </Button>
           </div>
         </div>
@@ -165,18 +165,16 @@ export function CoverImageUpload({
             {isUploading ? (
               <>
                 <Loader2 size={16} className="animate-spin" aria-hidden="true" />
-                Uploading...
+                Enviando...
               </>
             ) : (
               <>
                 <Upload size={16} aria-hidden="true" />
-                Upload cover image
+                Enviar capa
               </>
             )}
           </Button>
-          <p className="text-xs text-white/55">
-            JPG, PNG, or WebP. Max 5MB. Recommended: 1200x400px.
-          </p>
+          <p className="text-xs text-white/55">JPG, PNG ou WebP. Max 5MB.</p>
         </div>
       )}
 

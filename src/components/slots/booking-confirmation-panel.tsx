@@ -4,7 +4,10 @@ import { Card, CardDescription, CardTitle } from "@/components/flow/card";
 import { FeedbackBanner } from "@/components/shared/feedback-banner";
 import { MultiDaySummary } from "@/components/slots/multi-day-summary";
 import { semanticTokens } from "@/design-system";
-import { formatDateTimeInTenantTimezone, formatUtcTimeRangeInTenantTimezone } from "@/lib/date-time";
+import {
+  formatDateTimeInTenantTimezone,
+  formatUtcTimeRangeInTenantTimezone,
+} from "@/lib/date-time";
 import type { CreateBookingResponse } from "@/types/booking";
 import type { AvailableSlot } from "@/types/slot";
 
@@ -27,7 +30,12 @@ interface BookingConfirmationPanelProps {
   onRetry: () => void;
   onRefreshSlots: () => void;
   onResetSuccess: () => void;
-  daysAffected?: { date: string; start: string; end: string; durationMinutes: number }[];
+  daysAffected?: {
+    date: string;
+    start: string;
+    end: string;
+    durationMinutes: number;
+  }[];
   errorDescription?: string;
 }
 
@@ -48,19 +56,24 @@ function SlotSummary({
     <div className="grid gap-3 rounded-[28px] border border-white/10 bg-white/5 p-4">
       <div className="flex items-center justify-between gap-3">
         <span className="text-sm font-semibold text-white">Horario</span>
-        <Badge variant="info">{formatUtcTimeRangeInTenantTimezone(start, end, tenantTimezone)}</Badge>
+        <Badge variant="info">
+          {formatUtcTimeRangeInTenantTimezone(start, end, tenantTimezone)}
+        </Badge>
       </div>
       <p className="text-sm leading-6 text-text-soft">
-        {formatDateTimeInTenantTimezone(start, tenantTimezone)} ({tenantTimezone})
+        {formatDateTimeInTenantTimezone(start, tenantTimezone)} (
+        {tenantTimezone})
       </p>
       {professionalName ? (
         <p className="text-sm leading-6 text-text-soft">
-          Profissional: <span className="font-semibold text-white">{professionalName}</span>
+          Profissional:{" "}
+          <span className="font-semibold text-white">{professionalName}</span>
         </p>
       ) : null}
       {serviceName ? (
         <p className="text-sm leading-6 text-text-soft">
-          Servico: <span className="font-semibold text-white">{serviceName}</span>
+          Servico:{" "}
+          <span className="font-semibold text-white">{serviceName}</span>
         </p>
       ) : null}
     </div>
@@ -95,7 +108,7 @@ function SuccessState({
         <div>
           <CardTitle>Agendamento confirmado</CardTitle>
           <CardDescription className="mt-3">
-            O horario foi confirmado pelo backend e voce permanece nesta mesma tela.
+            O horario foi confirmado.
           </CardDescription>
         </div>
         <Badge variant="success">Confirmado</Badge>
@@ -109,7 +122,12 @@ function SuccessState({
         serviceName={serviceName}
       />
 
-      <Button type="button" variant="secondary" size="md" onClick={onResetSuccess}>
+      <Button
+        type="button"
+        variant="secondary"
+        size="md"
+        onClick={onResetSuccess}
+      >
         Consultar outros horarios
       </Button>
     </Card>
@@ -143,13 +161,14 @@ export function BookingConfirmationPanel({
   }
 
   return (
-    <Card variant="glass" padding="lg" className="grid gap-5" aria-live="polite">
+    <Card
+      variant="glass"
+      padding="lg"
+      className="grid gap-5"
+      aria-live="polite"
+    >
       <div>
         <CardTitle>Confirmacao do agendamento</CardTitle>
-        <CardDescription className="mt-3">
-          O frontend apenas envia o slot escolhido. Disponibilidade, conflito e horario final
-          continuam sendo confirmados pelo backend.
-        </CardDescription>
       </div>
 
       {selectedSlot ? (
@@ -209,11 +228,21 @@ export function BookingConfirmationPanel({
           Atualizar horarios
         </Button>
       ) : state === "error" ? (
-        <Button type="button" size="md" onClick={onRetry} disabled={!selectedSlot}>
+        <Button
+          type="button"
+          size="md"
+          onClick={onRetry}
+          disabled={!selectedSlot}
+        >
           Tentar novamente
         </Button>
       ) : (
-        <Button type="button" size="md" onClick={onConfirm} disabled={!canConfirm}>
+        <Button
+          type="button"
+          size="md"
+          onClick={onConfirm}
+          disabled={!canConfirm}
+        >
           {state === "pending" ? "Confirmando..." : "Confirmar agendamento"}
         </Button>
       )}

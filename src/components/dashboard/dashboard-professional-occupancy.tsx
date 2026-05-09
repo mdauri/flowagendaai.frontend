@@ -1,4 +1,4 @@
-import { Card, CardDescription, CardTitle } from "@/components/flow/card";
+import { Card, CardTitle } from "@/components/flow/card";
 import type { DashboardProfessionalOccupancyItem } from "@/types/dashboard";
 import { DashboardEmptyState } from "@/components/dashboard/dashboard-empty-state";
 
@@ -15,8 +15,7 @@ export function DashboardProfessionalOccupancy({ items }: DashboardProfessionalO
   if (items.length === 0) {
     return (
       <DashboardEmptyState
-        title="Sem ocupacao por profissional"
-        description="Nenhum profissional retornou ocupacao para esta data."
+        title="Sem ocupacao por profissional hoje."
       />
     );
   }
@@ -24,11 +23,7 @@ export function DashboardProfessionalOccupancy({ items }: DashboardProfessionalO
   return (
     <Card variant="glass" padding="lg">
       <CardTitle>Ocupacao por profissional</CardTitle>
-      <CardDescription className="mt-3">
-        Lista exibida na ordem entregue pelo backend.
-      </CardDescription>
-
-      <ul className="mt-6 grid gap-4" aria-label="Ocupacao por profissional">
+      <ul className="mt-5 grid gap-4" aria-label="Ocupacao por profissional">
         {items.map((item) => (
           <li
             key={item.professionalId}

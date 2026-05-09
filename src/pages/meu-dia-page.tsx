@@ -50,7 +50,7 @@ function statusVariant(status: BookingStatus) {
 }
 
 function resolveCustomerName(customerName: string | null) {
-  return customerName ?? "Cliente nao informado";
+  return customerName ?? "Cliente nao identificado";
 }
 
 function shouldDisplayValue(value: string | null | undefined): value is string {
@@ -92,6 +92,7 @@ function resolveNextBooking(items: BookingReadItem[]) {
 export function MeuDiaPage() {
   const auth = useAuth();
   const tenantTimezone = auth.tenant?.timezone ?? "UTC";
+  const userProfessionalId = auth.user?.professionalId ?? null;
 
   const todayRange = useMemo(() => toUtcDayRange(tenantTimezone, 0), [tenantTimezone]);
 
@@ -131,6 +132,20 @@ export function MeuDiaPage() {
   const items = bookingsQuery.data?.items ?? [];
   const isEmpty = bookingsQuery.isSuccess && items.length === 0;
   const nextBooking = useMemo(() => resolveNextBooking(items), [items]);
+  const selectedDateInTenant = useMemo(
+    () => DateTime.fromFormat(selectedDate, "yyyy-MM-dd", { zone: tenantTimezone }).setLocale("pt-BR"),
+    [selectedDate, tenantTimezone]
+  );
+  const todayKey = DateTime.now().setZone(tenantTimezone).toFormat("yyyy-MM-dd");
+  const selectedDateKey = selectedDateInTenant.isValid ? selectedDateInTenant.toFormat("yyyy-MM-dd") : selectedDate;
+  const headerDateLabel = selectedDateInTenant.isValid
+    ? selectedDateInTenant.toFormat("ccc, dd LLL").replace(".", "")
+    : selectedDate;
+  const headerContext = `${selectedDateKey === todayKey ? "Hoje" : "Dia"} • ${headerDateLabel}`;
+  const shouldShowProfessionalName = useMemo(() => {
+    if (!userProfessionalId) return true;
+    return items.some((item) => item.professionalId !== userProfessionalId);
+  }, [items, userProfessionalId]);
 
   const kpis = useMemo(() => {
     const total = items.length;
@@ -187,35 +202,18 @@ export function MeuDiaPage() {
   }
 
   return (
-    <div className="space-y-6" aria-busy={bookingsQuery.isFetching ? "true" : "false"}>
-      <header className="space-y-2">
+    <div className="space-y-4 sm:space-y-5" aria-busy={bookingsQuery.isFetching ? "true" : "false"}>
+      <header className="space-y-1">
         <h2 className="text-2xl font-black tracking-tight text-white">Meu Dia</h2>
-        <CardDescription>
-          Painel operacional para acompanhar os atendimentos do dia.
-        </CardDescription>
+        <p className="text-sm text-text-soft">{headerContext}</p>
       </header>
-
-      <section className="grid gap-3 sm:grid-cols-3">
-        <Card variant="glass" padding="sm" radiusSize="xl">
-          <CardDescription>Total do dia</CardDescription>
-          <CardTitle className="mt-2">{kpis.total}</CardTitle>
-        </Card>
-        <Card variant="glass" padding="sm" radiusSize="xl">
-          <CardDescription>Valor estimado</CardDescription>
-          <CardTitle className="mt-2">{formatCurrency(kpis.estimatedValue)}</CardTitle>
-        </Card>
-        <Card variant="glass" padding="sm" radiusSize="xl">
-          <CardDescription>Cancelamentos</CardDescription>
-          <CardTitle className="mt-2">{kpis.cancelled}</CardTitle>
-        </Card>
-      </section>
 
       {nextBooking ? (
         <section>
-          <Card variant="premium" padding="md" radiusSize="xl">
+          <Card variant="premium" padding="sm" radiusSize="xl">
             <CardDescription>Proximo atendimento</CardDescription>
-            <div className="mt-2 flex flex-wrap items-center gap-2">
-              <CardTitle className="text-2xl">
+            <div className="mt-1 flex flex-wrap items-center gap-2">
+              <CardTitle className="text-xl sm:text-2xl">
                 {formatUtcTimeRangeInTenantTimezone(
                   nextBooking.start,
                   nextBooking.end,
@@ -231,7 +229,22 @@ export function MeuDiaPage() {
         </section>
       ) : null}
 
-      <section className="grid gap-3 sm:grid-cols-4">
+      <section className="grid gap-2 sm:grid-cols-3">
+        <Card variant="glass" padding="sm" radiusSize="xl">
+          <CardDescription className="text-xs">Total do dia</CardDescription>
+          <CardTitle className="mt-1 text-lg">{kpis.total}</CardTitle>
+        </Card>
+        <Card variant="glass" padding="sm" radiusSize="xl">
+          <CardDescription className="text-xs">Valor estimado</CardDescription>
+          <CardTitle className="mt-1 text-lg">{formatCurrency(kpis.estimatedValue)}</CardTitle>
+        </Card>
+        <Card variant="glass" padding="sm" radiusSize="xl">
+          <CardDescription className="text-xs">Cancelamentos</CardDescription>
+          <CardTitle className="mt-1 text-lg">{kpis.cancelled}</CardTitle>
+        </Card>
+      </section>
+
+      <section className="grid gap-2 grid-cols-2 sm:grid-cols-4">
         <Button type="button" variant="secondary" size="sm" onClick={() => applyRangeFromPreset(0)}>
           Hoje
         </Button>
@@ -272,7 +285,7 @@ export function MeuDiaPage() {
           </Card>
         ) : isEmpty ? (
           <Card variant="glass" padding="md">
-            <p className="text-sm font-semibold text-white">Sem agendamentos para a data selecionada.</p>
+            <p className="text-sm font-semibold text-white">Nenhum atendimento neste dia.</p>
           </Card>
         ) : (
           <ul className="grid gap-3" aria-label="Lista de atendimentos do dia">
@@ -295,9 +308,11 @@ export function MeuDiaPage() {
                           {resolveCustomerName(item.customerName)}
                           {shouldDisplayValue(item.customerPhone) ? ` · ${item.customerPhone}` : ""}
                         </p>
-                        <p className="mt-1 text-xs uppercase tracking-[0.12em] text-text-soft">
-                          Profissional: {item.professionalName}
-                        </p>
+                        {shouldShowProfessionalName ? (
+                          <p className="mt-1 text-xs uppercase tracking-[0.12em] text-text-soft">
+                            Profissional: {item.professionalName}
+                          </p>
+                        ) : null}
                       </div>
                       <div className="flex flex-col items-end gap-2">
                         <Badge variant={statusVariant(item.status)}>{statusLabel(item.status)}</Badge>
@@ -349,7 +364,9 @@ export function MeuDiaPage() {
                   <div>
                     <p className="text-xs uppercase tracking-[0.14em]">Atendimento</p>
                     <p className="mt-1 text-white">{bookingDetails.serviceName}</p>
-                    <p className="mt-1 text-text-soft">Profissional: {bookingDetails.professionalName}</p>
+                    {shouldShowProfessionalName ? (
+                      <p className="mt-1 text-text-soft">Profissional: {bookingDetails.professionalName}</p>
+                    ) : null}
                   </div>
                   <div>
                     <p className="text-xs uppercase tracking-[0.14em]">Cliente</p>
@@ -370,4 +387,3 @@ export function MeuDiaPage() {
     </div>
   );
 }
-

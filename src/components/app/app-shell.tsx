@@ -28,11 +28,7 @@ export function AppShell({
           <p className="text-sm font-semibold uppercase tracking-[0.22em] text-secondary">
             Agendoro
           </p>
-          <h1 className="mt-2 text-3xl font-black tracking-tight text-white">
-            Operacao autenticada
-          </h1>
           <p className="mt-2 text-sm leading-6 text-text-soft">
-            Tenant atual:{" "}
             <span className="font-semibold text-white">{tenant.name}</span>
           </p>
           <nav
@@ -47,7 +43,7 @@ export function AppShell({
                     "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
                     isActive
                       ? "border-primary bg-primary text-black"
-                      : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white"
+                      : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white",
                   )
                 }
               >
@@ -62,7 +58,7 @@ export function AppShell({
                       "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
                       isActive
                         ? "border-primary bg-primary text-black"
-                        : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white"
+                        : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white",
                     )
                   }
                 >
@@ -75,7 +71,7 @@ export function AppShell({
                       "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
                       isActive
                         ? "border-primary bg-primary text-black"
-                        : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white"
+                        : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white",
                     )
                   }
                 >
@@ -88,7 +84,7 @@ export function AppShell({
                       "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
                       isActive
                         ? "border-primary bg-primary text-black"
-                        : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white"
+                        : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white",
                     )
                   }
                 >
@@ -101,7 +97,7 @@ export function AppShell({
                       "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
                       isActive
                         ? "border-primary bg-primary text-black"
-                        : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white"
+                        : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white",
                     )
                   }
                 >
@@ -114,7 +110,7 @@ export function AppShell({
                       "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
                       isActive
                         ? "border-primary bg-primary text-black"
-                        : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white"
+                        : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white",
                     )
                   }
                 >
@@ -127,7 +123,7 @@ export function AppShell({
                       "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
                       isActive
                         ? "border-primary bg-primary text-black"
-                        : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white"
+                        : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white",
                     )
                   }
                 >
@@ -140,7 +136,7 @@ export function AppShell({
                       "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
                       isActive
                         ? "border-primary bg-primary text-black"
-                        : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white"
+                        : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white",
                     )
                   }
                 >
@@ -156,7 +152,7 @@ export function AppShell({
                     "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
                     isActive
                       ? "border-primary bg-primary text-black"
-                      : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white"
+                      : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white",
                   )
                 }
               >
@@ -171,7 +167,7 @@ export function AppShell({
                     "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
                     isActive
                       ? "border-primary bg-primary text-black"
-                      : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white"
+                      : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white",
                   )
                 }
               >
@@ -186,7 +182,7 @@ export function AppShell({
                     "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
                     isActive
                       ? "border-primary bg-primary text-black"
-                      : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white"
+                      : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white",
                   )
                 }
               >
@@ -195,7 +191,7 @@ export function AppShell({
             ) : null}
           </nav>
         </div>
-        <div className="min-w-0 xl:max-w-[360px]">
+        <div className="min-w-0 xl:max-w-90">
           <UserIdentityHeaderCard
             name={user.name}
             isLoading={isUserIdentityLoading}
