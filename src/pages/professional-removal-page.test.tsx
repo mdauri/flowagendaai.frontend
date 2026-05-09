@@ -45,7 +45,7 @@ vi.mock("react-router-dom", async () => {
 
 vi.mock("@/hooks/use-auth", () => ({
   useAuth: () => ({
-    user: { role: "mandant" },
+    user: { role: "admin" },
     tenant: { timezone: "America/Sao_Paulo" },
   }),
 }));

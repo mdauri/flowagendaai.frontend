@@ -174,8 +174,8 @@ export function ApiTokensPage() {
 
     if (!selectedTenantId) {
       toast({
-        title: "Mandante obrigatorio",
-        description: "Selecione o mandante para gerar o token.",
+        title: "Tenant obrigatorio",
+        description: "Selecione o tenant para gerar o token.",
         variant: "warning",
       });
       return;
@@ -235,8 +235,8 @@ export function ApiTokensPage() {
   async function handleRevoke(id: string) {
     if (!selectedTenantId) {
       toast({
-        title: "Mandante obrigatorio",
-        description: "Selecione um mandante para revogar o token.",
+        title: "Tenant obrigatorio",
+        description: "Selecione um tenant para revogar o token.",
         variant: "warning",
       });
       return;
@@ -305,25 +305,25 @@ export function ApiTokensPage() {
       <Card variant="premium" padding="lg">
         <CardTitle>API Tokens M2M</CardTitle>
         <CardDescription className="mt-3">
-          Crie e gerencie tokens para mandantes especificos com menor
+          Crie e gerencie tokens para tenants especificos com menor
           privilegio.
         </CardDescription>
       </Card>
 
       <Card variant="glass" padding="lg">
-        <CardTitle>Mandante alvo</CardTitle>
+        <CardTitle>Tenant alvo</CardTitle>
         <CardDescription className="mt-2">
-          Selecione o mandante para criar, listar e revogar tokens.
+          Selecione o tenant para criar, listar e revogar tokens.
         </CardDescription>
         {tenantsQuery.isLoading ? (
           <div className="mt-4 flex items-center gap-2 text-text-soft">
             <Loader2 size={16} className="animate-spin" />
-            Carregando mandantes...
+            Carregando tenants...
           </div>
         ) : tenantsQuery.isError ? (
           <PageState
-            title="Falha ao carregar mandantes"
-            description="Nao foi possivel carregar a lista de mandantes."
+            title="Falha ao carregar tenants"
+            description="Nao foi possivel carregar a lista de tenants."
             actionLabel="Tentar novamente"
             onAction={() => void tenantsQuery.refetch()}
           />
@@ -333,13 +333,13 @@ export function ApiTokensPage() {
               className="text-sm font-semibold text-white"
               htmlFor="api-token-tenant"
             >
-              Mandante
+              Tenant
             </label>
             <Select
               id="api-token-tenant"
               value={selectedTenantId}
               options={tenantOptions}
-              placeholder="Selecione um mandante"
+              placeholder="Selecione um tenant"
               onValueChange={setSelectedTenantId}
             />
           </div>
@@ -496,8 +496,8 @@ export function ApiTokensPage() {
         <CardTitle>Tokens cadastrados</CardTitle>
         {!selectedTenantId ? (
           <PageState
-            title="Selecione um mandante"
-            description="Escolha um mandante para visualizar os tokens M2M."
+            title="Selecione um tenant"
+            description="Escolha um tenant para visualizar os tokens M2M."
           />
         ) : listQuery.isLoading ? (
           <div className="mt-4 flex items-center gap-2 text-text-soft">

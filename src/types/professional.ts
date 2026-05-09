@@ -6,6 +6,7 @@ export interface Professional {
   imageUrl?: string | null;
   thumbnailUrl?: string | null;
   isActive?: boolean;
+  hasSystemAccess?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -16,7 +17,8 @@ export interface ListProfessionalsResponse {
 
 export interface CreateProfessionalInput {
   name: string;
-  email: string;
+  email?: string | null;
+  hasSystemAccess?: boolean;
   description?: string | null;
 }
 
@@ -26,6 +28,8 @@ export interface CreateProfessionalResponse {
 
 export interface UpdateProfessionalInput {
   name: string;
+  email?: string | null;
+  hasSystemAccess?: boolean;
   description?: string | null;
 }
 

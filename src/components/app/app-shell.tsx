@@ -41,7 +41,7 @@ export function AppShell({
           >
             {isProfessional ? (
               <NavLink
-                to="/app/minha-agenda"
+                to="/app/meu-dia"
                 className={({ isActive }) =>
                   cn(
                     "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
@@ -51,7 +51,7 @@ export function AppShell({
                   )
                 }
               >
-                Minha agenda
+                Meu Dia
               </NavLink>
             ) : (
               <>
@@ -67,6 +67,19 @@ export function AppShell({
                   }
                 >
                   Dashboard
+                </NavLink>
+                <NavLink
+                  to="/app/meu-dia"
+                  className={({ isActive }) =>
+                    cn(
+                      "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
+                      isActive
+                        ? "border-primary bg-primary text-black"
+                        : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white"
+                    )
+                  }
+                >
+                  Meu Dia
                 </NavLink>
                 <NavLink
                   to="/app/professionals"

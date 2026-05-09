@@ -62,7 +62,7 @@ function validateForm(values: FormValues): FormErrors {
   const errors: FormErrors = {};
 
   if (values.tenantName.trim().length < 2) {
-    errors.tenantName = "Informe o nome do mandante com pelo menos 2 caracteres.";
+    errors.tenantName = "Informe o nome do tenant com pelo menos 2 caracteres.";
   }
 
   if (!/^[a-z0-9-]{3,80}$/.test(values.tenantSlug)) {
@@ -87,18 +87,18 @@ function validateForm(values: FormValues): FormErrors {
 function mapApiErrorToMessage(error: ApiError): { message: string; fieldErrors?: FormErrors } {
   if (error.status === 403 || error.code === "FORBIDDEN") {
     return {
-      message: "Voce nao tem permissao para provisionar mandantes.",
+      message: "Voce nao tem permissao para provisionar tenants.",
     };
   }
 
   if (error.status === 409 || error.code === "CONFLICT_DUPLICATE_TENANT_OR_EMAIL") {
     const lowerMessage = error.message.toLowerCase();
 
-    if (lowerMessage.includes("identificador") || lowerMessage.includes("mandante")) {
+    if (lowerMessage.includes("identificador") || lowerMessage.includes("tenant")) {
       return {
-        message: "Ja existe um mandante com este identificador.",
+        message: "Ja existe um tenant com este identificador.",
         fieldErrors: {
-          tenantSlug: "Ja existe um mandante com este identificador.",
+          tenantSlug: "Ja existe um tenant com este identificador.",
         },
       };
     }
@@ -113,7 +113,7 @@ function mapApiErrorToMessage(error: ApiError): { message: string; fieldErrors?:
     }
 
     return {
-      message: "Slug do mandante ou email do administrador ja em uso.",
+      message: "Slug do tenant ou email do administrador ja em uso.",
     };
   }
 
@@ -201,7 +201,7 @@ export function SystemAdminTenantProvisionPage() {
       setGlobalError(null);
       setFieldErrors({});
       toast({
-        title: "Mandante provisionado",
+        title: "Tenant provisionado",
         description: `Tenant ${response.tenant.name} criado com sucesso.`,
         variant: "success",
       });
@@ -243,7 +243,7 @@ export function SystemAdminTenantProvisionPage() {
     <SystemAdminGate isAllowed={isAllowed}>
       <SectionHeading
         eyebrow="System Admin"
-        title="Provisionar novo mandante"
+        title="Provisionar novo tenant"
         description="Crie tenant e usuario administrativo inicial em uma operacao unica e auditavel."
       />
 
@@ -271,7 +271,7 @@ export function SystemAdminTenantProvisionPage() {
         ) : (
           <PageState
             title="Nenhum provisionamento executado nesta sessao"
-            description="Preencha os dados abaixo e confirme para criar um novo mandante com admin inicial."
+            description="Preencha os dados abaixo e confirme para criar um novo tenant com admin inicial."
           />
         )}
 
@@ -280,7 +280,7 @@ export function SystemAdminTenantProvisionPage() {
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <label htmlFor="tenant-name" className="text-sm font-semibold text-white">
-                  Nome do mandante
+                  Nome do tenant
                 </label>
                 <Input
                   id="tenant-name"
@@ -392,7 +392,7 @@ export function SystemAdminTenantProvisionPage() {
                     Provisionando...
                   </>
                 ) : (
-                  "Criar mandante e admin"
+                  "Criar tenant e admin"
                 )}
               </Button>
 

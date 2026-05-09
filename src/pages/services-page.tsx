@@ -57,7 +57,7 @@ export function ServicesPage() {
 
   const services = servicesQuery.data?.services ?? [];
   const canManageServices = useMemo(
-    () => ["admin", "mandant"].includes(auth.user?.role ?? ""),
+    () => ["admin"].includes(auth.user?.role ?? ""),
     [auth.user?.role],
   );
 
@@ -93,7 +93,7 @@ export function ServicesPage() {
           <Card variant="premium" padding="lg" className="h-full">
             <CardTitle>Acesso de leitura</CardTitle>
             <CardDescription className="mt-3">
-              Apenas usuarios com role `admin` ou `mandant` podem criar, alterar ou remover servicos.
+              Apenas usuarios com role `admin` podem criar, alterar ou remover servicos.
             </CardDescription>
           </Card>
         )}

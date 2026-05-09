@@ -10,7 +10,7 @@ interface SystemAdminGateProps {
 export function SystemAdminGate({
   isAllowed,
   fallbackTitle = "Acesso restrito",
-  fallbackDescription = "Voce nao tem permissao para provisionar mandantes.",
+  fallbackDescription = "Voce nao tem permissao para provisionar tenants.",
   children,
 }: SystemAdminGateProps) {
   if (isAllowed) {
