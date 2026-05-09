@@ -3,6 +3,7 @@ export interface AuthUser {
   name: string;
   email: string;
   role: string;
+  roles?: string[];
   professionalId?: string | null;
 }
 

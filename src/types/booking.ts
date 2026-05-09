@@ -28,6 +28,8 @@ export interface BookingReadItem {
   customerName: string | null;
   customerPhone: string | null;
   customerEmail: string | null;
+  servicePriceSnapshot?: number | null;
+  servicePrice?: number | null;
   createdAt: string;
   cancelledAt: string | null;
 }
