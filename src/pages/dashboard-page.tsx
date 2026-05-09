@@ -278,15 +278,6 @@ export function DashboardPage() {
         onClearFilters={handleClearFilters}
       />
       <div className="grid gap-6 xl:grid-cols-12">
-        <div className="xl:col-span-4">
-          <DashboardOccupancyCard occupancy={summary.occupancy} />
-        </div>
-        <div className="xl:col-span-8">
-          <DashboardKpiGrid summary={summary} />
-        </div>
-      </div>
-
-      <div className="grid gap-6 xl:grid-cols-12">
         <div className="xl:col-span-8">
           <DashboardAgendaList
             bookings={summary.todayBookings}
@@ -308,6 +299,15 @@ export function DashboardPage() {
             onViewBookingDetails={handleViewBookingDetails}
           />
           <DashboardProfessionalOccupancy items={summary.professionalOccupancy} />
+        </div>
+      </div>
+
+      <div className="grid gap-6 xl:grid-cols-12">
+        <div className="xl:col-span-4">
+          <DashboardOccupancyCard occupancy={summary.occupancy} />
+        </div>
+        <div className="xl:col-span-8">
+          <DashboardKpiGrid summary={summary} />
         </div>
       </div>
 

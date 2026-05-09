@@ -7,11 +7,9 @@ import {
   BookingConfirmationPanel,
   type BookingConfirmationPanelState,
 } from "@/components/slots/booking-confirmation-panel";
-import { SlotSearchActions } from "@/components/slots/slot-search-actions";
 import { SlotSearchFilters } from "@/components/slots/slot-search-filters";
 import { SlotsEmptyState } from "@/components/slots/slots-empty-state";
 import { SlotsErrorState } from "@/components/slots/slots-error-state";
-import { TenantTimezoneInfo } from "@/components/slots/tenant-timezone-info";
 import { PageState } from "@/components/shared/page-state";
 import { useAuth } from "@/hooks/use-auth";
 import { useAvailableDatesQuery } from "@/hooks/use-available-dates-query";
@@ -307,42 +305,35 @@ export function SlotsPage() {
   return (
     <>
       <SectionHeading
-        eyebrow="Slot Calculation"
+        eyebrow=""
         title="Consulta de horarios"
-        description="Consuma o contrato de slots do backend sem recalcular, sem reordenar e sem interpretar disponibilidade no frontend."
+        description=""
       />
 
       <div className="mt-8 grid gap-6">
-        <TenantTimezoneInfo timezone={activeTenantTimezone} />
-
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_20rem]">
-          <SlotSearchFilters
-            professionals={professionals}
-            services={services}
-            filters={filters}
-            timezone={activeTenantTimezone}
-            calendarMonth={calendarMonthInTimezone}
-            availableDates={availableDates}
-            canLoadAvailability={Boolean(filters.professionalId && filters.serviceId)}
-            isAvailabilityLoading={availableDatesQuery.isLoading || availableDatesQuery.isFetching}
-            availabilityErrorMessage={availabilityErrorMessage}
-            disabled={isBootstrapLoading}
-            onCalendarMonthChange={setCalendarMonth}
-            onFiltersChange={handleFiltersChange}
-          />
-
-          <SlotSearchActions
-            canSearch={hasCompleteFilters && isSelectedDateAvailable}
-            isSearching={availableSlotsQuery.isLoading || availableSlotsQuery.isFetching}
-            disabled={isBookingPending}
-            onSearch={handleSearch}
-          />
-        </div>
+        <SlotSearchFilters
+          professionals={professionals}
+          services={services}
+          filters={filters}
+          timezone={activeTenantTimezone}
+          calendarMonth={calendarMonthInTimezone}
+          availableDates={availableDates}
+          canLoadAvailability={Boolean(filters.professionalId && filters.serviceId)}
+          isAvailabilityLoading={availableDatesQuery.isLoading || availableDatesQuery.isFetching}
+          availabilityErrorMessage={availabilityErrorMessage}
+          canSearch={hasCompleteFilters && isSelectedDateAvailable}
+          isSearching={availableSlotsQuery.isLoading || availableSlotsQuery.isFetching}
+          disabled={isBootstrapLoading}
+          searchDisabled={isBookingPending}
+          onSearch={handleSearch}
+          onCalendarMonthChange={setCalendarMonth}
+          onFiltersChange={handleFiltersChange}
+        />
 
         {isBootstrapLoading ? (
           <PageState
-            title="Carregando contexto da consulta"
-            description="Precisamos dos cadastros de profissionais e servicos antes de consultar os horarios."
+            title="Carregando dados da consulta"
+            description="Estamos preparando profissionais e servicos."
           />
         ) : null}
 
@@ -358,8 +349,8 @@ export function SlotsPage() {
 
         {!isBootstrapLoading && !isBootstrapError && submittedFilters === null ? (
           <PageState
-            title="Preencha os filtros para consultar"
-            description="Selecione profissional, servico e data. Depois use Buscar horarios para consultar a API."
+            title="Preencha os filtros"
+            description="Escolha os filtros para visualizar horarios."
           />
         ) : null}
 

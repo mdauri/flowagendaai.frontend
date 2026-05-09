@@ -378,8 +378,8 @@ export function ProfessionalForm({
   const primarySubmittingLabel = isEditMode ? "Salvando..." : "Criando...";
   const title = isEditMode ? "Editar profissional" : "Novo profissional";
   const description = isEditMode
-    ? "Atualize os dados operacionais do profissional sem trocar de contexto."
-    : "O cadastro agora usa o backend real disponivel em `POST /professionals` e mantem o frontend sem regra operacional extra.";
+    ? "Atualize os dados do profissional."
+    : "Cadastre um novo profissional.";
 
   const submitDisabled = isEditMode ? isSubmitting : isSubmitting || isImageUploading;
   const submitLabel = isSubmitting
@@ -389,15 +389,15 @@ export function ProfessionalForm({
       : primaryLabel;
 
   return (
-    <Card variant="premium" padding="lg" className="h-full">
+    <Card variant="premium" padding="md" className="h-full">
       <div className="flex items-start justify-between gap-4">
         <div>
           <CardTitle>{title}</CardTitle>
-          <CardDescription className="mt-3">{description}</CardDescription>
+          <CardDescription className="mt-2">{description}</CardDescription>
         </div>
       </div>
 
-      <form className="mt-8 grid gap-5" onSubmit={handleSubmit}>
+      <form className="mt-5 grid gap-4" onSubmit={handleSubmit}>
         <label className="grid gap-2" htmlFor={nameId}>
           <span className="text-sm font-semibold text-white">Nome completo</span>
           <Input
@@ -420,14 +420,14 @@ export function ProfessionalForm({
 
         <div className="grid gap-2">
           <span className="text-sm font-semibold text-white">Acesso ao sistema</span>
-          <label className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2">
+          <label className="flex items-center gap-3 rounded-lg border border-white/10 bg-white/5 px-3 py-2">
             <Checkbox
               checked={form.hasSystemAccess}
               onCheckedChange={handleSystemAccessChange}
               disabled={submitDisabled}
-              aria-label="Permitir acesso ao sistema"
+              aria-label="Possui acesso ao sistema"
             />
-            <span className="text-sm text-white">Permitir acesso ao sistema</span>
+            <span className="text-sm text-white">Possui acesso</span>
           </label>
         </div>
 
@@ -495,7 +495,7 @@ export function ProfessionalForm({
           <div className="grid gap-2">
             <span className="text-sm font-semibold text-white">Foto (opcional)</span>
             <div
-              className={`relative flex aspect-square w-full cursor-pointer items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed transition-all ${
+              className={`relative flex h-28 w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl border border-dashed transition-all ${
                 isDraggingImage ? "border-white/20 bg-white/5" : "border-white/10"
               }`}
               onClick={openFileDialog}
@@ -538,7 +538,7 @@ export function ProfessionalForm({
                   </button>
                 </>
               ) : (
-                <div className="p-6 text-center text-sm text-text-soft">
+                <div className="p-3 text-center text-xs text-text-soft">
                   Clique ou arraste uma imagem (JPG, PNG ou WebP, ate 5MB).
                 </div>
               )}

@@ -170,10 +170,10 @@ describe("DashboardPage", () => {
 
     renderWithProviders(<DashboardPage />);
 
-    expect(await screen.findByText("Dashboard operacional")).toBeInTheDocument();
-    expect(screen.getByText("Nenhum agendamento")).toBeInTheDocument();
-    expect(screen.getByText("Sem proximos atendimentos")).toBeInTheDocument();
-    expect(screen.getByText("Sem ocupacao por profissional")).toBeInTheDocument();
+    expect(await screen.findByText("Dashboard")).toBeInTheDocument();
+    expect(screen.getByText("Nenhum agendamento hoje.")).toBeInTheDocument();
+    expect(screen.getByText("Sem proximos atendimentos.")).toBeInTheDocument();
+    expect(screen.getByText("Sem ocupacao por profissional hoje.")).toBeInTheDocument();
     expect(screen.getAllByText("0")).not.toHaveLength(0);
   });
 
@@ -202,13 +202,13 @@ describe("DashboardPage", () => {
 
     expect(await screen.findByText("Agenda do dia")).toBeInTheDocument();
     expect(screen.getAllByText("62.50%")).toHaveLength(2);
-    expect(screen.getByText("Cliente nao informado")).toBeInTheDocument();
+    expect(screen.getByText("Cliente sem nome")).toBeInTheDocument();
     expect(screen.getByText("Bruno")).toBeInTheDocument();
     expect(screen.getByText("bruno@example.com • +55 (11) 91234-5678")).toBeInTheDocument();
     expect(screen.queryByText(/null • null/i)).not.toBeInTheDocument();
     expect(screen.getAllByText("Ana")).toHaveLength(2);
     expect(screen.getByText("Retorno")).toBeInTheDocument();
-    expect(screen.getAllByText("America/Sao_Paulo")).toHaveLength(2);
+    expect(screen.getAllByText("America/Sao_Paulo")).toHaveLength(1);
     expect(mockedDashboardService.getSummary).toHaveBeenCalledWith({
       date: "2026-03-30",
       professionalId: undefined,

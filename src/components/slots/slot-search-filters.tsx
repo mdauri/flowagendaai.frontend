@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { DateTime } from "luxon";
+import { Button } from "@/components/flow/button";
 import { Input } from "@/components/flow/input";
 import { Select } from "@/components/flow/select";
 import { Card, CardDescription, CardTitle } from "@/components/flow/card";
@@ -18,9 +19,13 @@ interface SlotSearchFiltersProps {
   canLoadAvailability: boolean;
   isAvailabilityLoading: boolean;
   availabilityErrorMessage: string | null;
+  canSearch: boolean;
+  isSearching: boolean;
   disabled?: boolean;
+  searchDisabled?: boolean;
   onCalendarMonthChange: (month: DateTime) => void;
   onFiltersChange: (filters: ListAvailableSlotsInput) => void;
+  onSearch: () => void;
 }
 
 export function SlotSearchFilters({
@@ -33,9 +38,13 @@ export function SlotSearchFilters({
   canLoadAvailability,
   isAvailabilityLoading,
   availabilityErrorMessage,
+  canSearch,
+  isSearching,
   disabled = false,
+  searchDisabled = false,
   onCalendarMonthChange,
   onFiltersChange,
+  onSearch,
 }: SlotSearchFiltersProps) {
   const professionalId = useId();
   const serviceId = useId();
@@ -106,15 +115,13 @@ export function SlotSearchFilters({
   }
 
   return (
-    <Card variant="premium" padding="lg">
+    <Card variant="premium" padding="md">
       <div>
-        <CardTitle>Filtros da consulta</CardTitle>
-        <CardDescription className="mt-3">
-          Selecione profissional, servico e data antes de consultar a API de slots.
-        </CardDescription>
+        <CardTitle>Buscar horarios</CardTitle>
+        <CardDescription className="mt-2">Escolha profissional, servico e data.</CardDescription>
       </div>
 
-      <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+      <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         <label className="grid gap-2" htmlFor={professionalId}>
           <span className="text-sm font-semibold text-white">Profissional</span>
           <Select
@@ -267,13 +274,7 @@ export function SlotSearchFilters({
         </label>
       </div>
 
-      <div className="mt-8 grid gap-4">
-        {!canLoadAvailability ? (
-          <p className="text-xs text-white/60">
-            Selecione profissional e servico para habilitar a disponibilidade do calendario.
-          </p>
-        ) : null}
-
+      <div className="mt-4 grid gap-3">
         {canLoadAvailability && isAvailabilityLoading ? (
           <p className="text-xs text-white/60">Carregando disponibilidade do mes...</p>
         ) : null}
@@ -287,6 +288,19 @@ export function SlotSearchFilters({
             Nenhum dia disponivel neste mes. Navegue para outro mes ou altere os filtros.
           </p>
         ) : null}
+
+        <div className="pt-1">
+          <Button
+            type="button"
+            size="md"
+            className="w-full sm:w-auto"
+            onClick={onSearch}
+            disabled={!canSearch || isSearching || disabled || searchDisabled}
+            aria-disabled={!canSearch || isSearching || disabled || searchDisabled}
+          >
+            {isSearching ? "Buscando horarios..." : "Buscar horarios"}
+          </Button>
+        </div>
       </div>
     </Card>
   );

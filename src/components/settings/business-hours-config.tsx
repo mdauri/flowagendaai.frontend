@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Loader2, AlertCircle, CheckCircle2, Clock } from "lucide-react";
 import { Button } from "@/components/flow/button";
 import { tenantService, type BusinessHour } from "@/services/tenant-service";
-import { colors, semanticTokens } from "@/design-system";
+import { colors } from "@/design-system";
 
 interface DayConfigRowProps {
   config: BusinessHour;
@@ -42,7 +42,7 @@ function DayConfigRow({ config, onChange, disabled }: DayConfigRowProps) {
   };
 
   return (
-    <div className="flex flex-col gap-4 border-b border-white/5 pb-4 last:border-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+    <div className="flex flex-col gap-3 border-b border-white/5 pb-3 last:border-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
       <div className="flex items-center gap-3">
         {/* Custom Switch Implementation */}
         <button
@@ -76,7 +76,7 @@ function DayConfigRow({ config, onChange, disabled }: DayConfigRowProps) {
           value={config.startTime || "08:00"}
           onChange={handleStartTimeChange}
           disabled={disabled || !config.isOpen}
-          className={`rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-sm text-white outline-none transition-opacity focus:border-white/20 ${
+          className={`rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-xs text-white outline-none transition-opacity focus:border-white/20 ${
             !config.isOpen ? "opacity-30" : "opacity-100"
           }`}
         />
@@ -90,7 +90,7 @@ function DayConfigRow({ config, onChange, disabled }: DayConfigRowProps) {
           value={config.endTime || "18:00"}
           onChange={handleEndTimeChange}
           disabled={disabled || !config.isOpen}
-          className={`rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-sm text-white outline-none transition-opacity focus:border-white/20 ${
+          className={`rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-xs text-white outline-none transition-opacity focus:border-white/20 ${
             !config.isOpen ? "opacity-30" : "opacity-100"
           }`}
         />
@@ -175,7 +175,7 @@ export function BusinessHoursConfig() {
   }
 
   return (
-    <section className="space-y-6 rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+    <section className="space-y-4 rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
       <div className="flex items-center gap-2">
         <Clock size={20} style={{ color: colors.brand.primary }} />
         <h2 className="text-lg font-bold text-white">
@@ -183,7 +183,7 @@ export function BusinessHoursConfig() {
         </h2>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         {hours.map((h, index) => (
           <DayConfigRow
             key={h.dayOfWeek}
@@ -194,7 +194,7 @@ export function BusinessHoursConfig() {
         ))}
       </div>
 
-      <div className="flex items-center gap-3 pt-4">
+      <div className="flex items-center gap-3 pt-2">
         <Button onClick={handleSave} disabled={saving} size="md">
           {saving ? (
             <>
@@ -202,7 +202,7 @@ export function BusinessHoursConfig() {
               Salvando...
             </>
           ) : (
-            "Salvar Horários"
+            "Salvar horarios"
           )}
         </Button>
 

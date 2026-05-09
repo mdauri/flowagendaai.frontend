@@ -12,7 +12,7 @@ function resolveErrorMessage(error: unknown) {
     return error.message;
   }
 
-  return "Nao foi possivel carregar o dashboard operacional.";
+  return "Nao foi possivel carregar. Tente novamente.";
 }
 
 export function DashboardErrorState({ error, onRetry }: DashboardErrorStateProps) {

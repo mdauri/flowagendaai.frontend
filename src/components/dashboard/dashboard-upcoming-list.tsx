@@ -1,4 +1,4 @@
-import { Card, CardDescription, CardTitle } from "@/components/flow/card";
+import { Card, CardTitle } from "@/components/flow/card";
 import { formatUtcTimeRangeInTenantTimezone } from "@/lib/date-time";
 import type { DashboardSummaryBookingItem } from "@/types/dashboard";
 import { DashboardStatusBadge } from "@/components/dashboard/dashboard-status-badge";
@@ -15,7 +15,7 @@ interface DashboardUpcomingListProps {
 }
 
 function resolveCustomerName(customerName: string | null) {
-  return customerName ?? "Cliente nao informado";
+  return customerName ?? "Cliente sem nome";
 }
 
 function resolveCustomerContacts(booking: DashboardSummaryBookingItem): string[] {
@@ -43,8 +43,7 @@ export function DashboardUpcomingList({
   if (bookings.length === 0) {
     return (
       <DashboardEmptyState
-        title="Sem proximos atendimentos"
-        description="Nao ha itens futuros no recorte operacional retornado pelo backend."
+        title="Sem proximos atendimentos."
       />
     );
   }
@@ -52,11 +51,8 @@ export function DashboardUpcomingList({
   return (
     <Card variant="glass" padding="lg">
       <CardTitle>Proximos atendimentos</CardTitle>
-      <CardDescription className="mt-3">
-        Recorte operacional pronto para leitura rapida.
-      </CardDescription>
 
-      <ul className="mt-6 grid gap-3" aria-label="Proximos atendimentos">
+      <ul className="mt-5 grid gap-3" aria-label="Proximos atendimentos">
         {bookings.map((booking) => {
           const customerContacts = resolveCustomerContacts(booking);
           const isEligible = booking.status === "CONFIRMED" || booking.status === "PENDING";

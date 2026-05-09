@@ -1,6 +1,6 @@
 import { useEffect, useId, useMemo, useState, type FormEvent } from "react";
 import { Button } from "@/components/flow/button";
-import { Card, CardDescription, CardTitle } from "@/components/flow/card";
+import { Card, CardTitle } from "@/components/flow/card";
 import { Input } from "@/components/flow/input";
 import { Select } from "@/components/flow/select";
 import { FeedbackBanner } from "@/components/shared/feedback-banner";
@@ -78,13 +78,9 @@ export function AvailabilityRuleForm({
 
   const disabled = !professionalId || isSubmitting;
 
-  const title = mode === "edit" ? "Editar regra" : "Nova regra recorrente";
-  const description =
-    mode === "edit"
-      ? "Atualize dia e intervalo desta regra sem inferir agenda futura no frontend."
-      : "Crie uma regra simples por dia da semana e intervalo de horario.";
+  const title = mode === "edit" ? "Editar horario" : "Adicionar horario";
 
-  const submitLabel = mode === "edit" ? "Salvar alteracoes" : "Criar regra";
+  const submitLabel = mode === "edit" ? "Salvar alteracoes" : "Adicionar";
 
   const validationMessage = useMemo(() => {
     if (!form.dayOfWeek) {
@@ -124,7 +120,7 @@ export function AvailabilityRuleForm({
           startTime: form.startTime,
           endTime: form.endTime,
         });
-        setSuccessMessage("Regra atualizada com sucesso.");
+        setSuccessMessage("Horario atualizado com sucesso.");
         return;
       }
 
@@ -134,25 +130,24 @@ export function AvailabilityRuleForm({
         endTime: form.endTime,
       });
       setForm(initialForm);
-      setSuccessMessage("Regra criada com sucesso.");
+      setSuccessMessage("Horario adicionado com sucesso.");
     } catch (error) {
       if (error instanceof ApiError && error.status === 409) {
-        setErrorMessage("Ja existe uma disponibilidade conflitante para este profissional.");
+        setErrorMessage("Ja existe um horario conflitante para este profissional.");
         return;
       }
 
-      setErrorMessage(error instanceof ApiError ? error.message : "Nao foi possivel salvar a regra.");
+      setErrorMessage(error instanceof ApiError ? error.message : "Nao foi possivel salvar o horario.");
     }
   }
 
   return (
-    <Card variant="premium" padding="lg" className="h-full">
+    <Card variant="premium" padding="md" className="h-full">
       <div>
         <CardTitle>{title}</CardTitle>
-        <CardDescription className="mt-3">{description}</CardDescription>
       </div>
 
-      <form className="mt-8 grid gap-5" onSubmit={handleSubmit}>
+      <form className="mt-4 grid gap-4" onSubmit={handleSubmit}>
         <label className="grid gap-2" htmlFor={dayId}>
           <span className="text-sm font-semibold text-white">Dia da semana</span>
           <Select
@@ -203,7 +198,7 @@ export function AvailabilityRuleForm({
         </label>
 
         {errorMessage ? (
-          <FeedbackBanner title="Falha ao salvar disponibilidade" description={errorMessage} />
+          <FeedbackBanner title="Falha ao salvar horario" description={errorMessage} />
         ) : null}
 
         {successMessage ? (

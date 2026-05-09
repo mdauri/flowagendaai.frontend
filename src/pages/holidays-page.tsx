@@ -228,14 +228,11 @@ export function HolidaysPage() {
     <div className="mx-auto grid max-w-5xl gap-6">
       <div>
         <h2 className="text-2xl font-black tracking-tight text-white">Feriados e bloqueios</h2>
-        <p className="mt-2 text-sm leading-6 text-text-soft">
-          Bloqueie dias e horarios para impedir novos agendamentos.
-        </p>
+        <p className="mt-2 text-sm leading-6 text-text-soft">Gerencie dias bloqueados.</p>
       </div>
 
-      <Card className="p-6">
-        <CardTitle>Filtro por periodo</CardTitle>
-        <CardDescription>Use dd/mm/aaaa (Brasil). A API recebe YYYY-MM-DD.</CardDescription>
+      <Card className="p-4">
+        <CardTitle>Periodo</CardTitle>
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           <label className="grid gap-2 text-sm font-semibold text-white">
             Inicio
@@ -254,14 +251,13 @@ export function HolidaysPage() {
             />
           </label>
         </div>
-        <p className="mt-3 text-xs text-text-soft">
-          Data de referencia do tenant: <span className="text-white">{timezone}</span>.
+        <p className="mt-2 text-xs text-text-soft">
+          Horario local: <span className="text-white">{timezone}</span>
         </p>
       </Card>
 
-      <Card className="p-6">
-        <CardTitle>{editingId ? "Editar bloqueio" : "Novo bloqueio"}</CardTitle>
-        <CardDescription>Dia inteiro ou intervalo no dia, com motivo opcional.</CardDescription>
+      <Card className="p-4">
+        <CardTitle>{editingId ? "Editar bloqueio" : "Adicionar bloqueio"}</CardTitle>
 
         <form className="mt-4 grid gap-4" onSubmit={handleSubmit}>
           <div className="grid gap-3 md:grid-cols-2">
@@ -284,7 +280,7 @@ export function HolidaysPage() {
           </div>
 
           <label className="grid gap-2 text-sm font-semibold text-white">
-            Descricao / motivo (opcional)
+            Motivo (opcional)
             <Input
               value={form.description}
               onChange={(event) => setForm((prev) => ({ ...prev, description: event.target.value }))}
@@ -359,11 +355,8 @@ export function HolidaysPage() {
         </form>
       </Card>
 
-      <Card className="p-6">
+      <Card className="p-4">
         <CardTitle>Bloqueios cadastrados</CardTitle>
-        <CardDescription>
-          {listQuery.isLoading ? "Carregando..." : `${items.length} itens`}
-        </CardDescription>
 
         {listQuery.isLoading ? (
           <div className="mt-4 flex items-center gap-2 text-text-soft">
@@ -382,7 +375,7 @@ export function HolidaysPage() {
             />
           </div>
         ) : items.length === 0 ? (
-          <p className="mt-4 text-sm text-text-soft">Nenhum bloqueio no periodo.</p>
+          <p className="mt-4 text-sm text-text-soft">Nenhum bloqueio neste periodo.</p>
         ) : (
           <ul className="mt-4 grid gap-3">
             {items.map((item) => (

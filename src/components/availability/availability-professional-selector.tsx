@@ -1,4 +1,4 @@
-import { Card, CardDescription, CardTitle } from "@/components/flow/card";
+import { Card, CardTitle } from "@/components/flow/card";
 import { Select } from "@/components/flow/select";
 import type { Professional } from "@/types/professional";
 
@@ -21,13 +21,9 @@ export function AvailabilityProfessionalSelector({
   }));
 
   return (
-    <Card variant="glass" padding="lg" className="grid gap-5">
+    <Card variant="glass" padding="md" className="grid gap-3">
       <div>
-        <CardTitle>Contexto operacional</CardTitle>
-        <CardDescription className="mt-3">
-          Selecione primeiro o profissional. A tela apenas representa o estado da disponibilidade base
-          e exibe o timezone do tenant como contexto.
-        </CardDescription>
+        <CardTitle>Selecionar profissional</CardTitle>
       </div>
 
       <div className="grid gap-2">
@@ -46,9 +42,9 @@ export function AvailabilityProfessionalSelector({
 
       <div
         id="availability-timezone-context"
-        className="rounded-3xl border border-white/10 bg-white/5 px-4 py-4 text-sm leading-6 text-text-soft"
+        className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-text-soft"
       >
-        Timezone do tenant: <span className="font-semibold text-white">{tenantTimezone}</span>
+        Horario local: <span className="font-semibold text-white">{tenantTimezone}</span>
       </div>
     </Card>
   );
