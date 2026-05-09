@@ -5,7 +5,6 @@ import {
   useMemo,
   useRef,
   useState,
-  type CSSProperties,
   type DragEvent,
   type FormEvent,
 } from "react";
@@ -397,22 +396,22 @@ export function ServiceForm(props: ServiceFormProps) {
   }
 
   return (
-    <Card variant="premium" padding="lg" className="h-full">
+    <Card variant="premium" padding="md" className="h-full">
       <div className="flex items-start justify-between gap-4">
         <div>
           <CardTitle>
             {isEditMode ? "Editar servico" : "Novo servico"}
           </CardTitle>
-          <CardDescription className="mt-3">
+          <CardDescription className="mt-2">
             {isEditMode
-              ? "Atualize os dados operacionais do servico dentro do tenant atual."
-              : "O cadastro agora usa o backend real em `POST /services`, mantendo a tela focada no fluxo operacional minimo, sem regra adicional no frontend."}
+              ? "Atualize os dados do servico."
+              : "Cadastre um novo servico."}
           </CardDescription>
         </div>
       </div>
 
-      <form className="mt-8 grid gap-5" onSubmit={handleSubmit}>
-        <div className="grid gap-5">
+      <form className="mt-5 grid gap-4" onSubmit={handleSubmit}>
+        <div className="grid gap-4">
           <label className="grid gap-2" htmlFor={nameId}>
             <span className="text-sm font-semibold text-white">
               Nome do servico
@@ -456,20 +455,9 @@ export function ServiceForm(props: ServiceFormProps) {
               }}
               placeholder="Descreva o que esta incluso no servico, prerequisitos, ou outras informacoes relevantes."
               maxLength={1000}
-              rows={4}
+              rows={3}
               disabled={props.isSubmitting}
             />
-            <div className="flex items-center justify-between">
-              <p className="text-sm leading-6 text-text-soft">
-                Informe detalhes do servico para ajudar os clientes a entender o
-                que estao agendando.
-              </p>
-              <span
-                className={`text-sm font-medium ${charCount >= 900 ? "text-warning" : "text-text-soft"}`}
-              >
-                {charCount}/1000
-              </span>
-            </div>
           </label>
 
           <label className="grid gap-2" htmlFor={durationInMinutesId}>
@@ -495,9 +483,7 @@ export function ServiceForm(props: ServiceFormProps) {
               disabled={props.isSubmitting}
             />
             <DurationHelper durationInMinutes={Number(form.durationInMinutes)} />
-            <p className="text-sm leading-6 text-text-soft">
-              Campo obrigatorio. Use minutos inteiros maiores que zero. Maximo 4320 minutos (72 horas).
-            </p>
+            <p className="text-xs leading-5 text-text-soft">Use minutos inteiros.</p>
           </label>
 
           <label className="grid gap-2" htmlFor={priceId}>
@@ -578,38 +564,29 @@ export function ServiceForm(props: ServiceFormProps) {
               Imagem do servico (opcional)
             </span>
             <div
-              className={`relative flex h-48 items-center justify-center overflow-hidden rounded-2xl border p-4 transition-colors ${
+              className={`relative flex h-28 items-center justify-center overflow-hidden rounded-xl border border-dashed p-3 transition-colors ${
                 isDraggingImage
-                  ? "border-(--drag-border) bg-(--drag-surface)"
+                  ? "border-white/20 bg-white/10"
                   : "border-white/10 bg-white/5"
               }`}
-              aria-label="Pré-visualização da imagem"
+              aria-label="Pre-visualizacao da imagem"
               onDragEnter={handleImageDragEnter}
               onDragOver={handleImageDragOver}
               onDragLeave={handleImageDragLeave}
               onDrop={handleImageDrop}
-              style={
-                {
-                  "--drag-border": "rgba(255, 138, 61, 0.9)",
-                  "--drag-surface": "rgba(255, 138, 61, 0.08)",
-                } as CSSProperties
-              }
             >
               {imagePreviewUrl ? (
                 <img
                   src={imagePreviewUrl}
-                  alt="Pré-visualização do serviço"
+                  alt="Pre-visualizacao do servico"
                   className="h-full w-full object-cover"
                 />
               ) : (
-                <div className="flex flex-col items-center gap-2 text-center text-sm text-text-soft">
+                <div className="flex flex-col items-center gap-1 text-center text-xs text-text-soft">
                   <p>
                     {isDraggingImage
-                      ? "Solte a imagem para carregar a pré-visualização."
-                      : "Arraste e solte ou selecione uma imagem JPG, PNG ou WebP de até 5MB."}
-                  </p>
-                  <p>
-                    Ela será enviada automaticamente após o serviço ser criado.
+                      ? "Solte a imagem aqui."
+                      : "Arraste ou clique para selecionar."}
                   </p>
                 </div>
               )}
@@ -622,10 +599,10 @@ export function ServiceForm(props: ServiceFormProps) {
               />
             </div>
 
-            <div className="flex flex-wrap items-center gap-3 text-sm text-white">
+            <div className="flex flex-wrap items-center gap-2 text-sm text-white">
               <button
                 type="button"
-                className="rounded-lg border border-white/30 px-4 py-2 text-sm font-semibold transition hover:border-white/70"
+                className="rounded-lg border border-white/30 px-3 py-1.5 text-xs font-semibold transition hover:border-white/70"
                 onClick={openFileDialog}
                 disabled={isImageUploading || props.isSubmitting}
               >
@@ -634,7 +611,7 @@ export function ServiceForm(props: ServiceFormProps) {
               {selectedImageFile ? (
                 <button
                   type="button"
-                  className="rounded-lg border border-white/30 px-4 py-2 text-sm font-semibold transition hover:border-white/70"
+                  className="rounded-lg border border-white/30 px-3 py-1.5 text-xs font-semibold transition hover:border-white/70"
                   onClick={handleImageRemove}
                   disabled={isImageUploading}
                 >

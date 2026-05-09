@@ -67,7 +67,7 @@ describe("MeuDiaPage", () => {
     renderWithProviders(<MeuDiaPage />, { route: "/app/meu-dia", withRouter: true });
 
     expect(screen.getByText("Meu Dia")).toBeInTheDocument();
-    expect(screen.getByText("Sem agendamentos para a data selecionada.")).toBeInTheDocument();
+    expect(screen.getByText("Nenhum atendimento neste dia.")).toBeInTheDocument();
   });
 
   test("renderiza erro e permite retry", async () => {
@@ -133,9 +133,9 @@ describe("MeuDiaPage", () => {
     await user.click(screen.getByRole("button", { name: /Ver detalhes de Corte/i }));
     expect(screen.getByRole("dialog")).toBeInTheDocument();
     expect(screen.getByText("Detalhe do agendamento")).toBeInTheDocument();
-    // "Corte" and "Ana" appear in list and in dialog; assert at least once.
+    // "Corte" appears in list and dialog.
     expect(screen.getAllByText("Corte").length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Ana/i).length).toBeGreaterThan(0);
+    expect(screen.queryByText(/Profissional:/i)).not.toBeInTheDocument();
     expect(screen.getByText("+5511999999999")).toBeInTheDocument();
     expect(screen.getByText("maria@example.com")).toBeInTheDocument();
 
@@ -193,7 +193,7 @@ describe("MeuDiaPage", () => {
     await user.click(screen.getByRole("button", { name: /Ver detalhes de Escova/i }));
 
     expect(screen.getAllByText("Escova").length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Cintia Pro/i).length).toBeGreaterThan(0);
+    expect(screen.queryByText(/Profissional:/i)).not.toBeInTheDocument();
     expect(screen.getAllByText("Joana").length).toBeGreaterThan(0);
     expect(screen.getAllByText("+5511888888888").length).toBeGreaterThan(0);
     expect(screen.getAllByText("joana@example.com").length).toBeGreaterThan(0);

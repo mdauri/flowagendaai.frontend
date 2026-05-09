@@ -1,13 +1,12 @@
 import { Button } from "@/components/flow/button";
 import { Badge } from "@/components/flow/badge";
-import { Card, CardDescription, CardTitle } from "@/components/flow/card";
+import { Card, CardTitle } from "@/components/flow/card";
 import { Pencil, Trash2 } from "lucide-react";
-import { formatDateTimeInTenantTimezone } from "@/lib/date-time";
 import type { Professional } from "@/types/professional";
 
 interface ProfessionalsListProps {
   professionals: Professional[];
-  tenantTimezone: string;
+  tenantTimezone?: string;
   canManageProfessionals?: boolean;
   pendingImageUploads?: Record<string, { file: File; message: string }>;
   onRetryImageUpload?: (professional: Professional) => void;
@@ -17,7 +16,7 @@ interface ProfessionalsListProps {
 
 export function ProfessionalsList({
   professionals,
-  tenantTimezone,
+  tenantTimezone: _tenantTimezone,
   canManageProfessionals = false,
   pendingImageUploads,
   onRetryImageUpload,
@@ -37,9 +36,9 @@ export function ProfessionalsList({
           padding="md"
           className="border-white/10"
         >
-          <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-            <div className="flex gap-4">
-              <div className="h-14 w-14 shrink-0 overflow-hidden rounded-full border border-white/10 bg-white/5">
+          <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+            <div className="flex gap-3">
+              <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full border border-white/10 bg-white/5">
                 {imageSrc ? (
                   <img
                     src={imageSrc}
@@ -60,17 +59,14 @@ export function ProfessionalsList({
 
               <div className="min-w-0">
                 <CardTitle className="truncate">{professional.name}</CardTitle>
-                <CardDescription className="mt-2">
-                  Profissional operacional vinculado ao tenant autenticado.
-                </CardDescription>
 
                 {professional.description ? (
                   <p
-                    className="mt-3 text-sm leading-relaxed text-text-soft"
+                    className="mt-2 text-sm leading-relaxed text-text-soft"
                     style={{
                       whiteSpace: "pre-wrap",
                       display: "-webkit-box",
-                      WebkitLineClamp: "5",
+                      WebkitLineClamp: "3",
                       WebkitBoxOrient: "vertical",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
@@ -100,20 +96,12 @@ export function ProfessionalsList({
                     </div>
                   </div>
                 ) : null}
-
-                <p className="mt-4 text-sm text-text-soft">
-                  Criado em{" "}
-                  {formatDateTimeInTenantTimezone(
-                    professional.createdAt,
-                    tenantTimezone
-                  )}
-                </p>
               </div>
             </div>
 
-            <div className="flex flex-col items-stretch gap-3 md:items-end">
+            <div className="flex flex-col items-stretch gap-2 md:items-end">
               <Badge variant="success" className="justify-center md:justify-start">
-                Integrado
+                {professional.hasSystemAccess ? "Com acesso" : "Ativo"}
               </Badge>
 
               {canManageProfessionals ? (
@@ -122,17 +110,19 @@ export function ProfessionalsList({
                     type="button"
                     variant="secondary"
                     size="sm"
+                    className="h-8 px-3 text-xs"
                     onClick={() => onEditProfessional?.(professional)}
                   >
-                    <Pencil className="mr-2 h-4 w-4" />
+                    <Pencil className="mr-1 h-3.5 w-3.5" />
                     Editar
                   </Button>
                   <Button
                     type="button"
                     size="sm"
+                    className="h-8 px-3 text-xs"
                     onClick={() => onDeleteProfessional?.(professional)}
                   >
-                    <Trash2 className="mr-2 h-4 w-4" />
+                    <Trash2 className="mr-1 h-3.5 w-3.5" />
                     Remover
                   </Button>
                 </div>

@@ -1,4 +1,4 @@
-import { Card, CardDescription, CardTitle } from "@/components/flow/card";
+import { Card, CardTitle } from "@/components/flow/card";
 import { formatUtcTimeRangeInTenantTimezone } from "@/lib/date-time";
 import type { DashboardSummaryBookingItem } from "@/types/dashboard";
 import { DashboardStatusBadge } from "@/components/dashboard/dashboard-status-badge";
@@ -15,7 +15,7 @@ interface DashboardAgendaListProps {
 }
 
 function resolveCustomerName(customerName: string | null) {
-  return customerName ?? "Cliente nao informado";
+  return customerName ?? "Cliente sem nome";
 }
 
 function resolveCustomerContacts(booking: DashboardSummaryBookingItem): string[] {
@@ -43,24 +43,17 @@ export function DashboardAgendaList({
   if (bookings.length === 0) {
     return (
       <DashboardEmptyState
-        title="Nenhum agendamento"
-        description="Nao ha agendamentos para a data consultada."
+        title="Nenhum agendamento hoje."
+        description=""
       />
     );
   }
 
   return (
     <Card variant="glass" padding="lg">
-      <div className="flex items-end justify-between gap-4">
-        <div>
-          <CardTitle>Agenda do dia</CardTitle>
-          <CardDescription className="mt-3">
-            Ordem preservada exatamente como retornada pelo backend.
-          </CardDescription>
-        </div>
-      </div>
+      <CardTitle>Agenda do dia</CardTitle>
 
-      <ul className="mt-8 grid gap-4" aria-label="Agenda do dia">
+      <ul className="mt-5 grid gap-4" aria-label="Agenda do dia">
         {bookings.map((booking) => {
           const customerContacts = resolveCustomerContacts(booking);
           const isEligible = booking.status === "CONFIRMED" || booking.status === "PENDING";
