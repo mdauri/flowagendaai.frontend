@@ -57,10 +57,10 @@ describe("SystemAdminTenantProvisionPage", () => {
 
     expect(screen.getByText("Acesso restrito")).toBeInTheDocument();
     expect(
-      screen.getByText("Voce nao tem permissao para provisionar mandantes.")
+      screen.getByText("Voce nao tem permissao para provisionar tenants.")
     ).toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: "Criar mandante e admin" })
+      screen.queryByRole("button", { name: "Criar tenant e admin" })
     ).not.toBeInTheDocument();
   });
 
@@ -69,12 +69,15 @@ describe("SystemAdminTenantProvisionPage", () => {
 
     renderWithProviders(<SystemAdminTenantProvisionPage />, { withRouter: true });
 
-    await user.click(screen.getByRole("button", { name: "Criar mandante e admin" }));
+    await user.click(screen.getByRole("button", { name: "Criar tenant e admin" }));
 
     expect(screen.getByText("Falha no provisionamento")).toBeInTheDocument();
     expect(screen.getByText("Existem campos invalidos. Revise o formulario.")).toBeInTheDocument();
     expect(
-      screen.getByText("Informe o nome do mandante com pelo menos 2 caracteres.")
+      screen.queryByText("Informe o nome do mandante com pelo menos 2 caracteres.")
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByText("Informe o nome do tenant com pelo menos 2 caracteres.")
     ).toBeInTheDocument();
     expect(screen.getByText("Slug invalido. Use apenas minusculas, numeros e hifen.")).toBeInTheDocument();
     expect(
@@ -103,12 +106,12 @@ describe("SystemAdminTenantProvisionPage", () => {
 
     renderWithProviders(<SystemAdminTenantProvisionPage />, { withRouter: true });
 
-    await user.type(screen.getByLabelText("Nome do mandante"), "Clinica Aurora");
+    await user.type(screen.getByLabelText("Nome do tenant"), "Clinica Aurora");
     await user.type(screen.getByLabelText("Identificador (slug)"), "Clínica Aurora");
     await user.type(screen.getByLabelText("Nome do admin inicial"), "Admin Aurora");
     await user.type(screen.getByLabelText("Email do admin inicial"), "ADMIN@AURORA.COM");
 
-    await user.click(screen.getByRole("button", { name: "Criar mandante e admin" }));
+    await user.click(screen.getByRole("button", { name: "Criar tenant e admin" }));
 
     await waitFor(() => {
       expect(mutateAsyncMock).toHaveBeenCalledWith({
@@ -129,7 +132,7 @@ describe("SystemAdminTenantProvisionPage", () => {
     expect(screen.getByText("admin@aurora.com")).toBeInTheDocument();
 
     expect(toastMock).toHaveBeenCalledWith({
-      title: "Mandante provisionado",
+      title: "Tenant provisionado",
       description: "Tenant Clinica Aurora criado com sucesso.",
       variant: "success",
     });
@@ -144,12 +147,12 @@ describe("SystemAdminTenantProvisionPage", () => {
 
     renderWithProviders(<SystemAdminTenantProvisionPage />, { withRouter: true });
 
-    await user.type(screen.getByLabelText("Nome do mandante"), "Clinica Boreal");
+    await user.type(screen.getByLabelText("Nome do tenant"), "Clinica Boreal");
     await user.type(screen.getByLabelText("Identificador (slug)"), "clinica-boreal");
     await user.type(screen.getByLabelText("Nome do admin inicial"), "Admin Boreal");
     await user.type(screen.getByLabelText("Email do admin inicial"), "admin@boreal.com");
 
-    await user.click(screen.getByRole("button", { name: "Criar mandante e admin" }));
+    await user.click(screen.getByRole("button", { name: "Criar tenant e admin" }));
 
     expect(await screen.findByText("Falha no provisionamento")).toBeInTheDocument();
     expect(

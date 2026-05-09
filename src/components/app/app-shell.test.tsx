@@ -46,18 +46,12 @@ describe("AppShell", () => {
     expect(screen.getByRole("link", { name: "Provisionamento" })).toBeInTheDocument();
   });
 
-  test("nao exibe API Tokens para mandant", () => {
-    renderShell("mandant");
-
-    expect(screen.queryByRole("link", { name: "API Tokens" })).not.toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Meu Dia" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Dashboard" })).toBeInTheDocument();
-  });
-
   test("nao exibe API Tokens para admin", () => {
     renderShell("admin");
 
     expect(screen.queryByRole("link", { name: "API Tokens" })).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Meu Dia" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Dashboard" })).toBeInTheDocument();
   });
 
   test("role professional exibe Meu Dia e oculta links operacionais", () => {

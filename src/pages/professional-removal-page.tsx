@@ -27,7 +27,7 @@ export function ProfessionalRemovalPage() {
   const [cancelDialogError, setCancelDialogError] = useState<string | null>(null);
 
   const canManageProfessionals = useMemo(
-    () => ["admin", "mandant"].includes(auth.user?.role ?? ""),
+    () => ["admin"].includes(auth.user?.role ?? ""),
     [auth.user?.role]
   );
 
@@ -102,7 +102,7 @@ export function ProfessionalRemovalPage() {
     return (
       <PageState
         title="Acesso restrito"
-        description="Apenas usuarios com role admin ou mandant podem resolver a retirada operacional de profissionais."
+        description="Apenas usuarios com role admin podem resolver a retirada operacional de profissionais."
       />
     );
   }

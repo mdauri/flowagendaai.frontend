@@ -10,7 +10,7 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("@/hooks/use-auth", () => ({
   useAuth: () => ({
-    user: { role: "mandant" },
+    user: { role: "admin" },
     tenant: { timezone: "America/Sao_Paulo" },
   }),
 }));

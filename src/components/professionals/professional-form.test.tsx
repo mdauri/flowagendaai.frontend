@@ -5,7 +5,8 @@ import { ProfessionalForm } from "@/components/professionals/professional-form";
 import { renderWithProviders } from "@/test/render";
 
 describe("ProfessionalForm", () => {
-  it("renderiza o modo de criacao com a CTA correta", () => {
+  it("renderiza o modo de criacao com a CTA correta", async () => {
+    const user = userEvent.setup();
     renderWithProviders(
       <ProfessionalForm
         mode="create"
@@ -16,6 +17,8 @@ describe("ProfessionalForm", () => {
     );
 
     expect(screen.getByRole("heading", { name: "Novo profissional" })).toBeInTheDocument();
+    expect(screen.queryByLabelText("Email do profissional")).not.toBeInTheDocument();
+    await user.click(screen.getAllByRole("checkbox", { name: "Permitir acesso ao sistema" })[0]);
     expect(screen.getByLabelText("Email do profissional")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Criar profissional" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Limpar" })).toBeInTheDocument();
@@ -54,5 +57,74 @@ describe("ProfessionalForm", () => {
 
     await user.click(screen.getByRole("button", { name: "Cancelar edicao" }));
     expect(onCancelEdit).toHaveBeenCalledTimes(1);
+  });
+
+  it("permite criar profissional operacional sem email", async () => {
+    const user = userEvent.setup();
+    const onCreateSubmit = vi.fn().mockResolvedValue({
+      professional: {
+        id: "professional-1",
+        name: "Ana Souza",
+        slug: "ana-souza",
+        description: null,
+        imageUrl: null,
+        thumbnailUrl: null,
+        createdAt: "2026-01-01T00:00:00.000Z",
+        updatedAt: "2026-01-01T00:00:00.000Z",
+      },
+    });
+
+    renderWithProviders(
+      <ProfessionalForm
+        mode="create"
+        isSubmitting={false}
+        onCreateSubmit={onCreateSubmit}
+        onEditSubmit={vi.fn()}
+      />,
+    );
+
+    await user.type(screen.getByLabelText("Nome completo"), "Ana Souza");
+    await user.click(screen.getByRole("button", { name: "Criar profissional" }));
+
+    expect(onCreateSubmit).toHaveBeenCalledWith({
+      name: "Ana Souza",
+      email: null,
+      hasSystemAccess: false,
+      description: null,
+    });
+  });
+
+  it("permite editar profissional sem email quando sem acesso", async () => {
+    const user = userEvent.setup();
+    const onEditSubmit = vi.fn().mockResolvedValue(undefined);
+
+    renderWithProviders(
+      <ProfessionalForm
+        mode="edit"
+        initialValues={{
+          id: "professional-1",
+          name: "Ana Souza",
+          slug: "ana-souza",
+          hasSystemAccess: false,
+          description: null,
+          imageUrl: null,
+          thumbnailUrl: null,
+          createdAt: "2026-01-01T00:00:00.000Z",
+          updatedAt: "2026-01-01T00:00:00.000Z",
+        }}
+        isSubmitting={false}
+        onCreateSubmit={vi.fn()}
+        onEditSubmit={onEditSubmit}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Salvar alteracoes" }));
+    expect(onEditSubmit).toHaveBeenCalledWith(
+      "professional-1",
+      "Ana Souza",
+      null,
+      false,
+      null,
+    );
   });
 });

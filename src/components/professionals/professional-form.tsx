@@ -11,6 +11,7 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/flow/button";
 import { Card, CardDescription, CardTitle } from "@/components/flow/card";
+import { Checkbox } from "@/components/flow/checkbox";
 import { Input } from "@/components/flow/input";
 import { Textarea } from "@/components/flow/textarea";
 import { FeedbackBanner } from "@/components/shared/feedback-banner";
@@ -33,6 +34,8 @@ interface ProfessionalFormProps {
     professionalId: string,
     name: string,
     description?: string | null,
+    hasSystemAccess?: boolean,
+    email?: string | null,
   ) => Promise<void>;
   onCancelEdit?: () => void;
   onImageUploadFailed?: (professionalId: string, file: File, message: string) => void;
@@ -43,6 +46,7 @@ interface ProfessionalFormProps {
 const initialForm = {
   name: "",
   email: "",
+  hasSystemAccess: false,
   description: "",
 };
 
@@ -115,6 +119,7 @@ export function ProfessionalForm({
       setForm({
         name: initialValues.name ?? "",
         email: "",
+        hasSystemAccess: initialValues.hasSystemAccess ?? false,
         description: initialValues.description ?? "",
       });
       setCharCount((initialValues.description ?? "").length);
@@ -140,6 +145,14 @@ export function ProfessionalForm({
     setForm((current) => ({
       ...current,
       email: event.target.value,
+    }));
+  };
+
+  const handleSystemAccessChange = (checked: boolean) => {
+    setForm((current) => ({
+      ...current,
+      hasSystemAccess: checked,
+      email: checked ? current.email : "",
     }));
   };
 
@@ -278,6 +291,8 @@ export function ProfessionalForm({
           initialValues.id,
           form.name,
           form.description.trim() === "" ? null : form.description,
+          form.hasSystemAccess,
+          form.hasSystemAccess ? form.email.trim().toLowerCase() : null,
         );
         onCancelEdit?.();
       } catch (error) {
@@ -292,7 +307,7 @@ export function ProfessionalForm({
     const pendingImage = selectedImageFile;
     const normalizedEmail = form.email.trim().toLowerCase();
 
-    if (!normalizedEmail || !normalizedEmail.includes("@")) {
+    if (form.hasSystemAccess && (!normalizedEmail || !normalizedEmail.includes("@"))) {
       setErrorMessage("Informe um email valido para o profissional.");
       return;
     }
@@ -300,7 +315,8 @@ export function ProfessionalForm({
     try {
       const createResult = await onCreateSubmit({
         name: form.name,
-        email: normalizedEmail,
+        email: form.hasSystemAccess ? normalizedEmail : null,
+        hasSystemAccess: form.hasSystemAccess,
         description: form.description.trim() === "" ? null : form.description,
       });
 
@@ -402,7 +418,20 @@ export function ProfessionalForm({
           />
         </label>
 
-        {!isEditMode ? (
+        <div className="grid gap-2">
+          <span className="text-sm font-semibold text-white">Acesso ao sistema</span>
+          <label className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2">
+            <Checkbox
+              checked={form.hasSystemAccess}
+              onCheckedChange={handleSystemAccessChange}
+              disabled={submitDisabled}
+              aria-label="Permitir acesso ao sistema"
+            />
+            <span className="text-sm text-white">Permitir acesso ao sistema</span>
+          </label>
+        </div>
+
+        {form.hasSystemAccess ? (
           <label className="grid gap-2" htmlFor={emailId}>
             <span className="text-sm font-semibold text-white">Email do profissional</span>
             <Input

@@ -49,7 +49,7 @@ export function ProvisionResultCard({
       {onCreateAnother ? (
         <div className="mt-6">
           <Button variant="secondary" size="md" onClick={onCreateAnother}>
-            Criar outro mandante
+            Criar outro tenant
           </Button>
         </div>
       ) : null}

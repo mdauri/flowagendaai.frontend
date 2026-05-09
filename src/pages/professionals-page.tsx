@@ -33,10 +33,16 @@ export function ProfessionalsPage() {
     return createProfessionalMutation.mutateAsync(input);
   }
 
-  async function handleUpdateProfessional(professionalId: string, name: string, description?: string | null) {
+  async function handleUpdateProfessional(
+    professionalId: string,
+    name: string,
+    description: string | null | undefined,
+    hasSystemAccess?: boolean,
+    email?: string | null,
+  ) {
     await updateProfessionalMutation.mutateAsync({
       professionalId,
-      input: { name, description },
+      input: { name, description, hasSystemAccess, email },
     });
   }
 
@@ -81,7 +87,7 @@ export function ProfessionalsPage() {
   const professionals = professionalsQuery.data?.professionals ?? [];
   const isEditingProfessional = editingProfessional !== null;
   const canManageProfessionals = useMemo(
-    () => ["admin", "mandant"].includes(auth.user?.role ?? ""),
+    () => ["admin"].includes(auth.user?.role ?? ""),
     [auth.user?.role]
   );
 
@@ -140,7 +146,7 @@ export function ProfessionalsPage() {
           <Card variant="premium" padding="lg" className="h-full">
             <CardTitle>Acesso de leitura</CardTitle>
             <CardDescription className="mt-3">
-              Apenas usuarios com role `admin` ou `mandant` podem criar, alterar ou remover
+              Apenas usuarios com role `admin` podem criar, alterar ou remover
               profissionais.
             </CardDescription>
           </Card>
