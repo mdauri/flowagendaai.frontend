@@ -59,7 +59,7 @@ describe("SettingsPage", () => {
       withRouter: true,
     });
 
-    expect(screen.getByText("Configuracoes do Tenant")).toBeInTheDocument();
+    expect(screen.getByText("Configuracoes")).toBeInTheDocument();
     expect(screen.getByDisplayValue("Test Studio")).toBeInTheDocument();
     expect(screen.getByText("Perfil Publico")).toBeInTheDocument();
   });
@@ -90,7 +90,7 @@ describe("SettingsPage", () => {
     expect(screen.getByDisplayValue("Updated Studio")).toBeInTheDocument();
 
     // Click save
-    const saveButton = screen.getByRole("button", { name: "Salvar" });
+    const saveButton = screen.getByRole("button", { name: "Salvar perfil" });
     await user.click(saveButton);
 
     await waitFor(() => {
@@ -119,7 +119,7 @@ describe("SettingsPage", () => {
       withRouter: true,
     });
 
-    const saveButton = screen.getByRole("button", { name: "Salvar" });
+    const saveButton = screen.getByRole("button", { name: "Salvar perfil" });
     fireEvent.click(saveButton);
 
     await waitFor(() => {
@@ -139,7 +139,7 @@ describe("SettingsPage", () => {
       withRouter: true,
     });
 
-    const saveButton = screen.getByRole("button", { name: "Salvar" });
+    const saveButton = screen.getByRole("button", { name: "Salvar perfil" });
     fireEvent.click(saveButton);
 
     await waitFor(() => {
@@ -172,7 +172,7 @@ describe("SettingsPage", () => {
       withRouter: true,
     });
 
-    const saveButton = screen.getByRole("button", { name: "Salvar" });
+    const saveButton = screen.getByRole("button", { name: "Salvar perfil" });
     fireEvent.click(saveButton);
 
     // Should show "Salvando..." text
@@ -200,7 +200,7 @@ describe("SettingsPage", () => {
 
     // The page should render normally with the mocked data above
     // (bootstrapping test would need a separate mock setup)
-    expect(screen.getByText("Configuracoes do Tenant")).toBeInTheDocument();
+    expect(screen.getByText("Configuracoes")).toBeInTheDocument();
   });
 
   it("public address input is rendered", () => {
@@ -209,7 +209,7 @@ describe("SettingsPage", () => {
       withRouter: true,
     });
 
-    expect(screen.getByLabelText(/Public Address/i)).toBeInTheDocument();
+    expect(screen.getByRole("textbox", { name: /Endereco/i })).toBeInTheDocument();
   });
 
   it("cover image upload section is rendered", () => {
@@ -220,7 +220,7 @@ describe("SettingsPage", () => {
 
     expect(screen.getByText("Imagem de Capa")).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: /Upload cover image/i })
+      screen.getByRole("button", { name: /Enviar capa/i })
     ).toBeInTheDocument();
   });
 
@@ -230,13 +230,13 @@ describe("SettingsPage", () => {
       withRouter: true,
     });
 
-    expect(screen.getByText("Logo do Tenant")).toBeInTheDocument();
+    expect(screen.getByText("Logo")).toBeInTheDocument();
     // The mock tenant has logoUrl, so it shows success state with Replace button
     expect(
-      screen.getByRole("button", { name: "Replace logo" })
+      screen.getByRole("button", { name: "Trocar logo" })
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "Remove logo" })
+      screen.getByRole("button", { name: "Remover logo" })
     ).toBeInTheDocument();
   });
 
@@ -290,7 +290,7 @@ describe("SettingsPage", () => {
     // component should show the success state with remove button.
     // But the component uses local state initialized from tenant.logoUrl.
     // Let's check if the remove button is present.
-    const removeButton = screen.getByRole("button", { name: "Remove logo" });
+    const removeButton = screen.getByRole("button", { name: "Remover logo" });
     await user.click(removeButton);
 
     await waitFor(() => {
@@ -309,7 +309,7 @@ describe("SettingsPage", () => {
       withRouter: true,
     });
 
-    const removeButton = screen.getByRole("button", { name: "Remove logo" });
+    const removeButton = screen.getByRole("button", { name: "Remover logo" });
     await user.click(removeButton);
 
     await waitFor(() => {

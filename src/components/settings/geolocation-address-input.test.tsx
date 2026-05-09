@@ -49,11 +49,11 @@ describe("GeolocationAddressInput", () => {
   it("renders text input and detect location button", () => {
     renderWithProviders(<GeolocationAddressInput {...defaultProps} />);
 
-    const input = screen.getByRole("textbox", { name: /Public Address/ });
+    const input = screen.getByRole("textbox", { name: /Endereco/ });
     expect(input).toBeInTheDocument();
 
     const button = screen.getByRole("button", {
-      name: /Detect my current location/i,
+      name: /Usar localizacao atual para preencher o endereco/i,
     });
     expect(button).toBeInTheDocument();
   });
@@ -100,7 +100,7 @@ describe("GeolocationAddressInput", () => {
 
     renderWithProviders(<GeolocationAddressInput {...defaultProps} />);
 
-    const button = screen.getByRole("button", { name: /Detect my current location/i });
+    const button = screen.getByRole("button", { name: /Usar localizacao atual para preencher o endereco/i });
     fireEvent.click(button);
 
     await waitFor(() => {
@@ -138,17 +138,17 @@ describe("GeolocationAddressInput", () => {
 
     renderWithProviders(<GeolocationAddressInput {...defaultProps} />);
 
-    const button = screen.getByRole("button", { name: /Detect my current location/i });
+    const button = screen.getByRole("button", { name: /Usar localizacao atual para preencher o endereco/i });
     fireEvent.click(button);
 
     await waitFor(() => {
       expect(
-        screen.getByText(/Location access denied/i)
+        screen.getByText(/Permissao de localizacao negada/i)
       ).toBeInTheDocument();
     });
 
     expect(
-      screen.queryByRole("button", { name: /Detect my current location/i })
+      screen.queryByRole("button", { name: /Usar localizacao atual para preencher o endereco/i })
     ).not.toBeInTheDocument();
   });
 
@@ -174,17 +174,17 @@ describe("GeolocationAddressInput", () => {
 
     renderWithProviders(<GeolocationAddressInput {...defaultProps} />);
 
-    const button = screen.getByRole("button", { name: /Detect my current location/i });
+    const button = screen.getByRole("button", { name: /Usar localizacao atual para preencher o endereco/i });
     fireEvent.click(button);
 
     await waitFor(() => {
       expect(
-        screen.getByText(/Could not determine your address/i)
+        screen.getByText(/Nao foi possivel identificar o endereco/i)
       ).toBeInTheDocument();
     });
 
     expect(
-      screen.getByRole("button", { name: /Detect my current location/i })
+      screen.getByRole("button", { name: /Usar localizacao atual para preencher o endereco/i })
     ).toBeInTheDocument();
   });
 
@@ -212,11 +212,11 @@ describe("GeolocationAddressInput", () => {
 
     renderWithProviders(<GeolocationAddressInput {...defaultProps} />);
 
-    const button = screen.getByRole("button", { name: /Detect my current location/i });
+    const button = screen.getByRole("button", { name: /Usar localizacao atual para preencher o endereco/i });
     fireEvent.click(button);
 
     await waitFor(() => {
-      expect(screen.getByText(/Detecting\.\.\./i)).toBeInTheDocument();
+      expect(screen.getByText(/Localizando\.\.\./i)).toBeInTheDocument();
     });
   });
 
@@ -250,12 +250,12 @@ describe("GeolocationAddressInput", () => {
 
     renderWithProviders(<GeolocationAddressInput {...defaultProps} />);
 
-    const button = screen.getByRole("button", { name: /Detect my current location/i });
+    const button = screen.getByRole("button", { name: /Usar localizacao atual para preencher o endereco/i });
     fireEvent.click(button);
 
     await waitFor(() => {
       expect(
-        screen.getByRole("button", { name: /Update my current location/i })
+        screen.getByRole("button", { name: /Atualizar localizacao/i })
       ).toBeInTheDocument();
     });
   });
@@ -277,7 +277,7 @@ describe("GeolocationAddressInput", () => {
       <GeolocationAddressInput {...defaultProps} onError={onError} />
     );
 
-    const button = screen.getByRole("button", { name: /Detect my current location/i });
+    const button = screen.getByRole("button", { name: /Usar localizacao atual para preencher o endereco/i });
     fireEvent.click(button);
 
     await waitFor(() => {
@@ -306,7 +306,7 @@ describe("GeolocationAddressInput", () => {
       <GeolocationAddressInput {...defaultProps} onError={onError} />
     );
 
-    const button = screen.getByRole("button", { name: /Detect my current location/i });
+    const button = screen.getByRole("button", { name: /Usar localizacao atual para preencher o endereco/i });
     fireEvent.click(button);
 
     await waitFor(() => {

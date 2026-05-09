@@ -31,17 +31,17 @@ describe("LogoUpload", () => {
       render(<LogoUpload {...defaultProps} />);
 
       expect(
-        screen.getByRole("button", { name: "Upload logo" }),
+        screen.getByRole("button", { name: "Enviar logo" }),
       ).toBeInTheDocument();
       expect(
-        screen.getByText(/JPG, PNG, or WebP\. Max 2MB\. Recommended: 512x512px\./i),
+        screen.getByText(/JPG, PNG ou WebP\. Max 2MB\./i),
       ).toBeInTheDocument();
     });
 
     it("renders circular placeholder", () => {
       render(<LogoUpload {...defaultProps} />);
 
-      const placeholder = screen.getByLabelText("No logo configured");
+      const placeholder = screen.getByLabelText("Nenhuma logo cadastrada");
       expect(placeholder).toBeInTheDocument();
       expect(placeholder).toHaveClass("rounded-full");
     });
@@ -62,10 +62,10 @@ describe("LogoUpload", () => {
       expect(logoImage).toHaveClass("rounded-full");
 
       expect(
-        screen.getByRole("button", { name: "Replace logo" }),
+        screen.getByRole("button", { name: "Trocar logo" }),
       ).toBeInTheDocument();
       expect(
-        screen.getByRole("button", { name: "Remove logo" }),
+        screen.getByRole("button", { name: "Remover logo" }),
       ).toBeInTheDocument();
     });
   });
@@ -85,9 +85,9 @@ describe("LogoUpload", () => {
       fireEvent.change(hiddenInput, { target: { files: [file] } });
 
       await waitFor(() => {
-        const button = screen.getByRole("button", { name: "Upload logo" });
+        const button = screen.getByRole("button", { name: "Enviar logo" });
         expect(button).toBeDisabled();
-        expect(button).toHaveTextContent("Uploading...");
+        expect(button).toHaveTextContent("Enviando...");
       });
     });
   });
@@ -103,10 +103,10 @@ describe("LogoUpload", () => {
       );
 
       expect(
-        screen.getByRole("button", { name: "Replace logo" }),
+        screen.getByRole("button", { name: "Trocar logo" }),
       ).toBeDisabled();
       expect(
-        screen.getByRole("button", { name: "Remove logo" }),
+        screen.getByRole("button", { name: "Remover logo" }),
       ).toBeDisabled();
     });
 
@@ -114,7 +114,7 @@ describe("LogoUpload", () => {
       render(<LogoUpload {...defaultProps} disabled />);
 
       expect(
-        screen.getByRole("button", { name: "Upload logo" }),
+        screen.getByRole("button", { name: "Enviar logo" }),
       ).toBeDisabled();
     });
   });
@@ -131,7 +131,7 @@ describe("LogoUpload", () => {
 
       expect(
         screen.getByText(
-          "Invalid file type. Only JPG, PNG, and WebP are allowed.",
+          "Formato invalido. Use JPG, PNG ou WebP.",
         ),
       ).toBeInTheDocument();
     });
@@ -147,7 +147,7 @@ describe("LogoUpload", () => {
       fireEvent.change(hiddenInput, { target: { files: [file] } });
 
       expect(
-        screen.getByText("File size exceeds 2MB limit."),
+        screen.getByText("Arquivo maior que 2MB."),
       ).toBeInTheDocument();
     });
   });
@@ -212,7 +212,7 @@ describe("LogoUpload", () => {
         />
       );
 
-      const removeButton = screen.getByRole("button", { name: "Remove logo" });
+      const removeButton = screen.getByRole("button", { name: "Remover logo" });
       fireEvent.click(removeButton);
 
       expect(onRemove).toHaveBeenCalled();
@@ -245,7 +245,7 @@ describe("LogoUpload", () => {
       render(<LogoUpload {...defaultProps} />);
 
       expect(
-        screen.getByRole("button", { name: "Upload logo" }),
+        screen.getByRole("button", { name: "Enviar logo" }),
       ).toBeInTheDocument();
     });
 
@@ -258,7 +258,7 @@ describe("LogoUpload", () => {
       );
 
       expect(
-        screen.getByRole("button", { name: "Remove logo" }),
+        screen.getByRole("button", { name: "Remover logo" }),
       ).toBeInTheDocument();
     });
 
@@ -276,7 +276,7 @@ describe("LogoUpload", () => {
     it("placeholder has appropriate alt text when no logo", () => {
       render(<LogoUpload {...defaultProps} />);
 
-      expect(screen.getByLabelText("No logo configured")).toBeInTheDocument();
+      expect(screen.getByLabelText("Nenhuma logo cadastrada")).toBeInTheDocument();
     });
   });
 });

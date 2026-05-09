@@ -110,7 +110,7 @@ export function DashboardHeader({
               type="date"
               value={date}
               inputSize="sm"
-              className="h-auto w-37 border-0 bg-transparent px-0 py-0 [box-shadow:none] focus-visible:[box-shadow:none]"
+              className="h-auto w-[9.25rem] border-0 bg-transparent px-0 py-0 [background-color:transparent] [box-shadow:none] focus-visible:[box-shadow:none]"
               onChange={(event) => {
                 onDateChange(event.target.value);
               }}
