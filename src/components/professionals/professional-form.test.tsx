@@ -18,7 +18,7 @@ describe("ProfessionalForm", () => {
 
     expect(screen.getByRole("heading", { name: "Novo profissional" })).toBeInTheDocument();
     expect(screen.queryByLabelText("Email do profissional")).not.toBeInTheDocument();
-    await user.click(screen.getAllByRole("checkbox", { name: "Permitir acesso ao sistema" })[0]);
+    await user.click(screen.getAllByRole("checkbox", { name: "Possui acesso ao sistema" })[0]);
     expect(screen.getByLabelText("Email do profissional")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Criar profissional" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Limpar" })).toBeInTheDocument();

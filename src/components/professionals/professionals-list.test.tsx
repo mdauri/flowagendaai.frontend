@@ -25,7 +25,7 @@ describe("ProfessionalsList", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("exibe descricao com clamp em 5 linhas quando existir", () => {
+  it("exibe descricao com clamp em 3 linhas quando existir", () => {
     const description = "Especialista em coloracao\nAtende seg-sex.";
 
     render(
@@ -50,7 +50,7 @@ describe("ProfessionalsList", () => {
         content.includes("Atende seg-sex.")
       );
     });
-    expect(el.style.webkitLineClamp).toBe("5");
+    expect(el.style.webkitLineClamp).toBe("3");
   });
 
   it("mostra CTA de retry no card quando existir pending upload", async () => {

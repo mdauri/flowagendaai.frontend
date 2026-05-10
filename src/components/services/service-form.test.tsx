@@ -31,7 +31,7 @@ describe("ServiceForm", () => {
       </QueryClientProvider>,
     );
 
-    const dropzone = screen.getByLabelText("Pré-visualização da imagem");
+    const dropzone = screen.getByLabelText("Pre-visualizacao da imagem");
     const file = new File(["image"], "service.png", { type: "image/png" });
 
     fireEvent.dragEnter(dropzone, {
@@ -42,7 +42,7 @@ describe("ServiceForm", () => {
     });
 
     expect(screen.getByText("service.png")).toBeInTheDocument();
-    expect(screen.getByAltText("Pré-visualização do serviço")).toHaveAttribute(
+    expect(screen.getByAltText("Pre-visualizacao do servico")).toHaveAttribute(
       "src",
       "blob:preview",
     );
@@ -130,8 +130,7 @@ describe("ServiceForm", () => {
     const durationInput = screen.getByPlaceholderText("Ex.: 60");
     await fireEvent.change(durationInput, { target: { value: "1440" } });
 
-    // Check that the helper text appears (it should show "Maximo 4320 minutos")
-    expect(await screen.findByText(/Maximo 4320 minutos/)).toBeInTheDocument();
+    expect(await screen.findByText(/Servico multi-dia/)).toBeInTheDocument();
   });
 
   it("does not show DurationHelper for single-day duration", () => {
@@ -154,7 +153,7 @@ describe("ServiceForm", () => {
     expect(screen.queryByText(/Servico multi-dia/)).not.toBeInTheDocument();
   });
 
-  it("shows max duration hint in helper text", () => {
+  it("shows compact duration helper hint", () => {
     const queryClient = new QueryClient({
       defaultOptions: {
         queries: { retry: false },
@@ -168,6 +167,6 @@ describe("ServiceForm", () => {
       </QueryClientProvider>,
     );
 
-    expect(screen.getByText(/Maximo 4320 minutos/)).toBeInTheDocument();
+    expect(screen.getByText(/Use minutos inteiros/)).toBeInTheDocument();
   });
 });
