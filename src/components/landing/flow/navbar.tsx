@@ -2,9 +2,8 @@ import { Link } from "react-router-dom";
 import { LogIn, MessageCircle } from "lucide-react";
 import { Button } from "@/components/landing/flow/button";
 
-const WHATSAPP_LINK = import.meta.env.VITE_WHATSAPP_LINK ?? "#";
 const FRONTEND_URL =
-  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5173";
+  import.meta.env.VITE_FRONTEND_URL ?? "http://localhost:5173";
 
 export function Navbar() {
   return (

@@ -16,8 +16,6 @@ import {
 import { Card } from "@/components/landing/flow/card";
 import { compositionPatterns, semanticTokens } from "@/design-system";
 
-const WHATSAPP_LINK = import.meta.env.VITE_WHATSAPP_LINK ?? "#";
-
 const features = [
   {
     title: "Agenda inteligente",
