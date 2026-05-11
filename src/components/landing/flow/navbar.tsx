@@ -53,7 +53,7 @@ export function Navbar() {
         <Button
           size="md"
           as="a"
-          href="#precos"
+          href={"https://wa.me/5512982933873?text=Agendoro"}
           //target="_blank"
           //rel="noopener noreferrer"
         >
