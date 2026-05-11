@@ -78,7 +78,7 @@ export function HowItWorks() {
         <div className="mt-10 flex justify-center">
           <Button
             as="a"
-            href="#precos"
+            href={"https://wa.me/5512982933873?text=Agendoro"}
             //target="_blank"
             //rel="noopener noreferrer"
           >

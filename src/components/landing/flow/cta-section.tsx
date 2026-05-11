@@ -29,7 +29,7 @@ export function CTASection() {
           <div className="flex flex-col gap-4 sm:flex-row lg:flex-col">
             <Button
               as="a"
-              href="#precos"
+              href={"https://wa.me/5512982933873?text=Agendoro"}
               //target="_blank"
               //rel="noopener noreferrer"
             >
