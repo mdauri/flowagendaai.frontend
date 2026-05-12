@@ -121,13 +121,16 @@ export function PublicBookingPage() {
 
   useEffect(() => {
     if (!servicesQuery.data?.length) return;
-    if (preselectedServiceId && !selectedService) {
-      const matchedService = servicesQuery.data.find((service) => service.id === preselectedServiceId);
-      if (matchedService) {
-        setSelectedService(matchedService);
-      }
+    if (!preselectedServiceId || selectedService) return;
+
+    const matchedService = servicesQuery.data.find((service) => service.id === preselectedServiceId);
+    if (!matchedService) return;
+
+    setSelectedService(matchedService);
+    if (currentStep === "service") {
+      setCurrentStep("date");
     }
-  }, [preselectedServiceId, servicesQuery.data, selectedService]);
+  }, [preselectedServiceId, servicesQuery.data, selectedService, currentStep]);
 
   useEffect(() => {
     if (!selectedService) return;

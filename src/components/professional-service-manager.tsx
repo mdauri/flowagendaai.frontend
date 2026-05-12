@@ -6,7 +6,10 @@ import { useProfessionalsWithServicesQuery } from "@/hooks/use-professionals-wit
 import { useServicesQuery } from "@/hooks/use-services-query";
 import { useBulkAssociateMutation } from "@/hooks/use-bulk-associate-mutation";
 import { useBulkDissociateMutation } from "@/hooks/use-bulk-dissociate-mutation";
-import type { ProfessionalFilterStatus, ProfessionalWithServices } from "@/types/professional-service";
+import type {
+  ProfessionalFilterStatus,
+  ProfessionalWithServices,
+} from "@/types/professional-service";
 import { ProfessionalList } from "./professional-list";
 import { BulkActionBar } from "./bulk-action-bar";
 import { SearchFilter } from "./search-filter";
@@ -18,12 +21,16 @@ export function ProfessionalServiceManager() {
   const navigate = useNavigate();
 
   // Local state
-  const [selectedProfessionalIds, setSelectedProfessionalIds] = useState<Set<string>>(new Set());
+  const [selectedProfessionalIds, setSelectedProfessionalIds] = useState<
+    Set<string>
+  >(new Set());
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterStatus, setFilterStatus] = useState<ProfessionalFilterStatus>("all");
+  const [filterStatus, setFilterStatus] =
+    useState<ProfessionalFilterStatus>("all");
 
   // React Query
-  const { data, isLoading, error, refetch } = useProfessionalsWithServicesQuery();
+  const { data, isLoading, error, refetch } =
+    useProfessionalsWithServicesQuery();
   const servicesQuery = useServicesQuery();
   const bulkAssociate = useBulkAssociateMutation();
   const bulkDissociate = useBulkDissociateMutation();
@@ -42,22 +49,27 @@ export function ProfessionalServiceManager() {
   const filteredProfessionals = useMemo(() => {
     if (!data) return [];
 
-    return data.professionals.filter((professional: ProfessionalWithServices) => {
-      // Search filter
-      const matchesSearch = professional.name
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase());
+    return data.professionals.filter(
+      (professional: ProfessionalWithServices) => {
+        // Search filter
+        const matchesSearch = professional.name
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase());
 
-      // Status filter
-      const isAssociated = professional.services.some((s) => s.id === serviceId);
-      const matchesStatus =
-        filterStatus === "all" ||
-        (filterStatus === "associated" && isAssociated) ||
-        (filterStatus === "not-associated" && !isAssociated) ||
-        (filterStatus === "no-services" && professional.services.length === 0);
+        // Status filter
+        const isAssociated = professional.services.some(
+          (s) => s.id === serviceId,
+        );
+        const matchesStatus =
+          filterStatus === "all" ||
+          (filterStatus === "associated" && isAssociated) ||
+          (filterStatus === "not-associated" && !isAssociated) ||
+          (filterStatus === "no-services" &&
+            professional.services.length === 0);
 
-      return matchesSearch && matchesStatus;
-    });
+        return matchesSearch && matchesStatus;
+      },
+    );
   }, [data, searchQuery, filterStatus, serviceId]);
 
   // Handlers
@@ -122,9 +134,10 @@ export function ProfessionalServiceManager() {
     );
   }
 
-  const associatedCount = data?.professionals.filter((p: ProfessionalWithServices) =>
-    p.services.some((s) => s.id === serviceId)
-  ).length || 0;
+  const associatedCount =
+    data?.professionals.filter((p: ProfessionalWithServices) =>
+      p.services.some((s) => s.id === serviceId),
+    ).length || 0;
 
   return (
     <div className="professional-service-manager space-y-6">
@@ -134,15 +147,13 @@ export function ProfessionalServiceManager() {
           variant="ghost"
           size="sm"
           onClick={() => navigate("/app/services")}
-          className="h-10 w-10 p-0 flex-shrink-0"
+          className="h-10 w-10 p-0 shrink-0"
           aria-label="Go back to services"
         >
           <ChevronLeft className="h-5 w-5" />
         </Button>
         <div className="flex-1">
-          <h1 className="text-xl font-bold text-white">
-            Profissionais
-          </h1>
+          <h1 className="text-xl font-bold text-white">Profissionais</h1>
           <p className="text-sm text-white/55 mt-1">
             {associatedCount} professionals associated
           </p>
@@ -182,7 +193,11 @@ export function ProfessionalServiceManager() {
       />
 
       {/* Action Footer */}
-      <Card variant="surface" padding="md" className="sticky bottom-0 border-t border-white/10">
+      <Card
+        variant="surface"
+        padding="md"
+        className="sticky bottom-0 border-t border-white/10"
+      >
         <div className="flex items-center justify-between gap-4">
           <Button
             variant="ghost"

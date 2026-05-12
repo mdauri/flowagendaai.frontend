@@ -166,6 +166,9 @@ async function progressToSlotStep(user: ReturnType<typeof userEvent.setup>) {
 const renderPage = () =>
   renderWithProviders(<PublicBookingPage />, { route: "/p/maria-silva", withRouter: true });
 
+const renderPageWithRoute = (route: string) =>
+  renderWithProviders(<PublicBookingPage />, { route, withRouter: true });
+
 describe("PublicBookingPage", () => {
   it("renders loading skeleton while professional data is loading", () => {
     mockProfessionalQuery.mockReturnValue(createProfessionalResponse({ isLoading: true }));
@@ -208,6 +211,21 @@ describe("PublicBookingPage", () => {
 
     expect(screen.getByText(/Escolha a data/i)).toBeInTheDocument();
     expect(screen.getByText(/Horários em/i)).toBeInTheDocument();
+  });
+
+  it("auto-advances to date step when service query param is valid", async () => {
+    renderPageWithRoute("/p/maria-silva?service=service-1");
+
+    expect(await screen.findByText(/Escolha a data/i)).toBeInTheDocument();
+    expect(screen.getByText(/Serviço selecionado: Corte Feminino/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Escolha o serviço/i)).not.toBeInTheDocument();
+  });
+
+  it("keeps service step when service query param is invalid", async () => {
+    renderPageWithRoute("/p/maria-silva?service=unknown-service");
+
+    expect(await screen.findByText(/Escolha o serviço/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Escolha a data/i)).not.toBeInTheDocument();
   });
 
   it("shows slots and allows progressing to customer data", async () => {
