@@ -20,13 +20,18 @@ export function CatalogPage() {
   const error = catalogQuery.error as ApiError | null;
 
   // Professional selection modal state
-  const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
+  const [selectedServiceId, setSelectedServiceId] = useState<string | null>(
+    null,
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Fetch professionals when a service is selected
-  const professionalsQuery = useProfessionalsByServiceQuery(selectedServiceId ?? undefined, {
-    enabled: Boolean(selectedServiceId),
-  });
+  const professionalsQuery = useProfessionalsByServiceQuery(
+    selectedServiceId ?? undefined,
+    {
+      enabled: Boolean(selectedServiceId),
+    },
+  );
 
   // Auto-navigate when professionals are loaded
   useEffect(() => {
@@ -60,11 +65,13 @@ export function CatalogPage() {
       document.title = `${catalog.tenant.name} - Catálogo de Serviços | Agendoro`;
 
       // Update meta description
-      const metaDescription = document.querySelector('meta[name="description"]');
+      const metaDescription = document.querySelector(
+        'meta[name="description"]',
+      );
       if (metaDescription) {
         metaDescription.setAttribute(
           "content",
-          `Veja os serviços de ${catalog.tenant.name} e agende online`
+          `Veja os serviços de ${catalog.tenant.name} e agende online`,
         );
       }
     }
@@ -100,12 +107,14 @@ export function CatalogPage() {
   if (catalogQuery.isLoading) {
     return (
       <div
-        className="min-h-screen bg-[var(--bg-base)] px-4 py-8"
-        style={{
-          backgroundColor: colors.background.base,
-        } as React.CSSProperties}
+        className="min-h-screen bg-(--bg-base) px-4 py-8"
+        style={
+          {
+            backgroundColor: colors.background.base,
+          } as React.CSSProperties
+        }
       >
-        <div className="mx-auto max-w-[1200px]">
+        <div className="mx-auto max-w-300">
           <CatalogSkeleton count={6} />
         </div>
       </div>
@@ -116,13 +125,19 @@ export function CatalogPage() {
   if (error) {
     return (
       <div
-        className="min-h-screen bg-[var(--bg-base)]"
-        style={{
-          backgroundColor: colors.background.base,
-        } as React.CSSProperties}
+        className="min-h-screen bg-(--bg-base)"
+        style={
+          {
+            backgroundColor: colors.background.base,
+          } as React.CSSProperties
+        }
       >
-        <div className="mx-auto max-w-[1200px]">
-          <CatalogErrorState error={error} onRetry={handleRetry} onBack={handleBack} />
+        <div className="mx-auto max-w-300">
+          <CatalogErrorState
+            error={error}
+            onRetry={handleRetry}
+            onBack={handleBack}
+          />
         </div>
       </div>
     );
@@ -132,12 +147,14 @@ export function CatalogPage() {
   if (!catalog || catalog.services.length === 0) {
     return (
       <div
-        className="min-h-screen bg-[var(--bg-base)]"
-        style={{
-          backgroundColor: colors.background.base,
-        } as React.CSSProperties}
+        className="min-h-screen bg-(--bg-base)"
+        style={
+          {
+            backgroundColor: colors.background.base,
+          } as React.CSSProperties
+        }
       >
-        <div className="mx-auto max-w-[1200px]">
+        <div className="mx-auto max-w-300">
           <CatalogEmptyState onBack={handleBack} />
         </div>
       </div>
@@ -147,12 +164,14 @@ export function CatalogPage() {
   // Success state - render catalog
   return (
     <div
-      className="min-h-screen bg-[var(--bg-base)] px-4 py-8"
-      style={{
-        backgroundColor: colors.background.base,
-      } as React.CSSProperties}
+      className="min-h-screen bg-(--bg-base) px-4 py-8"
+      style={
+        {
+          backgroundColor: colors.background.base,
+        } as React.CSSProperties
+      }
     >
-      <div className="mx-auto max-w-[1200px]">
+      <div className="mx-auto max-w-300">
         {/* Cover Banner */}
         {catalog.tenant && (
           <TenantCoverBanner
@@ -189,7 +208,8 @@ export function CatalogPage() {
         isOpen={isModalOpen}
         serviceName={
           selectedServiceId
-            ? catalog?.services.find((s) => s.id === selectedServiceId)?.name ?? ""
+            ? (catalog?.services.find((s) => s.id === selectedServiceId)
+                ?.name ?? "")
             : ""
         }
         professionals={professionalsQuery.data?.professionals ?? []}

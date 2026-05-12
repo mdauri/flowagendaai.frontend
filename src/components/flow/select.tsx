@@ -74,14 +74,21 @@ export function Select({
   onValueChange,
   ...props
 }: SelectProps) {
+  const VIEWPORT_MARGIN = 8;
+  const MENU_GAP = 10;
+  const DEFAULT_MENU_MAX_HEIGHT = 288;
+  const MIN_MENU_HEIGHT = 120;
+
   const [isOpen, setIsOpen] = React.useState(false);
   const rootRef = React.useRef<HTMLDivElement | null>(null);
   const triggerRef = React.useRef<HTMLButtonElement | null>(null);
   const menuRef = React.useRef<HTMLDivElement | null>(null);
   const [menuRect, setMenuRect] = React.useState<{
-    top: number;
+    top?: number;
+    bottom?: number;
     left: number;
     width: number;
+    maxHeight: number;
   } | null>(null);
   const selectedOption = options.find((option) => option.value === value) ?? null;
 
@@ -92,12 +99,24 @@ export function Select({
       return;
     }
 
+    const viewportHeight = window.innerHeight;
+    const availableBelow = viewportHeight - rect.bottom - MENU_GAP - VIEWPORT_MARGIN;
+    const availableAbove = rect.top - MENU_GAP - VIEWPORT_MARGIN;
+    const shouldOpenUp = availableBelow < MIN_MENU_HEIGHT && availableAbove > availableBelow;
+    const availableSpace = shouldOpenUp ? availableAbove : availableBelow;
+    const safeMaxHeight = Math.max(
+      MIN_MENU_HEIGHT,
+      Math.min(DEFAULT_MENU_MAX_HEIGHT, Math.floor(availableSpace))
+    );
+
     setMenuRect({
-      top: rect.bottom + 10,
+      top: shouldOpenUp ? undefined : rect.bottom + MENU_GAP,
+      bottom: shouldOpenUp ? viewportHeight - rect.top + MENU_GAP : undefined,
       left: rect.left,
       width: rect.width,
+      maxHeight: safeMaxHeight,
     });
-  }, []);
+  }, [DEFAULT_MENU_MAX_HEIGHT, MENU_GAP, MIN_MENU_HEIGHT, VIEWPORT_MARGIN]);
 
   React.useEffect(() => {
     function handlePointerDown(event: MouseEvent) {
@@ -183,11 +202,17 @@ export function Select({
                 style={{
                   ...menuStyle,
                   top: menuRect.top,
+                  bottom: menuRect.bottom,
                   left: menuRect.left,
                   width: menuRect.width,
                 }}
               >
-                <ul className="grid max-h-72 gap-1 overflow-auto" role="listbox" aria-labelledby={id}>
+                <ul
+                  className="grid gap-1 overflow-auto"
+                  style={{ maxHeight: menuRect.maxHeight }}
+                  role="listbox"
+                  aria-labelledby={id}
+                >
                   <li>
                     <button
                       type="button"
