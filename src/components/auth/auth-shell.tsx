@@ -18,7 +18,9 @@ export function AuthShell({ children }: PropsWithChildren) {
           />
           <div className="mt-8 max-w-xl">
             <Card variant="premium" padding="lg">
-              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-secondary">Gestão simples</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-secondary">
+                Gestão simples
+              </p>
               <ul className="mt-4 space-y-3 text-sm leading-7 text-text-soft">
                 <li>Agenda, profissionais e serviços em um só lugar.</li>
                 <li>Acesso seguro para cuidar da operação do seu negócio.</li>
