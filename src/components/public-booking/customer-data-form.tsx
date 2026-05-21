@@ -11,6 +11,7 @@ interface CustomerDataFormProps {
   phone: string;
   email: string;
   notes: string;
+  nameInputRef?: React.Ref<HTMLInputElement>;
   onNameChange: (value: string) => void;
   onPhoneChange: (value: string) => void;
   onEmailChange: (value: string) => void;
@@ -27,6 +28,7 @@ export function CustomerDataForm({
   phone,
   email,
   notes,
+  nameInputRef,
   onNameChange,
   onPhoneChange,
   onEmailChange,
@@ -40,6 +42,7 @@ export function CustomerDataForm({
           Nome completo *
         </label>
         <Input
+          ref={nameInputRef}
           value={name}
           onChange={(event) => onNameChange(event.target.value)}
           placeholder="Seu nome"

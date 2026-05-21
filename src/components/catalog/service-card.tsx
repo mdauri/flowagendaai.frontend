@@ -61,7 +61,7 @@ export function ServiceCard({
       variant="glass"
       padding="none"
       radiusSize="xl"
-      className="service-card flex flex-col overflow-hidden transition-all duration-300 hover:-translate-y-0.5 hover:border-(--border-hover) hover:shadow-card"
+      className="service-card flex flex-col overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:border-(--border-hover) hover:shadow-card"
       style={
         {
           minHeight: "400px",
@@ -119,24 +119,26 @@ export function ServiceCard({
       {/* Content Section */}
       <div className="flex flex-1 flex-col gap-3 p-5">
         {/* Name and Price */}
-        <div className="flex items-start justify-between gap-2">
+        <div className="flex items-start justify-between gap-3">
           <CardTitle
-            className="text-lg font-bold"
+            className="min-w-0 text-lg font-semibold"
             style={{
               color: colors.text.primary,
               fontFamily: typography.family.sans,
-              fontWeight: typography.weight.bold,
+              fontWeight: typography.weight.semibold,
               lineHeight: typography.leading.tight,
-              letterSpacing: typography.tracking.tight,
+              letterSpacing: 0,
             }}
           >
             {service.name}
           </CardTitle>
           {typeof service.price === "number" ? (
             <span
-              className="text-base font-bold"
+              className="shrink-0 rounded-full border px-3 py-1 text-sm font-bold"
               style={{
-                color: colors.brand.primary,
+                backgroundColor: colors.badge.background,
+                borderColor: colors.badge.border,
+                color: colors.badge.text,
                 fontFamily: typography.family.sans,
                 fontWeight: typography.weight.bold,
                 whiteSpace: "nowrap",
@@ -150,13 +152,14 @@ export function ServiceCard({
 
         {/* Duration */}
         <div
-          className="flex items-center gap-1.5"
+          className="flex items-center gap-2"
           aria-label={`Duração: ${formatDuration(service.durationInMinutes)}`}
         >
           <Clock
-            size={18}
+            size={20}
+            strokeWidth={2.4}
             style={{
-              color: colors.text.muted,
+              color: colors.brand.primary,
             }}
             aria-hidden="true"
           />
@@ -195,7 +198,7 @@ export function ServiceCard({
         <div className="mt-auto pt-2">
           <Button
             onClick={() => onBook(service.id)}
-            className="w-full"
+            className="w-full hover:scale-[1.02] hover:shadow-depth"
             size="md"
             aria-label={`${actionLabel} ${service.name}`}
             style={{

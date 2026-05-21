@@ -52,8 +52,7 @@ describe("ServiceCard", () => {
 
   it("should show fallback when no image", () => {
     render(<ServiceCard service={mockService} tenantSlug="test" onBook={vi.fn()} />);
-    // Should show initials "CF" for "Corte Feminino"
-    expect(screen.getByText("CF")).toBeInTheDocument();
+    expect(screen.getByText("C")).toBeInTheDocument();
   });
 
   it("should format duration correctly for different values", () => {
@@ -120,6 +119,6 @@ describe("ServiceCard", () => {
     const image = screen.getByRole("img", { name: "Imagem do serviço Corte Feminino" });
     fireEvent.error(image);
 
-    expect(screen.getByText("CF")).toBeInTheDocument();
+    expect(screen.getByText("C")).toBeInTheDocument();
   });
 });

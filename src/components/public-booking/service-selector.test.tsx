@@ -42,7 +42,7 @@ describe("ServiceSelector", () => {
     const image = screen.getByRole("img", { name: "Imagem do serviço Corte Feminino" });
     fireEvent.error(image);
 
-    expect(screen.getByText("CF")).toBeInTheDocument();
+    expect(screen.getByText("C")).toBeInTheDocument();
   });
 
   it("shows fallback when service has no image", () => {
@@ -57,7 +57,7 @@ describe("ServiceSelector", () => {
       />,
     );
 
-    expect(screen.getByText("COL")).toBeInTheDocument();
+    expect(screen.getByText("C")).toBeInTheDocument();
     expect(screen.queryByRole("img", { name: "Imagem do serviço Coloração" })).not.toBeInTheDocument();
   });
 

@@ -213,6 +213,19 @@ describe("PublicBookingPage", () => {
     expect(screen.getByText(/Horários em/i)).toBeInTheDocument();
   });
 
+  it("renders tenant identity in topbar and removes redundant public booking labels", () => {
+    renderPage();
+
+    expect(screen.getByText("Test Studio")).toBeInTheDocument();
+    expect(screen.getByText("T")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Ativar tema/i })).toBeInTheDocument();
+    expect(screen.queryByText(/^Agendoro$/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Agendamento publico/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Tenant Demo/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Fuso Horário/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Link Público/i)).not.toBeInTheDocument();
+  });
+
   it("auto-advances to date step when service query param is valid", async () => {
     renderPageWithRoute("/p/maria-silva?service=service-1");
 
@@ -239,7 +252,53 @@ describe("PublicBookingPage", () => {
     const continueButton = screen.getByRole("button", { name: /Continuar/i });
     await user.click(continueButton);
 
-    expect(screen.getByText(/Complete seus dados/i)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Seus dados/i })).toBeInTheDocument();
+    expect(screen.getByText(/Etapa 4 de 5/i)).toBeInTheDocument();
+    expect(screen.getByText(/Serviço selecionado: Corte Feminino/i)).toBeInTheDocument();
+    expect(screen.getByText(/Resumo do agendamento/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Horários disponíveis/i)).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText(/Seu nome/i)).toHaveFocus();
+    });
+  });
+
+  it("returns from customer data to slot step without losing typed data", async () => {
+    renderPage();
+    const user = userEvent.setup();
+
+    await progressToSlotStep(user);
+    await user.click(await screen.findByRole("button", { name: /10:00 – 11:00/i }));
+    await user.click(screen.getByRole("button", { name: /Continuar/i }));
+
+    await user.type(screen.getByPlaceholderText(/Seu nome/i), "João da Silva");
+    await user.type(screen.getByPlaceholderText(/\+55 \(11\) 9xxxx-xxxx/i), "11912345678");
+
+    await user.click(screen.getByRole("button", { name: /Voltar/i }));
+    expect(screen.getByText(/Horários disponíveis/i)).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: /Continuar/i }));
+    expect(screen.getByPlaceholderText(/Seu nome/i)).toHaveValue("João da Silva");
+    expect(screen.getByPlaceholderText(/\+55 \(11\) 9xxxx-xxxx/i)).toHaveValue("+55 (11) 91234-5678");
+  });
+
+  it("keeps customer continue disabled until required fields have content and shows inline validation after advancing attempt", async () => {
+    renderPage();
+    const user = userEvent.setup();
+
+    await progressToSlotStep(user);
+    await user.click(await screen.findByRole("button", { name: /10:00 – 11:00/i }));
+    await user.click(screen.getByRole("button", { name: /Continuar/i }));
+
+    const customerContinue = screen.getByRole("button", { name: /Continuar/i });
+    expect(customerContinue).toBeDisabled();
+
+    await user.type(screen.getByPlaceholderText(/Seu nome/i), "Jo");
+    await user.type(screen.getByPlaceholderText(/\+55 \(11\) 9xxxx-xxxx/i), "11");
+    expect(customerContinue).toBeEnabled();
+
+    await user.click(customerContinue);
+    expect(screen.getByText(/Informe seu nome/i)).toBeInTheDocument();
+    expect(screen.getByText(/Telefone inválido/i)).toBeInTheDocument();
   });
 
   it("keeps unavailable day disabled in calendar", async () => {
@@ -307,7 +366,7 @@ describe("PublicBookingPage", () => {
     await user.type(screen.getByPlaceholderText(/\+55 \(11\) 9xxxx-xxxx/i), "11912345678");
     await user.type(screen.getByRole("textbox", { name: /Observação/i }), "Sem tintura");
 
-    const confirmButton = screen.getByRole("button", { name: /Confirmar agendamento/i });
+    const confirmButton = screen.getByRole("button", { name: /Continuar/i });
     await user.click(confirmButton);
 
     await waitFor(() => {
@@ -330,9 +389,9 @@ describe("PublicBookingPage", () => {
     const continueButton = screen.getByRole("button", { name: /Continuar/i });
     await user.click(continueButton);
 
-    const confirmButton = screen.getByRole("button", { name: /Confirmar agendamento/i });
     await user.type(screen.getByPlaceholderText(/Seu nome/i), "João da Silva");
     await user.type(screen.getByPlaceholderText(/\+55 \(11\) 9xxxx-xxxx/i), "11912345678");
+    const confirmButton = screen.getByRole("button", { name: /Continuar/i });
     await user.click(confirmButton);
 
     await waitFor(() => {
@@ -357,7 +416,7 @@ describe("PublicBookingPage", () => {
 
     await user.type(screen.getByPlaceholderText(/Seu nome/i), "João da Silva");
     await user.type(screen.getByPlaceholderText(/\+55 \(11\) 9xxxx-xxxx/i), "11912345678");
-    const confirmButton = screen.getByRole("button", { name: /Confirmar agendamento/i });
+    const confirmButton = screen.getByRole("button", { name: /Continuar/i });
     await user.click(confirmButton);
 
     await waitFor(() => {
@@ -389,7 +448,7 @@ describe("PublicBookingPage", () => {
     await user.click(screen.getByRole("button", { name: /Continuar/i }));
     await user.type(screen.getByPlaceholderText(/Seu nome/i), "João da Silva");
     await user.type(screen.getByPlaceholderText(/\+55 \(11\) 9xxxx-xxxx/i), "11912345678");
-    await user.click(screen.getByRole("button", { name: /Confirmar agendamento/i }));
+    await user.click(screen.getByRole("button", { name: /Continuar/i }));
 
     await waitFor(() => {
       expect(screen.getByText(/Horario indisponivel/i)).toBeInTheDocument();

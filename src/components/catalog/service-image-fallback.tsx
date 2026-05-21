@@ -1,10 +1,24 @@
-import { Image as ImageIcon } from "lucide-react";
-import { getFallbackStyles } from "@/utils/generate-fallback-color";
-
 interface ServiceImageFallbackProps {
   serviceId: string;
   serviceName: string;
   className?: string;
+}
+
+function hashName(value: string) {
+  return Array.from(value).reduce((hash, char) => {
+    return (hash * 31 + char.charCodeAt(0)) % 360;
+  }, 17);
+}
+
+function getFallbackGradient(serviceId: string, serviceName: string) {
+  const hue = hashName(`${serviceName}-${serviceId}`);
+  const accentHue = (hue + 28) % 360;
+
+  return {
+    background:
+      `linear-gradient(135deg, hsl(${hue} 58% 38%) 0%, hsl(${accentHue} 72% 48%) 52%, color-mix(in srgb, var(--theme-primary) 74%, hsl(${hue} 68% 42%) 26%) 100%)`,
+    textShadow: "0 8px 28px rgba(0, 0, 0, 0.28)",
+  };
 }
 
 export function ServiceImageFallback({
@@ -12,31 +26,25 @@ export function ServiceImageFallback({
   serviceName,
   className,
 }: ServiceImageFallbackProps) {
-  const { backgroundColor, textColor, initials } = getFallbackStyles(serviceId, serviceName);
+  const { background, textShadow } = getFallbackGradient(serviceId, serviceName);
+  const initial = serviceName.trim().charAt(0).toUpperCase() || "?";
 
   return (
     <div
       className={`flex aspect-square items-center justify-center ${className ?? ""}`}
       style={{
-        backgroundColor,
+        background,
       }}
       aria-hidden="true"
     >
-      <div className="flex flex-col items-center justify-center gap-2">
-        <ImageIcon
-          size={32}
-          style={{
-            color: textColor,
-            opacity: 0.6,
-          }}
-        />
+      <div className="flex items-center justify-center">
         <span
-          className="text-3xl font-black tracking-tight"
+          className="text-[4rem] font-black leading-none text-white"
           style={{
-            color: textColor,
+            textShadow,
           }}
         >
-          {initials}
+          {initial}
         </span>
       </div>
     </div>

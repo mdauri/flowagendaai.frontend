@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { X } from "lucide-react";
+import { Check, X } from "lucide-react";
 import { colors, typography, shadows, semanticTokens } from "@/design-system";
 import { Button } from "@/components/flow/button";
 
@@ -31,6 +31,11 @@ function ProfessionalAvatar({ professional }: ProfessionalAvatarProps) {
     () => professional.thumbnailUrl ?? professional.imageUrl ?? null,
     [professional.thumbnailUrl, professional.imageUrl]
   );
+  const hue = useMemo(() => {
+    return Array.from(professional.name).reduce((hash, char) => {
+      return (hash * 33 + char.charCodeAt(0)) % 360;
+    }, 29);
+  }, [professional.name]);
 
   if (preferredImageSrc && !hasImageError) {
     return (
@@ -47,7 +52,7 @@ function ProfessionalAvatar({ professional }: ProfessionalAvatarProps) {
     <div
       className="flex h-full w-full items-center justify-center text-lg font-bold text-white"
       style={{
-        backgroundColor: colors.brand.primary,
+        backgroundColor: `hsl(${hue} 62% 42%)`,
       }}
       aria-hidden="true"
     >
@@ -65,11 +70,14 @@ export function ProfessionalSelectionModal({
   onSelectProfessional,
   onClose,
 }: ProfessionalSelectionModalProps) {
+  const [selectedProfessionalSlug, setSelectedProfessionalSlug] = useState<string | null>(null);
+
   if (!isOpen) {
     return null;
   }
 
   const handleSelect = (professionalSlug: string) => {
+    setSelectedProfessionalSlug(professionalSlug);
     onSelectProfessional(professionalSlug);
   };
 
@@ -90,7 +98,7 @@ export function ProfessionalSelectionModal({
       <div
         className="relative mx-auto my-4 w-full max-w-md rounded-2xl border p-6 shadow-2xl"
         style={{
-          backgroundColor: semanticTokens.surface.base,
+          backgroundColor: "var(--theme-modal-surface, var(--theme-surface))",
           borderColor: semanticTokens.border.subtle,
           color: colors.text.primary,
           backdropFilter: `blur(${semanticTokens.blur.panel})`,
@@ -138,16 +146,17 @@ export function ProfessionalSelectionModal({
               key={professional.id}
               type="button"
               onClick={() => handleSelect(professional.slug)}
-              className="flex w-full items-center justify-between rounded-xl border bg-surface-glass-subtle p-4 transition-all hover:bg-surface-glass focus:outline-none focus:ring-2"
+              aria-pressed={selectedProfessionalSlug === professional.slug}
+              className="group flex w-full items-center justify-between rounded-xl border bg-surface-glass-subtle p-4 transition-all hover:-translate-y-0.5 hover:bg-surface-glass hover:shadow-card focus:outline-none focus-visible:[box-shadow:var(--theme-focus-ring)]"
               style={{
-                borderColor: semanticTokens.border.subtle,
-                boxShadow: semanticTokens.interaction.focus.ring,
+                borderColor:
+                  selectedProfessionalSlug === professional.slug
+                    ? colors.brand.primary
+                    : semanticTokens.border.subtle,
               }}
             >
               <div className="flex items-center gap-3">
-                <div
-                  className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-full"
-                >
+                <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-full">
                   <ProfessionalAvatar professional={professional} />
                 </div>
                 <div className="text-left">
@@ -173,11 +182,20 @@ export function ProfessionalSelectionModal({
                 </div>
               </div>
               <div
-                className="flex h-8 w-8 items-center justify-center rounded-full border-2"
-                style={{ borderColor: semanticTokens.border.subtle }}
+                className="flex h-8 w-8 items-center justify-center rounded-full border transition-all"
+                style={{
+                  backgroundColor:
+                    selectedProfessionalSlug === professional.slug
+                      ? colors.brand.primary
+                      : "transparent",
+                  borderColor: colors.brand.primary,
+                  borderWidth: "1.5px",
+                }}
                 aria-hidden="true"
               >
-                <div className="h-3 w-3 rounded-full" style={{ backgroundColor: semanticTokens.border.strong }} />
+                {selectedProfessionalSlug === professional.slug ? (
+                  <Check className="h-4 w-4 text-[var(--theme-text-on-primary)]" strokeWidth={3} />
+                ) : null}
               </div>
             </button>
           ))}

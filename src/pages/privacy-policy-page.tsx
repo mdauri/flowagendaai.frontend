@@ -74,7 +74,7 @@ const sections = [
 
 export function PrivacyPolicyPage() {
   return (
-    <main className="min-h-screen bg-background text-white">
+    <main className="min-h-screen bg-background text-[var(--theme-text-primary)]">
       <div
         className="pointer-events-none absolute inset-0"
         style={{ backgroundImage: compositionPatterns.overlay.legalPage }}
@@ -83,10 +83,10 @@ export function PrivacyPolicyPage() {
       <div className="relative z-10 px-6 py-10 md:px-10 lg:px-16 lg:py-14">
         <div className="mx-auto max-w-4xl">
           <Card padding="md" radiusSize="xl" className="md:p-8">
-            <div className="flex flex-col gap-4 border-b border-white/10 pb-6">
+            <div className="flex flex-col gap-4 border-b border-[var(--theme-border-subtle)] pb-6">
               <Link
                 to="/"
-                className="text-sm font-semibold uppercase tracking-[0.2em] text-secondary transition hover:text-white"
+                className="text-sm font-semibold uppercase tracking-[0.2em] text-secondary transition hover:text-[var(--theme-text-primary)]"
               >
                 Voltar para o Agendoro
               </Link>
@@ -94,7 +94,7 @@ export function PrivacyPolicyPage() {
                 <p className="text-sm font-semibold uppercase tracking-[0.22em] text-secondary">
                   Política de Privacidade
                 </p>
-                <h1 className="mt-3 text-4xl font-black tracking-tight text-white md:text-5xl">
+                <h1 className="mt-3 text-4xl font-black tracking-tight text-[var(--theme-text-primary)] md:text-5xl">
                   Privacidade, uso de dados e funcionamento da plataforma
                   Agendoro
                 </h1>
@@ -121,7 +121,7 @@ export function PrivacyPolicyPage() {
                     backgroundColor: semanticTokens.surface.glassSubtle,
                   }}
                 >
-                  <h2 className="text-2xl font-black tracking-tight text-white">
+                  <h2 className="text-2xl font-black tracking-tight text-[var(--theme-text-primary)]">
                     {section.title}
                   </h2>
                   <div className="mt-4 space-y-4 text-sm leading-7 text-text-soft md:text-base">

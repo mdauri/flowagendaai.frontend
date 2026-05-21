@@ -31,15 +31,16 @@
 
 [data-theme="dark"] {
   color-scheme: dark;
-  --theme-background: #0a0a0b;
-  --theme-surface: #121216;
-  --theme-surface-elevated: #1a1a1d;
-  --theme-surface-glass: rgba(255, 255, 255, 0.05);
-  --theme-surface-glass-subtle: rgba(255, 255, 255, 0.03);
-  --theme-surface-glass-hover: rgba(255, 255, 255, 0.07);
-  --theme-text-primary: #ffffff;
-  --theme-text-soft: rgba(255, 255, 255, 0.72);
-  --theme-text-muted: rgba(255, 255, 255, 0.55);
+  --theme-background: #1a1510;
+  --theme-surface: #2a2420;
+  --theme-surface-elevated: #302923;
+  --theme-modal-surface: #2e2a25;
+  --theme-surface-glass: rgba(64, 54, 47, 0.68);
+  --theme-surface-glass-subtle: rgba(255, 248, 238, 0.06);
+  --theme-surface-glass-hover: rgba(255, 248, 238, 0.10);
+  --theme-text-primary: #fff8ef;
+  --theme-text-soft: rgba(255, 248, 239, 0.80);
+  --theme-text-muted: rgba(255, 248, 239, 0.68);
   --theme-text-on-primary: #1a1a1a;
   --theme-primary: #ff8a3d;
   --theme-secondary: #ffb84d;

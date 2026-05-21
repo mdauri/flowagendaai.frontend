@@ -105,10 +105,10 @@ export function CatalogPage() {
   };
 
   const publicTopbar = (
-    <div className="mb-5 flex items-center justify-between rounded-full border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] px-4 py-3 shadow-[var(--theme-shadow-card)] backdrop-blur-[var(--theme-blur-panel)]">
+    <div className="mb-5 flex items-center justify-between border-b border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] px-4 py-3 shadow-[0_10px_24px_rgba(52,42,31,0.08)] backdrop-blur-[var(--theme-blur-panel)] sm:rounded-full sm:border">
       <div className="min-w-0">
-        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-secondary">
-          Agendoro
+        <p className="text-xs font-bold uppercase tracking-[0.08em] text-primary">
+          AGENDORO
         </p>
         <p className="truncate text-sm font-semibold text-[var(--theme-text-primary)]">
           Catalogo publico
@@ -199,8 +199,9 @@ export function CatalogPage() {
             logoUrl={catalog.tenant.logoUrl}
             coverImageUrl={catalog.tenant.coverImageUrl}
             publicAddress={catalog.tenant.publicAddress}
+            subtitle="Escolha um serviço para agendar"
             variant="full"
-            className="mb-8"
+            className="mb-5"
           />
         )}
 
@@ -208,7 +209,7 @@ export function CatalogPage() {
         <main>
           <section
             aria-label="Serviços disponíveis"
-            className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-5 lg:grid-cols-3 xl:grid-cols-4"
+            className="mx-auto grid max-w-[1120px] grid-cols-1 justify-center gap-4 sm:grid-cols-2 md:gap-5 lg:grid-cols-3"
           >
             {catalog.services.map((service) => (
               <ServiceCard

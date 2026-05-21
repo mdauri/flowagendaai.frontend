@@ -10,6 +10,7 @@ export interface TenantCoverBannerProps {
   coverImageUrl?: string | null;
   coverThumbnailUrl?: string | null;
   publicAddress?: string | null;
+  subtitle?: string;
   variant: "full" | "compact";
   isLoading?: boolean;
   className?: string;
@@ -135,6 +136,7 @@ export function TenantCoverBanner({
   coverImageUrl,
   coverThumbnailUrl,
   publicAddress,
+  subtitle,
   variant,
   isLoading,
   className,
@@ -235,6 +237,20 @@ export function TenantCoverBanner({
           >
             {tenantName}
           </h1>
+
+          {subtitle && (
+            <p
+              className={cn("font-semibold", variant === "full" ? "text-sm sm:text-base" : "text-xs")}
+              style={{
+                color: textColor,
+                textShadow,
+                fontFamily: typography.family.sans,
+                lineHeight: typography.leading.relaxed,
+              }}
+            >
+              {subtitle}
+            </p>
+          )}
 
           {variant === "full" && tenantSlug && (
             <p

@@ -16,6 +16,7 @@ export function ThemeSwitcher({ compact = false, className }: ThemeSwitcherProps
       type="button"
       aria-label={isDark ? "Ativar tema claro" : "Ativar tema escuro"}
       aria-pressed={!isDark}
+      title="Alternar tema"
       onClick={() => setTheme(isDark ? "light-pastel" : "dark")}
       className={cn(
         "inline-flex items-center justify-center rounded-full border border-[var(--theme-border-default)] bg-[var(--theme-surface-glass)] text-[var(--theme-text-soft)] backdrop-blur-[var(--theme-blur-panel)] transition-all hover:border-[var(--theme-border-strong)] hover:bg-[var(--theme-surface-glass-hover)] hover:text-[var(--theme-text-primary)] active:scale-95 focus-visible:outline-none focus-visible:[box-shadow:var(--theme-focus-ring)]",
