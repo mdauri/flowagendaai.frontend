@@ -41,12 +41,12 @@ export function AvailabilityRulesList({
       </Card>
 
       {availability.map((item) => (
-        <Card key={item.id} variant="surface" padding="md" className="border-white/10">
+        <Card key={item.id} variant="surface" padding="md" className="border-[var(--theme-border-subtle)]">
           <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div>
               <CardTitle>{dayLabels[item.dayOfWeek]}</CardTitle>
               <CardDescription className="mt-2">
-                <span className="font-semibold text-white">
+                <span className="font-semibold text-[var(--theme-text-primary)]">
                   {formatUtcTimeInTenantTimezone(item.dayOfWeek, item.startTimeUtc, tenantTimezone)} -{" "}
                   {formatUtcTimeInTenantTimezone(item.dayOfWeek, item.endTimeUtc, tenantTimezone)}
                 </span>

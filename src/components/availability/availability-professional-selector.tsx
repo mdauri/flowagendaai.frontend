@@ -27,7 +27,7 @@ export function AvailabilityProfessionalSelector({
       </div>
 
       <div className="grid gap-2">
-        <label htmlFor="availability-professional-select" className="text-sm font-semibold text-white">
+        <label htmlFor="availability-professional-select" className="text-sm font-semibold text-[var(--theme-text-primary)]">
           Profissional
         </label>
         <Select
@@ -42,9 +42,9 @@ export function AvailabilityProfessionalSelector({
 
       <div
         id="availability-timezone-context"
-        className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-text-soft"
+        className="rounded-xl border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] px-3 py-2 text-xs text-text-soft"
       >
-        Horario local: <span className="font-semibold text-white">{tenantTimezone}</span>
+        Horario local: <span className="font-semibold text-[var(--theme-text-primary)]">{tenantTimezone}</span>
       </div>
     </Card>
   );

@@ -36,7 +36,7 @@ export function HowItWorks() {
           <p className="text-sm font-semibold uppercase tracking-[0.22em] text-secondary">
             Como funciona
           </p>
-          <h2 className="mt-3 text-3xl font-black tracking-tight text-white md:text-5xl">
+          <h2 className="mt-3 text-3xl font-black tracking-tight text-[var(--theme-text-primary)] md:text-5xl">
             Simples assim — em 3 passos
           </h2>
           <p className="mt-4 text-base leading-7 text-text-soft">
@@ -60,11 +60,11 @@ export function HowItWorks() {
               >
                 <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-[radial-gradient(circle_at_top,rgba(249,112,21,0.20),rgba(218,158,98,0.10))]">
                   <Icon className="h-10 w-10 text-secondary" />
-                  <span className="absolute -top-3 right-0 flex h-8 w-8 items-center justify-center rounded-full bg-[radial-gradient(circle_at_top,rgba(249,112,21,1),rgba(218,158,98,1))] text-xs font-black text-white ">
+                  <span className="absolute -top-3 right-0 flex h-8 w-8 items-center justify-center rounded-full bg-[radial-gradient(circle_at_top,rgba(249,112,21,1),rgba(218,158,98,1))] text-xs font-black text-[var(--theme-text-primary)] ">
                     {step.number}
                   </span>
                 </div>
-                <h3 className="text-lg font-black tracking-tight text-white md:text-xl">
+                <h3 className="text-lg font-black tracking-tight text-[var(--theme-text-primary)] md:text-xl">
                   {step.title}
                 </h3>
                 <p className="text-sm leading-7 text-text-soft">

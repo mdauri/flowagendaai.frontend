@@ -115,7 +115,7 @@ export function DashboardBookingDetailsDialog({
     >
       <div
         ref={dialogRef}
-        className="relative z-[1201] w-full max-w-lg max-h-[calc(100vh-3rem)] overflow-y-auto rounded-[28px] border border-white/30 bg-[#141416] p-6 shadow-2xl"
+        className="relative z-[1201] w-full max-w-lg max-h-[calc(100vh-3rem)] overflow-y-auto rounded-[28px] border border-[var(--theme-border-default)] bg-[var(--theme-surface)] p-6 shadow-2xl"
       >
         <div className="flex items-start justify-between gap-3">
           <div>
@@ -131,7 +131,7 @@ export function DashboardBookingDetailsDialog({
           <p className="mt-6 text-sm text-text-soft">Carregando detalhes...</p>
         ) : errorMessage && !booking && !fallbackBooking ? (
           <div className="mt-6 rounded-[20px] border border-red-400/30 bg-red-950/20 p-4">
-            <p className="text-sm font-semibold text-white">Nao foi possivel carregar o detalhe.</p>
+            <p className="text-sm font-semibold text-[var(--theme-text-primary)]">Nao foi possivel carregar o detalhe.</p>
             <p className="mt-1 text-xs text-text-soft">{errorMessage}</p>
             {onRetry ? (
               <div className="mt-3">
@@ -143,7 +143,7 @@ export function DashboardBookingDetailsDialog({
           </div>
         ) : booking || fallbackBooking ? (
           <div className="mt-6 grid gap-4">
-            <div className="rounded-[20px] border border-white/10 bg-white/5 p-4">
+            <div className="rounded-[20px] border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-4">
               <p className="text-xs uppercase tracking-[0.14em] text-text-soft">Resumo</p>
               <div className="mt-3 flex flex-wrap items-center gap-3">
                 <DashboardStatusBadge status={booking?.status ?? fallbackBooking?.status ?? "PENDING"} />
@@ -157,9 +157,9 @@ export function DashboardBookingDetailsDialog({
               </div>
             </div>
 
-            <div className="rounded-[20px] border border-white/10 bg-white/5 p-4">
+            <div className="rounded-[20px] border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-4">
               <p className="text-xs uppercase tracking-[0.14em] text-text-soft">Cliente</p>
-              <p className="mt-2 text-sm font-semibold text-white">
+              <p className="mt-2 text-sm font-semibold text-[var(--theme-text-primary)]">
                 {resolveCustomerName(booking?.customerName ?? fallbackBooking?.customerName ?? null)}
               </p>
               {(booking?.customerPhone ?? fallbackBooking?.customerPhone) ? (
@@ -169,9 +169,9 @@ export function DashboardBookingDetailsDialog({
               ) : null}
             </div>
 
-            <div className="rounded-[20px] border border-white/10 bg-white/5 p-4">
+            <div className="rounded-[20px] border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-4">
               <p className="text-xs uppercase tracking-[0.14em] text-text-soft">Atendimento</p>
-              <p className="mt-2 text-sm font-semibold text-white">
+              <p className="mt-2 text-sm font-semibold text-[var(--theme-text-primary)]">
                 {booking?.professionalName ?? fallbackBooking?.professionalName ?? "Nao informado"}
               </p>
               <p className="mt-1 text-sm text-text-soft">
@@ -179,16 +179,16 @@ export function DashboardBookingDetailsDialog({
               </p>
             </div>
 
-            <div className="rounded-[20px] border border-white/10 bg-white/5 p-4">
+            <div className="rounded-[20px] border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-4">
               <p className="text-xs uppercase tracking-[0.14em] text-text-soft">Metadados</p>
               {booking?.createdAt ? (
                 <p className="mt-2 text-xs text-text-soft">
-                  Criado em <span className="font-semibold text-white">{booking.createdAt}</span>
+                  Criado em <span className="font-semibold text-[var(--theme-text-primary)]">{booking.createdAt}</span>
                 </p>
               ) : null}
               {booking?.cancelledAt ? (
                 <p className="mt-1 text-xs text-text-soft">
-                  Cancelado em <span className="font-semibold text-white">{booking.cancelledAt}</span>
+                  Cancelado em <span className="font-semibold text-[var(--theme-text-primary)]">{booking.cancelledAt}</span>
                 </p>
               ) : null}
             </div>

@@ -330,7 +330,7 @@ export function ApiTokensPage() {
         ) : (
           <div className="mt-4 grid gap-2">
             <label
-              className="text-sm font-semibold text-white"
+              className="text-sm font-semibold text-[var(--theme-text-primary)]"
               htmlFor="api-token-tenant"
             >
               Tenant
@@ -350,7 +350,7 @@ export function ApiTokensPage() {
         <CardTitle>Criar novo token</CardTitle>
         <CardDescription className="mt-2">
           O token sera exibido uma unica vez. Exemplo n8n: configure header
-          <span className="font-semibold text-white">
+          <span className="font-semibold text-[var(--theme-text-primary)]">
             {" "}
             Authorization: Bearer {"<TOKEN>"}
           </span>{" "}
@@ -359,7 +359,7 @@ export function ApiTokensPage() {
         <form className="mt-5 grid gap-4" onSubmit={handleCreate}>
           <div className="grid gap-2">
             <label
-              className="text-sm font-semibold text-white"
+              className="text-sm font-semibold text-[var(--theme-text-primary)]"
               htmlFor="api-token-name"
             >
               Nome do token
@@ -377,7 +377,7 @@ export function ApiTokensPage() {
           <div className="grid gap-2 md:grid-cols-2 md:gap-4">
             <div className="grid gap-2">
               <label
-                className="text-sm font-semibold text-white"
+                className="text-sm font-semibold text-[var(--theme-text-primary)]"
                 htmlFor="api-token-prefix"
               >
                 Prefixo
@@ -397,7 +397,7 @@ export function ApiTokensPage() {
 
             <div className="grid gap-2">
               <label
-                className="text-sm font-semibold text-white"
+                className="text-sm font-semibold text-[var(--theme-text-primary)]"
                 htmlFor="api-token-expires-at"
               >
                 Expira em
@@ -417,14 +417,14 @@ export function ApiTokensPage() {
           </div>
 
           <div className="grid gap-2">
-            <p className="text-sm font-semibold text-white">Escopos</p>
+            <p className="text-sm font-semibold text-[var(--theme-text-primary)]">Escopos</p>
             <div className="grid gap-2">
               {DEFAULT_SCOPE_OPTIONS.filter((scope) =>
                 allowedScopes.includes(scope.value),
               ).map((scope) => (
                 <label
                   key={scope.value}
-                  className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/5 p-3"
+                  className="flex items-start gap-3 rounded-2xl border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-3"
                 >
                   <Checkbox
                     checked={form.scopes.includes(scope.value)}
@@ -433,7 +433,7 @@ export function ApiTokensPage() {
                     }
                   />
                   <span className="grid gap-1">
-                    <span className="text-sm font-semibold text-white">
+                    <span className="text-sm font-semibold text-[var(--theme-text-primary)]">
                       {scope.label}
                     </span>
                     <span className="text-xs text-text-soft">

@@ -8,7 +8,7 @@ import {
 } from "@/design-system";
 
 const badgeVariants = cva(
-  "inline-flex items-center rounded-full border px-3 py-1 text-xs",
+  "inline-flex min-h-7 items-center rounded-full border px-3 py-1 text-xs tracking-[0.04em]",
   {
     variants: {
       variant: {
@@ -29,7 +29,7 @@ const badgeVariants = cva(
 
 const badgeBaseStyle: React.CSSProperties = {
   fontFamily: typography.family.sans,
-  fontWeight: typography.weight.medium,
+  fontWeight: typography.weight.semibold,
 };
 
 const badgeVariantStyles: Record<

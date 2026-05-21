@@ -258,7 +258,7 @@ export function MinhaAgendaPage() {
       <button
         key={item.id}
         type="button"
-        className="w-full rounded-3xl border border-white/10 bg-white/5 p-4 text-left transition hover:border-white/20"
+        className="w-full rounded-3xl border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-4 text-left transition hover:border-[var(--theme-border-default)]"
         onClick={() => setSelectedBookingId(item.id)}
       >
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -266,7 +266,7 @@ export function MinhaAgendaPage() {
             <p className="text-sm font-semibold text-secondary">
               {formatUtcTimeRangeInTenantTimezone(item.start, item.end, tenantTimezone)}
             </p>
-            <p className="mt-1 text-sm font-semibold text-white">{item.serviceName}</p>
+            <p className="mt-1 text-sm font-semibold text-[var(--theme-text-primary)]">{item.serviceName}</p>
             <p className="mt-1 text-sm text-text-soft">
               {resolveCustomerName(item.customerName)}
               {shouldDisplayValue(item.customerPhone) ? (
@@ -277,7 +277,7 @@ export function MinhaAgendaPage() {
               ) : null}
             </p>
             <p className="mt-1 text-xs text-text-soft">
-              Profissional: <span className="font-medium text-white">{item.professionalName}</span>
+              Profissional: <span className="font-medium text-[var(--theme-text-primary)]">{item.professionalName}</span>
             </p>
           </div>
           <Badge variant={statusVariant(item.status)}>{statusLabel(item.status)}</Badge>
@@ -289,7 +289,7 @@ export function MinhaAgendaPage() {
   return (
     <div className="grid gap-6">
       <div>
-        <h2 className="text-2xl font-black tracking-tight text-white">Minha agenda</h2>
+        <h2 className="text-2xl font-black tracking-tight text-[var(--theme-text-primary)]">Minha agenda</h2>
         <p className="mt-2 text-sm text-text-soft">{rangeLabel}</p>
       </div>
 

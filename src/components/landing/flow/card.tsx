@@ -61,6 +61,8 @@ const cardVariantStyles: Record<
 > = {
   glass: {
     backgroundColor: semanticTokens.surface.glass,
+    backgroundImage:
+      "linear-gradient(145deg, var(--theme-surface-glass), color-mix(in srgb, var(--theme-primary) 7%, transparent))",
     backdropFilter: `blur(${semanticTokens.blur.panel})`,
   },
   surface: {
@@ -111,7 +113,7 @@ export function CardTitle({
 }: React.HTMLAttributes<HTMLHeadingElement>) {
   return (
     <h3
-      className={cn("text-xl text-white", className)}
+      className={cn("text-xl text-[var(--theme-text-primary)]", className)}
       style={{
         fontFamily: typography.family.sans,
         fontWeight: typography.weight.black,

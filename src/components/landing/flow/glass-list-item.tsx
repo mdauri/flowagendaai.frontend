@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/cn";
 
 const glassListItemVariants = cva(
-  "flex items-center gap-3 border border-white/10 bg-white/5",
+  "flex items-center gap-3 border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)]",
   {
     variants: {
       size: {

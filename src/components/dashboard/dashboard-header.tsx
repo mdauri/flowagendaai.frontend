@@ -76,7 +76,7 @@ export function DashboardHeader({
   return (
     <div className="grid gap-4">
       <div>
-        <h2 className="text-3xl font-black tracking-tight text-white">
+        <h2 className="text-3xl font-black tracking-tight text-[var(--theme-text-primary)]">
           Dashboard
         </h2>
         <p className="mt-1 text-sm text-text-soft">
@@ -101,7 +101,7 @@ export function DashboardHeader({
             <ChevronLeft className="h-5 w-5" aria-hidden="true" />
           </Button>
 
-          <div className="flex min-h-10 items-center gap-2 rounded-2xl border border-white/20 bg-black/15 px-3 py-2 transition-all duration-200">
+          <div className="flex min-h-10 items-center gap-2 rounded-2xl border border-[var(--theme-border-default)] bg-[var(--theme-surface-glass)] px-3 py-2 transition-all duration-200">
             <CalendarDays
               className="h-4 w-4 text-text-soft"
               aria-hidden="true"

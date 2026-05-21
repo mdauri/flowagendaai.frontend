@@ -15,7 +15,7 @@ export function CTASection() {
             <p className="text-sm font-semibold uppercase tracking-[0.22em] text-secondary">
               Pronto para automatizar?
             </p>
-            <h2 className="mt-3 text-3xl font-black tracking-tight text-white md:text-5xl">
+            <h2 className="mt-3 text-3xl font-black tracking-tight text-[var(--theme-text-primary)] md:text-5xl">
               Fale com a gente agora e comece a receber agendamentos no
               automático
             </h2>

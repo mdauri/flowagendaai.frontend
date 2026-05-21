@@ -1,3 +1,4 @@
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DateTime } from "luxon";
 import { cn } from "@/lib/cn";
 import { colors, radius, semanticTokens } from "@/design-system";
@@ -29,20 +30,20 @@ export function MonthNavigator({ month, minDate, maxDate, onPrevMonth, onNextMon
         type="button"
         onClick={onPrevMonth}
         disabled={prevDisabled}
-        className="text-2xl leading-none text-white/60 transition hover:text-white"
+        className="flex h-9 w-9 items-center justify-center rounded-full text-text-muted transition hover:bg-[var(--theme-overlay-primary-soft)] hover:text-text-primary disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
         aria-label="Mês anterior"
       >
-        ◀
+        <ChevronLeft size={20} aria-hidden="true" />
       </button>
-      <span className="text-base font-semibold text-white">{localeMonth.toFormat("LLLL yyyy")}</span>
+      <span className="text-base font-semibold text-text-primary">{localeMonth.toFormat("LLLL yyyy")}</span>
       <button
         type="button"
         onClick={onNextMonth}
         disabled={nextDisabled}
-        className="text-2xl leading-none text-white/60 transition hover:text-white"
+        className="flex h-9 w-9 items-center justify-center rounded-full text-text-muted transition hover:bg-[var(--theme-overlay-primary-soft)] hover:text-text-primary disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
         aria-label="Próximo mês"
       >
-        ▶
+        <ChevronRight size={20} aria-hidden="true" />
       </button>
     </div>
   );
@@ -77,7 +78,7 @@ export function CalendarGrid({
 
   return (
     <div className="space-y-3">
-      <div className="grid grid-cols-7 text-center text-xs font-semibold uppercase tracking-wide text-white/60">
+      <div className="grid grid-cols-7 text-center text-xs font-semibold uppercase tracking-wide text-text-muted">
         {WEEKDAY_NAMES.map((label) => (
           <span key={label}>{label}</span>
         ))}
@@ -87,7 +88,9 @@ export function CalendarGrid({
           const isCurrentMonth = day.hasSame(month, "month");
           const isSelected = selectedDate ? day.hasSame(selectedDate, "day") : false;
           const hasSlots = availableDates.has(day.toISODate() ?? "");
-          const disabled = !isCurrentMonth || isOutOfRange(day) || !hasSlots;
+          const isPast = day < minDate.startOf("day");
+          const unavailable = !hasSlots;
+          const disabled = !isCurrentMonth || isOutOfRange(day) || unavailable;
           const isToday = day.hasSame(minDate.startOf("day"), "day");
 
           return (
@@ -97,14 +100,16 @@ export function CalendarGrid({
               onClick={() => !disabled && onSelectDate(day)}
               disabled={disabled}
               className={cn(
-                "relative flex h-10 w-10 items-center justify-center text-sm transition-all focus-visible:outline-none focus-visible:[box-shadow:var(--control-focus-ring)]",
-                disabled ? "cursor-not-allowed opacity-50" : "active:scale-95"
+                "relative flex h-10 w-10 items-center justify-center rounded-full text-sm transition-all focus-visible:outline-none focus-visible:[box-shadow:var(--control-focus-ring)]",
+                disabled
+                  ? "cursor-not-allowed"
+                  : "cursor-pointer hover:bg-[var(--theme-overlay-primary-soft)] active:scale-95",
               )}
               style={{
-                borderRadius: radius.xl,
                 backgroundColor: isSelected ? colors.brand.primary : "transparent",
                 color: isSelected ? colors.text.dark : (disabled ? colors.text.muted : colors.text.primary),
-                fontWeight: isSelected ? "bold" : "medium",
+                fontWeight: isSelected || isToday ? 700 : 500,
+                opacity: disabled ? (isPast ? 0.3 : 0.4) : 1,
                 "--control-focus-ring": semanticTokens.interaction.focus.ring,
                 borderColor: isToday && !isSelected ? semanticTokens.border.subtle : "transparent",
                 borderWidth: 1,
@@ -112,7 +117,7 @@ export function CalendarGrid({
               aria-pressed={isSelected}
             >
               <span className="relative z-10">{day.day}</span>
-              {hasSlots && !disabled && !isSelected ? (
+              {isToday && !isSelected ? (
                 <span className="absolute bottom-1 h-1 w-1 rounded-full" style={{ backgroundColor: colors.brand.primary }} aria-hidden />
               ) : null}
             </button>

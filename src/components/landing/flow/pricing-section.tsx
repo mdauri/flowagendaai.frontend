@@ -30,7 +30,7 @@ export function PricingSection() {
           <p className="text-sm font-semibold uppercase tracking-[0.22em] text-secondary">
             Investimento
           </p>
-          <h2 className="mt-3 text-3xl font-black tracking-tight text-white md:text-5xl">
+          <h2 className="mt-3 text-3xl font-black tracking-tight text-[var(--theme-text-primary)] md:text-5xl">
             O plano ideal para o seu momento
           </h2>
           <p className="mt-4 text-base leading-7 text-text-soft">
@@ -47,7 +47,7 @@ export function PricingSection() {
                 Essencial
               </p>
               <div className="mt-4 flex items-end gap-2">
-                <span className="text-5xl font-black text-white">
+                <span className="text-5xl font-black text-[var(--theme-text-primary)]">
                   R$&nbsp;97
                 </span>
                 <span className="mb-2 text-sm text-text-muted">/ mês</span>
@@ -61,7 +61,7 @@ export function PricingSection() {
               </p>
             </div>
 
-            <div className="mb-8 grow space-y-3 border-t border-white/10 pt-6">
+            <div className="mb-8 grow space-y-3 border-t border-[var(--theme-border-subtle)] pt-6">
               {essentialFeatures.map((item) => (
                 <GlassListItem
                   key={item}
@@ -103,12 +103,12 @@ export function PricingSection() {
                 Pro (Automação)
               </p>
               <div className="mt-4 flex items-end gap-2">
-                <span className="text-5xl font-black text-white">
+                <span className="text-5xl font-black text-[var(--theme-text-primary)]">
                   R$&nbsp;197
                 </span>
                 <span className="mb-2 text-sm text-text-muted">/ mês</span>
               </div>
-              <p className="mt-4 text-sm font-bold text-white">
+              <p className="mt-4 text-sm font-bold text-[var(--theme-text-primary)]">
                 + Implantação: R$ 497 (único)
               </p>
               <p className="mt-2 text-sm leading-7 text-text-soft">
@@ -117,7 +117,7 @@ export function PricingSection() {
               </p>
             </div>
 
-            <div className="mb-8 grow space-y-3 border-t border-white/10 pt-6">
+            <div className="mb-8 grow space-y-3 border-t border-[var(--theme-border-subtle)] pt-6">
               {proFeatures.map((item) => (
                 <GlassListItem
                   key={item}

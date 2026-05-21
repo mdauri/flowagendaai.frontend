@@ -29,7 +29,7 @@ export function AppShell({
             Agendoro
           </p>
           <p className="mt-2 text-sm leading-6 text-text-soft">
-            <span className="font-semibold text-white">{tenant.name}</span>
+            <span className="font-semibold text-[var(--theme-text-primary)]">{tenant.name}</span>
           </p>
           <nav
             aria-label="Navegacao principal da operacao"
@@ -43,7 +43,7 @@ export function AppShell({
                     "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
                     isActive
                       ? "border-primary bg-primary text-black"
-                      : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white",
+                      : "border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] text-text-soft hover:border-[var(--theme-border-default)] hover:text-[var(--theme-text-primary)]",
                   )
                 }
               >
@@ -58,7 +58,7 @@ export function AppShell({
                       "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
                       isActive
                         ? "border-primary bg-primary text-black"
-                        : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white",
+                        : "border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] text-text-soft hover:border-[var(--theme-border-default)] hover:text-[var(--theme-text-primary)]",
                     )
                   }
                 >
@@ -71,7 +71,7 @@ export function AppShell({
                       "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
                       isActive
                         ? "border-primary bg-primary text-black"
-                        : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white",
+                        : "border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] text-text-soft hover:border-[var(--theme-border-default)] hover:text-[var(--theme-text-primary)]",
                     )
                   }
                 >
@@ -84,7 +84,7 @@ export function AppShell({
                       "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
                       isActive
                         ? "border-primary bg-primary text-black"
-                        : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white",
+                        : "border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] text-text-soft hover:border-[var(--theme-border-default)] hover:text-[var(--theme-text-primary)]",
                     )
                   }
                 >
@@ -97,7 +97,7 @@ export function AppShell({
                       "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
                       isActive
                         ? "border-primary bg-primary text-black"
-                        : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white",
+                        : "border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] text-text-soft hover:border-[var(--theme-border-default)] hover:text-[var(--theme-text-primary)]",
                     )
                   }
                 >
@@ -110,7 +110,7 @@ export function AppShell({
                       "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
                       isActive
                         ? "border-primary bg-primary text-black"
-                        : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white",
+                        : "border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] text-text-soft hover:border-[var(--theme-border-default)] hover:text-[var(--theme-text-primary)]",
                     )
                   }
                 >
@@ -123,7 +123,7 @@ export function AppShell({
                       "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
                       isActive
                         ? "border-primary bg-primary text-black"
-                        : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white",
+                        : "border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] text-text-soft hover:border-[var(--theme-border-default)] hover:text-[var(--theme-text-primary)]",
                     )
                   }
                 >
@@ -136,7 +136,7 @@ export function AppShell({
                       "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
                       isActive
                         ? "border-primary bg-primary text-black"
-                        : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white",
+                    : "border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] text-text-soft hover:border-[var(--theme-border-default)] hover:text-[var(--theme-text-primary)]",
                     )
                   }
                 >
@@ -152,7 +152,7 @@ export function AppShell({
                     "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
                     isActive
                       ? "border-primary bg-primary text-black"
-                      : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white",
+                      : "border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] text-text-soft hover:border-[var(--theme-border-default)] hover:text-[var(--theme-text-primary)]",
                   )
                 }
               >
@@ -167,7 +167,7 @@ export function AppShell({
                     "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
                     isActive
                       ? "border-primary bg-primary text-black"
-                      : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white",
+                      : "border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] text-text-soft hover:border-[var(--theme-border-default)] hover:text-[var(--theme-text-primary)]",
                   )
                 }
               >
@@ -182,7 +182,7 @@ export function AppShell({
                     "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
                     isActive
                       ? "border-primary bg-primary text-black"
-                      : "border-white/10 bg-white/5 text-text-soft hover:border-white/20 hover:text-white",
+                      : "border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] text-text-soft hover:border-[var(--theme-border-default)] hover:text-[var(--theme-text-primary)]",
                   )
                 }
               >

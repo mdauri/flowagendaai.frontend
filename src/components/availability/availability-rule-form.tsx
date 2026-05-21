@@ -149,7 +149,7 @@ export function AvailabilityRuleForm({
 
       <form className="mt-4 grid gap-4" onSubmit={handleSubmit}>
         <label className="grid gap-2" htmlFor={dayId}>
-          <span className="text-sm font-semibold text-white">Dia da semana</span>
+          <span className="text-sm font-semibold text-[var(--theme-text-primary)]">Dia da semana</span>
           <Select
             id={dayId}
             value={form.dayOfWeek}
@@ -166,7 +166,7 @@ export function AvailabilityRuleForm({
         </label>
 
         <label className="grid gap-2" htmlFor={startTimeId}>
-          <span className="text-sm font-semibold text-white">Horario inicial</span>
+          <span className="text-sm font-semibold text-[var(--theme-text-primary)]">Horario inicial</span>
           <Input
             id={startTimeId}
             type="time"
@@ -182,7 +182,7 @@ export function AvailabilityRuleForm({
         </label>
 
         <label className="grid gap-2" htmlFor={endTimeId}>
-          <span className="text-sm font-semibold text-white">Horario final</span>
+          <span className="text-sm font-semibold text-[var(--theme-text-primary)]">Horario final</span>
           <Input
             id={endTimeId}
             type="time"

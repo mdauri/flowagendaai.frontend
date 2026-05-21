@@ -64,14 +64,14 @@ export function DashboardAgendaList({
           return (
           <li
             key={booking.bookingId}
-            className="grid gap-4 rounded-[28px] border border-white/10 bg-white/5 p-5 xl:grid-cols-[11rem_minmax(0,1fr)_12rem_auto]"
+            className="grid gap-4 rounded-[28px] border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-5 xl:grid-cols-[11rem_minmax(0,1fr)_12rem_auto]"
           >
             <div className="text-sm font-semibold text-secondary">
               {formatUtcTimeRangeInTenantTimezone(booking.start, booking.end, tenantTimezone)}
             </div>
 
             <div>
-              <p className="text-base font-semibold text-white">
+              <p className="text-base font-semibold text-[var(--theme-text-primary)]">
                 {resolveCustomerName(booking.customerName)}
               </p>
               {customerContacts.length > 0 && (
@@ -81,7 +81,7 @@ export function DashboardAgendaList({
             </div>
 
             <div>
-              <p className="text-sm font-medium text-white">{booking.professionalName}</p>
+              <p className="text-sm font-medium text-[var(--theme-text-primary)]">{booking.professionalName}</p>
               <p className="mt-1 text-xs uppercase tracking-[0.2em] text-text-soft">
                 {tenantTimezone}
               </p>

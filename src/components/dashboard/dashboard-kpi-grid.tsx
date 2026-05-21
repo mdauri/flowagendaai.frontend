@@ -14,7 +14,7 @@ const kpiDefinitions = [
   {
     key: "totalBookings",
     label: "Total",
-    toneClassName: "text-white",
+    toneClassName: "text-[var(--theme-text-primary)]",
   },
   {
     key: "confirmed",

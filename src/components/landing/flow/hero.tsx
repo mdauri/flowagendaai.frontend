@@ -53,8 +53,8 @@ const heroMetrics = [
 
 function HeroKpiCard({ title, subtitle }: { title: string; subtitle: string }) {
   return (
-    <Card padding="sm" radiusSize="sm" className="p-5">
-      <div className="text-2xl font-black text-secondary">{title}</div>
+    <Card padding="sm" radiusSize="sm" className="h-full p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--theme-border-strong)] hover:shadow-[var(--theme-shadow-card)]">
+      <div className="text-2xl font-extrabold tracking-tight text-secondary">{title}</div>
       <p className="mt-2 text-sm text-text-muted">{subtitle}</p>
     </Card>
   );
@@ -73,18 +73,18 @@ function HeroAgendaItem({
 }) {
   return (
     <div
-      className="flex items-center justify-between border border-white/10 bg-white/5 p-4"
+      className="flex items-center justify-between border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--theme-border-default)] hover:bg-[var(--theme-surface-glass-hover)]"
       style={{ borderRadius: radius.xs }}
     >
       <div className="flex items-center gap-4">
         <div
-          className="bg-surface-2 px-3 py-2 text-sm font-bold text-secondary"
+          className="bg-surface-2 px-3 py-2 text-sm font-bold text-secondary shadow-[inset_0_0_0_1px_var(--theme-border-subtle)]"
           style={{ borderRadius: radius.xs }}
         >
           {time}
         </div>
         <div>
-          <p className="font-semibold text-white">{title}</p>
+          <p className="font-semibold text-[var(--theme-text-primary)]">{title}</p>
           <p className="text-sm text-text-muted">
             Confirmação enviada via WhatsApp
           </p>
@@ -107,7 +107,7 @@ function HeroMetricCard({
   return (
     <Card padding="sm" radiusSize="xs">
       <p className="text-sm text-text-muted">{label}</p>
-      <p className="mt-2 text-3xl font-black text-white">{value}</p>
+      <p className="mt-2 text-3xl font-black text-[var(--theme-text-primary)]">{value}</p>
       <p className="mt-1 text-sm text-secondary">{detail}</p>
     </Card>
   );
@@ -125,7 +125,7 @@ export function Hero() {
             Sua agenda organizada · WhatsApp · Link próprio
           </Badge>
 
-          <h1 className="max-w-4xl text-4xl font-black leading-tight tracking-tight text-white md:text-6xl lg:text-7xl">
+          <h1 className="max-w-4xl text-4xl font-black leading-tight tracking-tight text-[var(--theme-text-primary)] md:text-6xl lg:text-7xl">
             Sua agenda organizada.
             <span className="bg-linear-to-r from-primary via-secondary to-tertiary bg-clip-text text-transparent">
               {" "}
@@ -161,11 +161,11 @@ export function Hero() {
         </div>
 
         <div className="relative">
-          <div className="absolute -inset-6 rounded-xxl bg-[radial-gradient(circle_at_center,rgba(255,138,61,0.20),transparent_60%)] blur-3xl" />
+          <div className="absolute -inset-6 rounded-xxl bg-[radial-gradient(circle_at_center,var(--theme-overlay-hero),transparent_62%)] blur-3xl" />
           <Card
             padding="sm"
             radiusSize="xl"
-            className="relative"
+            className="relative overflow-hidden before:absolute before:inset-x-8 before:top-0 before:h-px before:bg-linear-to-r before:from-transparent before:via-primary/50 before:to-transparent"
             style={{
               boxShadow: shadows.soft,
               backdropFilter: `blur(${semanticTokens.blur.shell})`,
@@ -177,14 +177,14 @@ export function Hero() {
               radiusSize="shell"
               className="p-5"
             >
-              <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div className="flex items-center justify-between border-b border-[var(--theme-border-subtle)] pb-4">
                 <div>
                   <p className="text-sm text-text-muted">Agendoro</p>
-                  <h3 className="text-xl font-bold text-white">
+                  <h3 className="text-xl font-bold text-[var(--theme-text-primary)]">
                     Agenda do dia
                   </h3>
                 </div>
-                <div className="rounded-md bg-linear-to-r from-primary to-secondary px-3 py-2 text-xs font-bold text-dark">
+                <div className="rounded-full border border-[var(--theme-border-accent)] bg-linear-to-r from-primary to-secondary px-3 py-1.5 text-xs font-bold text-dark shadow-[var(--theme-shadow-card)]">
                   Online
                 </div>
               </div>

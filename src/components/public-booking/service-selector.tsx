@@ -24,7 +24,7 @@ export function ServiceSelector({
     return (
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {[1, 2, 3].map((index) => (
-          <div key={index} className="h-72 animate-pulse rounded-3xl bg-white/5" />
+          <div key={index} className="h-72 animate-pulse rounded-3xl bg-surface-glass" />
         ))}
       </div>
     );

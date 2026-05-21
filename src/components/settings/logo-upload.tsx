@@ -151,7 +151,7 @@ export function LogoUpload({
               onClick={handleRemove}
               disabled={disabled || isUploading}
               aria-label="Remover logo"
-              className="text-white/55 transition-colors duration-150 hover:text-[#F87171]"
+              className="text-text-soft transition-colors duration-150 hover:text-[#F87171]"
             >
               Remover
             </Button>
@@ -160,10 +160,10 @@ export function LogoUpload({
       ) : (
         <div className="space-y-2">
           <div
-            className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-dashed border-[rgba(255,255,255,0.15)] bg-[rgba(255,255,255,0.05)] sm:h-16 sm:w-16"
+            className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-dashed border-[var(--theme-border-default)] bg-[var(--theme-surface-glass)] sm:h-16 sm:w-16"
             aria-label="Nenhuma logo cadastrada"
           >
-            <Upload size={20} className="text-white/30" aria-hidden="true" />
+            <Upload size={20} className="text-text-muted" aria-hidden="true" />
           </div>
           <Button
             type="button"
@@ -189,7 +189,7 @@ export function LogoUpload({
               </>
             )}
           </Button>
-          <p className="text-xs text-white/55">JPG, PNG ou WebP. Max 2MB.</p>
+          <p className="text-xs text-text-soft">JPG, PNG ou WebP. Max 2MB.</p>
         </div>
       )}
 

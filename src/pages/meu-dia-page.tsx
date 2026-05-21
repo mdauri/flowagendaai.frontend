@@ -204,7 +204,7 @@ export function MeuDiaPage() {
   return (
     <div className="space-y-4 sm:space-y-5" aria-busy={bookingsQuery.isFetching ? "true" : "false"}>
       <header className="space-y-1">
-        <h2 className="text-2xl font-black tracking-tight text-white">Meu Dia</h2>
+        <h2 className="text-2xl font-black tracking-tight text-[var(--theme-text-primary)]">Meu Dia</h2>
         <p className="text-sm text-text-soft">{headerContext}</p>
       </header>
 
@@ -222,7 +222,7 @@ export function MeuDiaPage() {
               </CardTitle>
               <Badge variant={statusVariant(nextBooking.status)}>{statusLabel(nextBooking.status)}</Badge>
             </div>
-            <p className="mt-2 text-sm text-white">
+            <p className="mt-2 text-sm text-[var(--theme-text-primary)]">
               {nextBooking.serviceName} · {resolveCustomerName(nextBooking.customerName)}
             </p>
           </Card>
@@ -273,7 +273,7 @@ export function MeuDiaPage() {
           </Card>
         ) : bookingsQuery.isError ? (
           <Card variant="glass" padding="md" role="alert">
-            <p className="text-sm font-semibold text-white">Nao foi possivel carregar o Meu Dia</p>
+            <p className="text-sm font-semibold text-[var(--theme-text-primary)]">Nao foi possivel carregar o Meu Dia</p>
             <p className="mt-1 text-sm text-text-soft">
               Verifique sua conexao e tente novamente.
             </p>
@@ -285,7 +285,7 @@ export function MeuDiaPage() {
           </Card>
         ) : isEmpty ? (
           <Card variant="glass" padding="md">
-            <p className="text-sm font-semibold text-white">Nenhum atendimento neste dia.</p>
+            <p className="text-sm font-semibold text-[var(--theme-text-primary)]">Nenhum atendimento neste dia.</p>
           </Card>
         ) : (
           <ul className="grid gap-3" aria-label="Lista de atendimentos do dia">
@@ -300,10 +300,10 @@ export function MeuDiaPage() {
                   >
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>
-                        <p className="text-base font-semibold text-white">
+                        <p className="text-base font-semibold text-[var(--theme-text-primary)]">
                           {formatUtcTimeRangeInTenantTimezone(item.start, item.end, tenantTimezone)}
                         </p>
-                        <p className="mt-1 text-sm text-white">{item.serviceName}</p>
+                        <p className="mt-1 text-sm text-[var(--theme-text-primary)]">{item.serviceName}</p>
                         <p className="mt-1 text-sm text-text-soft">
                           {resolveCustomerName(item.customerName)}
                           {shouldDisplayValue(item.customerPhone) ? ` · ${item.customerPhone}` : ""}
@@ -337,7 +337,7 @@ export function MeuDiaPage() {
               aria-modal="true"
               aria-labelledby="meu-dia-booking-details-title"
             >
-              <Card variant="surface" padding="lg" radiusSize="xxl" className="w-full max-w-lg border border-white/15">
+              <Card variant="surface" padding="lg" radiusSize="xxl" className="w-full max-w-lg border border-[var(--theme-border-default)]">
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <CardTitle id="meu-dia-booking-details-title">Detalhe do agendamento</CardTitle>
@@ -353,7 +353,7 @@ export function MeuDiaPage() {
                 <div className="mt-6 space-y-4 text-sm text-text-soft">
                   <div>
                     <p className="text-xs uppercase tracking-[0.14em]">Horario</p>
-                    <p className="mt-1 text-white">
+                    <p className="mt-1 text-[var(--theme-text-primary)]">
                       {formatUtcTimeRangeInTenantTimezone(
                         bookingDetails.start,
                         bookingDetails.end,
@@ -363,14 +363,14 @@ export function MeuDiaPage() {
                   </div>
                   <div>
                     <p className="text-xs uppercase tracking-[0.14em]">Atendimento</p>
-                    <p className="mt-1 text-white">{bookingDetails.serviceName}</p>
+                    <p className="mt-1 text-[var(--theme-text-primary)]">{bookingDetails.serviceName}</p>
                     {shouldShowProfessionalName ? (
                       <p className="mt-1 text-text-soft">Profissional: {bookingDetails.professionalName}</p>
                     ) : null}
                   </div>
                   <div>
                     <p className="text-xs uppercase tracking-[0.14em]">Cliente</p>
-                    <p className="mt-1 text-white">{resolveCustomerName(bookingDetails.customerName)}</p>
+                    <p className="mt-1 text-[var(--theme-text-primary)]">{resolveCustomerName(bookingDetails.customerName)}</p>
                     {shouldDisplayValue(bookingDetails.customerPhone) ? (
                       <p className="mt-1 text-text-soft">{bookingDetails.customerPhone}</p>
                     ) : null}

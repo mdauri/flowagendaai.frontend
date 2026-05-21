@@ -57,4 +57,15 @@ describe("PublicBookingHeader", () => {
     expect(screen.getByText("M")).toBeInTheDocument();
     expect(screen.queryByRole("img", { name: "Foto de Maria Silva" })).not.toBeInTheDocument();
   });
+
+  it("renders only the simplified professional identity", () => {
+    render(<PublicBookingHeader professional={baseProfessional} />);
+
+    expect(screen.getByText("Maria Silva")).toBeInTheDocument();
+    expect(screen.getByText("@maria-silva")).toBeInTheDocument();
+    expect(screen.queryByText(/Agendamento Público/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Fuso Horário/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Link Público/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/America\/Sao_Paulo/i)).not.toBeInTheDocument();
+  });
 });

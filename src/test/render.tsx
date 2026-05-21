@@ -6,6 +6,7 @@ import {
 } from "@tanstack/react-query";
 import { render } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
+import { ThemeProvider } from "@/theme/theme-provider";
 
 interface RenderWithProvidersOptions {
   route?: string;
@@ -41,7 +42,11 @@ export function renderWithProviders(
       children
     );
 
-    return <QueryClientProvider client={queryClient}>{content}</QueryClientProvider>;
+    return (
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>{content}</ThemeProvider>
+      </QueryClientProvider>
+    );
   }
 
   return {

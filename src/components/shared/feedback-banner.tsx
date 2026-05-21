@@ -38,7 +38,7 @@ export function FeedbackBanner({ title, description, tone = "danger", className 
       <div className="flex items-start gap-3">
         <Badge variant={tone}>{tone === "danger" ? "Erro" : tone === "warning" ? "Aviso" : "Info"}</Badge>
         <div>
-          <p className="font-semibold text-white">{title}</p>
+          <p className="font-semibold text-[var(--theme-text-primary)]">{title}</p>
           <p className="mt-1 text-sm leading-6 text-text-soft">{description}</p>
         </div>
       </div>

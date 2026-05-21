@@ -227,14 +227,14 @@ export function HolidaysPage() {
   return (
     <div className="mx-auto grid max-w-5xl gap-6">
       <div>
-        <h2 className="text-2xl font-black tracking-tight text-white">Feriados e bloqueios</h2>
+        <h2 className="text-2xl font-black tracking-tight text-[var(--theme-text-primary)]">Feriados e bloqueios</h2>
         <p className="mt-2 text-sm leading-6 text-text-soft">Gerencie dias bloqueados.</p>
       </div>
 
       <Card className="p-4">
         <CardTitle>Periodo</CardTitle>
         <div className="mt-4 grid gap-3 md:grid-cols-2">
-          <label className="grid gap-2 text-sm font-semibold text-white">
+          <label className="grid gap-2 text-sm font-semibold text-[var(--theme-text-primary)]">
             Inicio
             <Input
               value={startDateBr}
@@ -242,7 +242,7 @@ export function HolidaysPage() {
               placeholder="01/04/2026"
             />
           </label>
-          <label className="grid gap-2 text-sm font-semibold text-white">
+          <label className="grid gap-2 text-sm font-semibold text-[var(--theme-text-primary)]">
             Fim
             <Input
               value={endDateBr}
@@ -252,7 +252,7 @@ export function HolidaysPage() {
           </label>
         </div>
         <p className="mt-2 text-xs text-text-soft">
-          Horario local: <span className="text-white">{timezone}</span>
+          Horario local: <span className="text-[var(--theme-text-primary)]">{timezone}</span>
         </p>
       </Card>
 

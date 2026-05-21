@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import { Button } from "@/components/flow/button";
 import { Card } from "@/components/flow/card";
+import { ThemeSwitcher } from "@/components/app/theme-switcher";
 import { colors, radius, semanticTokens, shadows, typography } from "@/design-system";
 
 interface UserIdentityHeaderCardProps {
@@ -103,28 +104,38 @@ export function UserIdentityHeaderCard({
         )}
       </div>
 
-      {isLoading ? (
-        <div
-          aria-hidden="true"
-          className="h-[38px] w-[68px] shrink-0 animate-pulse rounded-full border border-white/10 bg-white/10 md:h-10 md:w-[76px]"
-        />
-      ) : (
-        <Button
-          type="button"
-          variant="secondary"
-          size="sm"
-          className="h-[38px] shrink-0 rounded-[var(--user-logout-radius)] border-white/15 bg-white/5 px-3 text-white hover:border-white/20 md:h-10 md:px-3.5"
-          style={
-            {
-              "--user-logout-radius": radius.lg,
-            } as CSSProperties
-          }
-          onClick={onLogout}
-        >
-          <PowerIcon />
-          <span>Sair</span>
-        </Button>
-      )}
+      <div className="flex shrink-0 items-center gap-2">
+        {isLoading ? (
+          <div
+            aria-hidden="true"
+            className="h-8 w-[96px] animate-pulse rounded-full border border-white/10 bg-white/10"
+          />
+        ) : (
+          <ThemeSwitcher compact />
+        )}
+        {isLoading ? (
+          <div
+            aria-hidden="true"
+            className="h-[38px] w-[68px] animate-pulse rounded-full border border-white/10 bg-white/10 md:h-10 md:w-[76px]"
+          />
+        ) : (
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            className="h-[38px] rounded-[var(--user-logout-radius)] border-white/15 bg-white/5 px-3 text-white hover:border-white/20 md:h-10 md:px-3.5"
+            style={
+              {
+                "--user-logout-radius": radius.lg,
+              } as CSSProperties
+            }
+            onClick={onLogout}
+          >
+            <PowerIcon />
+            <span>Sair</span>
+          </Button>
+        )}
+      </div>
     </Card>
   );
 }

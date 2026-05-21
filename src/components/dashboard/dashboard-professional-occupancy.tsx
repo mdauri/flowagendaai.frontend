@@ -27,11 +27,11 @@ export function DashboardProfessionalOccupancy({ items }: DashboardProfessionalO
         {items.map((item) => (
           <li
             key={item.professionalId}
-            className="rounded-[24px] border border-white/10 bg-white/5 p-4"
+            className="rounded-[24px] border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-4"
           >
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="font-semibold text-white">{item.professionalName}</p>
+                <p className="font-semibold text-[var(--theme-text-primary)]">{item.professionalName}</p>
                 <p className="mt-1 text-sm text-text-soft">
                   {item.bookedMinutes} min ocupados de {item.availableMinutes} min disponiveis
                 </p>

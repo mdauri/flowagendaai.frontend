@@ -52,22 +52,22 @@ export function LoginForm() {
     if (error.status === 403) {
       return {
         title: "Acesso nao autorizado",
-        description: "Sua conta nao tem permissao para acessar esta operacao.",
+        description: "Sua conta nao tem permissao para acessar este painel.",
       };
     }
 
     return {
       title: "Erro ao entrar",
       description:
-        "Tente novamente em instantes. Se o problema continuar, revise a configuracao da API.",
+        "Tente novamente em instantes. Se o problema continuar, fale com o suporte.",
     };
   })();
 
   return (
     <Card padding="lg" className="mx-auto max-w-xl">
-      <CardTitle>Login</CardTitle>
+      <CardTitle>Acesse sua conta</CardTitle>
       <CardDescription className="mt-2">
-        Entre com as credenciais configuradas para o seu tenant.
+        Use seu e-mail e senha para entrar no painel do Agendoro.
       </CardDescription>
 
       {feedback ? (
@@ -81,7 +81,7 @@ export function LoginForm() {
       <form className="mt-6 space-y-5" onSubmit={handleSubmit} noValidate>
         <div>
           <label
-            className="mb-2 block text-sm font-semibold text-white"
+            className="mb-2 block text-sm font-semibold text-[var(--theme-text-primary)]"
             htmlFor="email"
           >
             Email
@@ -102,7 +102,7 @@ export function LoginForm() {
 
         <div>
           <label
-            className="mb-2 block text-sm font-semibold text-white"
+            className="mb-2 block text-sm font-semibold text-[var(--theme-text-primary)]"
             htmlFor="password"
           >
             Senha

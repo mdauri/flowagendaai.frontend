@@ -4,6 +4,21 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Agendoro</title>
+    <script>
+      (function () {
+        var theme = "dark";
+        try {
+          var storedTheme = window.localStorage.getItem("agendoro-theme");
+          if (storedTheme === "dark" || storedTheme === "light-pastel") {
+            theme = storedTheme;
+          }
+        } catch (error) {
+          theme = "dark";
+        }
+        document.documentElement.setAttribute("data-theme", theme);
+        document.documentElement.style.colorScheme = theme === "dark" ? "dark" : "light";
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

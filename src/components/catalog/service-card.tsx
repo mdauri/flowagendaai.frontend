@@ -1,11 +1,13 @@
 import { Clock } from "lucide-react";
 import { Button } from "@/components/flow/button";
 import { Card, CardTitle } from "@/components/flow/card";
-import { colors, typography, radius, semanticTokens, shadows } from "@/design-system";
+import { colors, typography, semanticTokens } from "@/design-system";
 import { ServiceImageFallback } from "./service-image-fallback";
 import type { PublicCatalogService } from "@/types/service";
 
-type ServiceCardModel = Omit<PublicCatalogService, "price"> & { price?: number };
+type ServiceCardModel = Omit<PublicCatalogService, "price"> & {
+  price?: number;
+};
 
 interface ServiceCardProps {
   service: ServiceCardModel;
@@ -15,10 +17,15 @@ interface ServiceCardProps {
   selected?: boolean;
 }
 
-export function ServiceCard({ service, tenantSlug, onBook, actionLabel = "Agendar", selected = false }: ServiceCardProps) {
+export function ServiceCard({
+  service,
+  onBook,
+  actionLabel = "Agendar",
+  selected = false,
+}: ServiceCardProps) {
   const imageSrc = service.thumbnailUrl ?? service.imageUrl ?? undefined;
   const hasImage = Boolean(imageSrc);
-  
+
   const formatPrice = (price: number) => {
     return price.toLocaleString("pt-BR", {
       style: "currency",
@@ -39,9 +46,12 @@ export function ServiceCard({ service, tenantSlug, onBook, actionLabel = "Agenda
     return `${minutes} min`;
   };
 
-  const truncateDescription = (description: string | null | undefined, maxLines: number = 2) => {
+  const truncateDescription = (
+    description: string | null | undefined,
+    maxLines: number = 2,
+  ) => {
     if (!description) return null;
-    
+
     // CSS line-clamp is handled via style
     return description;
   };
@@ -51,19 +61,24 @@ export function ServiceCard({ service, tenantSlug, onBook, actionLabel = "Agenda
       variant="glass"
       padding="none"
       radiusSize="xl"
-      className="service-card flex flex-col overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:border-[var(--border-hover)]"
-      style={{
-        minHeight: "420px",
-        "--border-hover": semanticTokens.border.default,
-        borderColor: selected ? colors.brand.primary : undefined,
-        boxShadow: selected ? `0 0 0 1px ${colors.brand.primary}` : undefined,
-      } as React.CSSProperties}
+      className="service-card flex flex-col overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:border-(--border-hover) hover:shadow-card"
+      style={
+        {
+          minHeight: "400px",
+          "--border-hover": semanticTokens.border.default,
+          borderColor: selected ? colors.brand.primary : undefined,
+          boxShadow: selected ? `0 0 0 1px ${colors.brand.primary}` : undefined,
+        } as React.CSSProperties
+      }
     >
       {/* Image Section */}
-      <div className="relative aspect-square w-full overflow-hidden" style={{
-        minHeight: "200px",
-        backgroundColor: hasImage ? colors.background.surface2 : undefined,
-      }}>
+      <div
+        className="relative aspect-square w-full overflow-hidden"
+        style={{
+          minHeight: "200px",
+          backgroundColor: hasImage ? colors.background.surface2 : undefined,
+        }}
+      >
         {hasImage ? (
           <img
             src={imageSrc}
@@ -73,14 +88,21 @@ export function ServiceCard({ service, tenantSlug, onBook, actionLabel = "Agenda
             onError={(e) => {
               // Fallback to placeholder if image fails to load
               e.currentTarget.style.display = "none";
-              const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+              const fallback = e.currentTarget
+                .nextElementSibling as HTMLElement;
               if (fallback) {
                 fallback.style.display = "flex";
               }
             }}
           />
         ) : null}
-        
+        {hasImage ? (
+          <div
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-linear-to-t from-[rgba(0,0,0,0.28)] to-transparent"
+            aria-hidden="true"
+          />
+        ) : null}
+
         {/* Fallback (shown when no image or image fails) */}
         <div
           className={`absolute inset-0 ${hasImage ? "hidden" : "flex"}`}
@@ -97,24 +119,26 @@ export function ServiceCard({ service, tenantSlug, onBook, actionLabel = "Agenda
       {/* Content Section */}
       <div className="flex flex-1 flex-col gap-3 p-5">
         {/* Name and Price */}
-        <div className="flex items-start justify-between gap-2">
+        <div className="flex items-start justify-between gap-3">
           <CardTitle
-            className="text-lg font-bold"
+            className="min-w-0 text-lg font-semibold"
             style={{
               color: colors.text.primary,
               fontFamily: typography.family.sans,
-              fontWeight: typography.weight.bold,
+              fontWeight: typography.weight.semibold,
               lineHeight: typography.leading.tight,
-              letterSpacing: typography.tracking.tight,
+              letterSpacing: 0,
             }}
           >
             {service.name}
           </CardTitle>
           {typeof service.price === "number" ? (
             <span
-              className="text-base font-bold"
+              className="shrink-0 rounded-full border px-3 py-1 text-sm font-bold"
               style={{
-                color: colors.brand.primary,
+                backgroundColor: colors.badge.background,
+                borderColor: colors.badge.border,
+                color: colors.badge.text,
                 fontFamily: typography.family.sans,
                 fontWeight: typography.weight.bold,
                 whiteSpace: "nowrap",
@@ -128,13 +152,14 @@ export function ServiceCard({ service, tenantSlug, onBook, actionLabel = "Agenda
 
         {/* Duration */}
         <div
-          className="flex items-center gap-1.5"
+          className="flex items-center gap-2"
           aria-label={`Duração: ${formatDuration(service.durationInMinutes)}`}
         >
           <Clock
-            size={18}
+            size={20}
+            strokeWidth={2.4}
             style={{
-              color: colors.text.muted,
+              color: colors.brand.primary,
             }}
             aria-hidden="true"
           />
@@ -173,7 +198,7 @@ export function ServiceCard({ service, tenantSlug, onBook, actionLabel = "Agenda
         <div className="mt-auto pt-2">
           <Button
             onClick={() => onBook(service.id)}
-            className="w-full"
+            className="w-full hover:scale-[1.02] hover:shadow-depth"
             size="md"
             aria-label={`${actionLabel} ${service.name}`}
             style={{

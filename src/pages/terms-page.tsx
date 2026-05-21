@@ -97,7 +97,7 @@ const sections = [
 
 export function TermsPage() {
   return (
-    <main className="min-h-screen bg-background text-white">
+    <main className="min-h-screen bg-background text-[var(--theme-text-primary)]">
       <div
         className="pointer-events-none absolute inset-0"
         style={{ backgroundImage: compositionPatterns.overlay.legalPage }}
@@ -106,14 +106,14 @@ export function TermsPage() {
       <div className="relative z-10 px-6 py-10 md:px-10 lg:px-16 lg:py-14">
         <div className="mx-auto max-w-4xl">
           <Card padding="md" radiusSize="xl" className="md:p-8">
-            <div className="flex flex-col gap-4 border-b border-white/10 pb-6">
+            <div className="flex flex-col gap-4 border-b border-[var(--theme-border-subtle)] pb-6">
               <div className="flex flex-wrap gap-4 text-sm font-semibold uppercase tracking-[0.2em] text-secondary">
-                <Link to="/" className="transition hover:text-white">
+                <Link to="/" className="transition hover:text-[var(--theme-text-primary)]">
                   Voltar para o Agendoro
                 </Link>
                 <Link
                   to="/politica-de-privacidade"
-                  className="transition hover:text-white"
+                  className="transition hover:text-[var(--theme-text-primary)]"
                 >
                   Política de Privacidade
                 </Link>
@@ -123,7 +123,7 @@ export function TermsPage() {
                 <p className="text-sm font-semibold uppercase tracking-[0.22em] text-secondary">
                   Termos de Uso
                 </p>
-                <h1 className="mt-3 text-4xl font-black tracking-tight text-white md:text-5xl">
+                <h1 className="mt-3 text-4xl font-black tracking-tight text-[var(--theme-text-primary)] md:text-5xl">
                   Regras de uso do Agendoro
                 </h1>
                 <p className="mt-4 max-w-3xl text-base leading-7 text-text-soft md:text-lg">
@@ -148,7 +148,7 @@ export function TermsPage() {
                     backgroundColor: semanticTokens.surface.glassSubtle,
                   }}
                 >
-                  <h2 className="text-2xl font-black tracking-tight text-white">
+                  <h2 className="text-2xl font-black tracking-tight text-[var(--theme-text-primary)]">
                     {section.title}
                   </h2>
                   <div className="mt-4 space-y-4 text-sm leading-7 text-text-soft md:text-base">

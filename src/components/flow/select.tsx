@@ -42,7 +42,7 @@ interface SelectValueProps {
 
 const triggerStyle: React.CSSProperties = {
   borderRadius: radius.xl,
-  backgroundColor: "#4a4a4d",
+  backgroundColor: semanticTokens.surface.panelRaised,
   borderColor: semanticTokens.border.default,
   color: colors.text.primary,
   fontFamily: typography.family.sans,
@@ -51,8 +51,8 @@ const triggerStyle: React.CSSProperties = {
 
 const menuStyle: React.CSSProperties = {
   borderRadius: radius.xl,
-  backgroundColor: "#454548",
-  borderColor: "#5a5a5e",
+  backgroundColor: semanticTokens.surface.panelRaised,
+  borderColor: semanticTokens.border.default,
 };
 
 // Context for select
@@ -180,7 +180,7 @@ export function Select({
           }}
           {...props}
         >
-          <span className={cn(selectedOption ? "text-white" : "text-text-soft")}>
+          <span className={cn(selectedOption ? "text-[var(--theme-text-primary)]" : "text-text-soft")}>
             {selectedOption?.label ?? placeholder}
           </span>
           <span
@@ -221,8 +221,8 @@ export function Select({
                       className={cn(
                         "w-full rounded-2xl px-4 py-3 text-left text-sm transition-colors",
                         value === ""
-                          ? "bg-[#626265] text-white"
-                          : "text-text-soft hover:bg-[#57575b] hover:text-white"
+                          ? "bg-[var(--theme-surface-glass-hover)] text-[var(--theme-text-primary)]"
+                          : "text-text-soft hover:bg-[var(--theme-surface-glass)] hover:text-[var(--theme-text-primary)]"
                       )}
                       onClick={() => {
                         onValueChange("");
@@ -241,8 +241,8 @@ export function Select({
                         className={cn(
                           "w-full rounded-2xl px-4 py-3 text-left text-sm transition-colors",
                           option.value === value
-                            ? "bg-[#626265] text-white"
-                            : "text-text-soft hover:bg-[#57575b] hover:text-white"
+                            ? "bg-[var(--theme-surface-glass-hover)] text-[var(--theme-text-primary)]"
+                            : "text-text-soft hover:bg-[var(--theme-surface-glass)] hover:text-[var(--theme-text-primary)]"
                         )}
                         onClick={() => {
                           onValueChange(option.value);

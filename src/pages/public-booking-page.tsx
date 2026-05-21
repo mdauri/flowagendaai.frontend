@@ -1,11 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { colors, typography } from "@/design-system";
 import { DateTime } from "luxon";
 import { useSearchParams, useParams } from "react-router-dom";
 import { Button } from "@/components/flow/button";
 import { FeedbackBanner } from "@/components/shared/feedback-banner";
+import { ThemeSwitcher } from "@/components/app/theme-switcher";
 import { PublicBookingHeader } from "@/components/public-booking/public-booking-header";
-import { TenantCoverBanner } from "@/components/branding/tenant-cover-banner";
 import { SlotGrid } from "@/components/public-booking/slots";
 import { CustomerDataForm, SummaryCard } from "@/components/public-booking/customer-data-form";
 import { ServiceSelector } from "@/components/public-booking/service-selector";
@@ -23,11 +23,53 @@ import { useCreatePublicBookingMutation } from "@/hooks/use-create-public-bookin
 import { ApiError, BOOKING_CONFLICT_ERROR_CODE, MULTI_DAY_CONFLICT_ERROR_CODE } from "@/types/api";
 import type {
   CreatePublicBookingResponse,
+  PublicProfessional,
   PublicBookingStep,
   PublicServiceItem,
   PublicSlot,
   DaySegment,
 } from "@/types/public-booking";
+
+function PublicTenantTopbar({ professional }: { professional: PublicProfessional }) {
+  const [showLogoFallback, setShowLogoFallback] = useState(!professional.tenantLogoUrl);
+
+  useEffect(() => {
+    setShowLogoFallback(!professional.tenantLogoUrl);
+  }, [professional.tenantLogoUrl]);
+
+  const tenantInitial = professional.tenantName.trim().charAt(0).toUpperCase() || "?";
+
+  return (
+    <div className="flex items-center justify-between gap-4 rounded-full border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] px-4 py-3 shadow-[var(--theme-shadow-card)] backdrop-blur-[var(--theme-blur-panel)]">
+      <div className="flex min-w-0 items-center gap-3">
+        {!showLogoFallback && professional.tenantLogoUrl ? (
+          <img
+            src={professional.tenantLogoUrl}
+            alt=""
+            className="h-10 w-10 shrink-0 rounded-full object-cover shadow-inner ring-1 ring-[var(--theme-border-subtle)]"
+            loading="lazy"
+            onError={() => setShowLogoFallback(true)}
+          />
+        ) : (
+          <div
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-base font-black shadow-inner ring-1 ring-[var(--theme-border-subtle)]"
+            style={{
+              backgroundColor: colors.background.glass,
+              color: colors.text.primary,
+            }}
+            aria-hidden="true"
+          >
+            {tenantInitial}
+          </div>
+        )}
+        <p className="truncate text-sm font-semibold text-[var(--theme-text-primary)] sm:text-base">
+          {professional.tenantName}
+        </p>
+      </div>
+      <ThemeSwitcher compact />
+    </div>
+  );
+}
 
 const BRAZILIAN_PHONE_REGEX = /^\+55\s\(\d{2}\)\s\d{5}-\d{4}$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -35,7 +77,7 @@ const stepTitles: Record<PublicBookingStep, string> = {
   service: "Escolha o serviço",
   date: "Escolha a data",
   slot: "Selecione um horário",
-  customer: "Complete seus dados",
+  customer: "Seus dados",
   confirm: "Confirmando",
   success: "Agendamento confirmado",
 };
@@ -73,6 +115,8 @@ export function PublicBookingPage() {
   const [customerNotes, setCustomerNotes] = useState("");
   const [bookingResult, setBookingResult] = useState<CreatePublicBookingResponse | null>(null);
   const [bookingNotification, setBookingNotification] = useState<BookingNotification | null>(null);
+  const [hasTriedCustomerSubmit, setHasTriedCustomerSubmit] = useState(false);
+  const customerNameInputRef = useRef<HTMLInputElement>(null);
   const [multiDayConflictError, setMultiDayConflictError] = useState<{
     conflictDay: string;
     conflictStart: string;
@@ -169,7 +213,7 @@ export function PublicBookingPage() {
   }, [selectedDate, calendarMonth, availableDatesQuery.data, availableDates]);
 
   const timezone = slotsQuery.data?.tenantTimezone ?? tenantTimezone;
-  const stepOrder: PublicBookingStep[] = ["service", "date", "slot", "customer"];
+  const stepOrder: PublicBookingStep[] = ["service", "date", "slot", "customer", "confirm"];
   const canGoBack = stepOrder.includes(currentStep) && currentStep !== "service";
 
   const selectedSlotStart = selectedSlot?.start ?? null;
@@ -181,14 +225,23 @@ export function PublicBookingPage() {
   const isPhoneValid = BRAZILIAN_PHONE_REGEX.test(customerPhone);
   const isEmailValid =
     customerEmail.trim().length === 0 || EMAIL_REGEX.test(customerEmail.trim().toLowerCase());
+  const requiredCustomerFieldsFilled = customerName.trim().length > 0 && customerPhone.trim() !== "+55";
   const formIsValid = isNameValid && isPhoneValid && isEmailValid;
 
   const inSlotStep = currentStep === "slot";
-  const showSlotsSection = inSlotStep || currentStep === "customer";
+  const showSlotsSection = inSlotStep;
 
   const stepSubtitle = useMemo(() => stepTitles[currentStep], [currentStep]);
   const stepIndex = stepOrder.indexOf(currentStep);
   const displayedStep = stepIndex >= 0 ? stepIndex + 1 : stepOrder.length;
+
+  useEffect(() => {
+    if (currentStep !== "customer") return;
+
+    window.setTimeout(() => {
+      customerNameInputRef.current?.focus();
+    }, 0);
+  }, [currentStep]);
 
   const handleServiceSelect = (service: PublicServiceItem) => {
     if (selectedService?.id !== service.id) {
@@ -197,6 +250,7 @@ export function PublicBookingPage() {
       setSelectedSlot(null);
       setCalendarMonth(minDate.startOf("month"));
       setBookingNotification(null);
+      setHasTriedCustomerSubmit(false);
     }
     if (currentStep === "service") {
       setCurrentStep("date");
@@ -207,11 +261,13 @@ export function PublicBookingPage() {
     setSelectedDate(date.setZone(tenantTimezone).startOf("day"));
     setSelectedSlot(null);
     setBookingNotification(null);
+    setHasTriedCustomerSubmit(false);
   };
 
   const handleSlotSelect = (slot: PublicSlot) => {
     setSelectedSlot(slot);
     setBookingNotification(null);
+    setHasTriedCustomerSubmit(false);
   };
 
   const resetFlow = () => {
@@ -224,6 +280,7 @@ export function PublicBookingPage() {
     setCustomerNotes("");
     setBookingResult(null);
     setBookingNotification(null);
+    setHasTriedCustomerSubmit(false);
     setCalendarMonth(minDate.startOf("month"));
     setCurrentStep("service");
   };
@@ -255,6 +312,9 @@ export function PublicBookingPage() {
     if (currentStep === "slot" && selectedSlot) {
       setCurrentStep("customer");
       return;
+    }
+    if (currentStep === "customer") {
+      setHasTriedCustomerSubmit(true);
     }
     if (currentStep === "customer" && formIsValid && selectedSlot && selectedService) {
       setCurrentStep("confirm");
@@ -349,7 +409,7 @@ export function PublicBookingPage() {
       : currentStep === "slot"
       ? "Continuar"
       : currentStep === "customer"
-      ? "Confirmar agendamento"
+      ? "Continuar"
       : "";
 
   const primaryDisabled =
@@ -358,7 +418,7 @@ export function PublicBookingPage() {
       : currentStep === "slot"
       ? !selectedSlot
       : currentStep === "customer"
-      ? !formIsValid
+      ? !requiredCustomerFieldsFilled
       : true;
 
   const slotBanner = slotError ? (
@@ -381,6 +441,9 @@ export function PublicBookingPage() {
   if (professionalQuery.isLoading) {
     return (
       <div className="px-4 py-6">
+        <div className="mx-auto mb-4 flex max-w-2xl justify-end">
+          <ThemeSwitcher compact />
+        </div>
         <ProfessionalSkeleton />
       </div>
     );
@@ -389,9 +452,23 @@ export function PublicBookingPage() {
   if (professionalQuery.isError) {
     const error = professionalQuery.error as ApiError;
     if (error?.status === 404) {
-      return <ProfessionalNotFoundState />;
+      return (
+        <div className="px-4 py-6">
+          <div className="mx-auto mb-4 flex max-w-2xl justify-end">
+            <ThemeSwitcher compact />
+          </div>
+          <ProfessionalNotFoundState />
+        </div>
+      );
     }
-    return <ConnectionErrorState onRetry={() => professionalQuery.refetch()} />;
+    return (
+      <div className="px-4 py-6">
+        <div className="mx-auto mb-4 flex max-w-2xl justify-end">
+          <ThemeSwitcher compact />
+        </div>
+        <ConnectionErrorState onRetry={() => professionalQuery.refetch()} />
+      </div>
+    );
   }
 
   if (!professional) {
@@ -401,27 +478,16 @@ export function PublicBookingPage() {
   const shouldShowBookingNotification =
     bookingNotification && currentStep !== "confirm" && currentStep !== "success";
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
-
   return (
     <div
-      className="min-h-screen pb-32 text-white transition-colors duration-500"
+      className="min-h-screen pb-32 text-text-primary transition-colors duration-500"
       style={{
         backgroundColor: colors.background.base,
         fontFamily: typography.family.sans,
       }}
     >
       <div className="mx-auto flex max-w-2xl flex-col gap-6 px-4 py-6 transition-all duration-300 sm:px-6 lg:px-8">
-        {/* Cover Banner */}
-        <TenantCoverBanner
-          tenantName={professional.tenantName}
-          tenantSlug={professional.tenantSlug ?? undefined}
-          logoUrl={professional.tenantLogoUrl}
-          coverImageUrl={professional.tenantCoverImageUrl}
-          coverThumbnailUrl={professional.tenantCoverThumbnailUrl}
-          publicAddress={professional.tenantPublicAddress}
-          variant="compact"
-        />
-
+        <PublicTenantTopbar professional={professional} />
         <PublicBookingHeader professional={professional} />
         <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
           <div className="flex items-center justify-between">
@@ -437,14 +503,14 @@ export function PublicBookingPage() {
             ) : (
               <div />
             )}
-            <p className="text-xs uppercase tracking-[0.4em] text-white/60">
+            <p className="text-xs uppercase tracking-[0.4em] text-text-muted">
               Etapa {displayedStep} de {stepOrder.length}
             </p>
           </div>
           <div>
             <h2 className="text-2xl font-black">{stepSubtitle}</h2>
-            {currentStep === "date" && selectedService ? (
-              <p className="mt-1 text-sm text-white/70">
+            {(currentStep === "date" || currentStep === "customer") && selectedService ? (
+              <p className="mt-1 text-sm text-text-soft">
                 Serviço selecionado: {selectedService.name}
               </p>
             ) : null}
@@ -487,7 +553,7 @@ export function PublicBookingPage() {
                 onSelectDate={handleDateSelect}
               />
               {availableDatesQuery.isLoading ? (
-                <p className="text-sm text-white/70">Carregando disponibilidade do mês...</p>
+                <p className="text-sm text-text-soft">Carregando disponibilidade do mês...</p>
               ) : null}
               {availableDatesError ? (
                 <div className="space-y-3">
@@ -509,14 +575,14 @@ export function PublicBookingPage() {
                   </Button>
                 </div>
               ) : null}
-              <p className="text-sm text-white/70">Horários em: {timezone}</p>
+              <p className="text-sm text-text-soft">Horários em: {timezone}</p>
             </div>
           )}
           {showSlotsSection && (
             <div className="space-y-4">
               <div>
-                <p className="text-sm uppercase tracking-[0.3em] text-white/60">Horários disponíveis</p>
-                <p className="text-sm text-white/70">Selecione o horário que prefere</p>
+                <p className="text-sm uppercase tracking-[0.3em] text-text-muted">Horários disponíveis</p>
+                <p className="text-sm text-text-soft">Selecione o horário que prefere</p>
               </div>
               {slotBanner}
               {multiDayConflictError && (
@@ -542,21 +608,6 @@ export function PublicBookingPage() {
           )}
           {currentStep === "customer" && selectedService && selectedSlot && selectedDate && (
             <div className="space-y-5">
-              <CustomerDataForm
-                name={customerName}
-                phone={customerPhone}
-                email={customerEmail}
-                notes={customerNotes}
-                onNameChange={setCustomerName}
-                onPhoneChange={setCustomerPhone}
-                onEmailChange={setCustomerEmail}
-                onNotesChange={setCustomerNotes}
-                errors={{
-                  name: !isNameValid ? "Informe seu nome" : undefined,
-                  phone: customerPhone && !isPhoneValid ? "Telefone inválido" : undefined,
-                  email: customerEmail && !isEmailValid ? "Informe um e-mail valido" : undefined,
-                }}
-              />
               <SummaryCard
                 service={selectedService}
                 date={selectedDate}
@@ -566,6 +617,22 @@ export function PublicBookingPage() {
                 timezone={timezone}
                 customerPhone={customerPhone}
                 daysAffected={(selectedSlot as PublicSlot & { daysAffected?: DaySegment[] }).daysAffected}
+              />
+              <CustomerDataForm
+                nameInputRef={customerNameInputRef}
+                name={customerName}
+                phone={customerPhone}
+                email={customerEmail}
+                notes={customerNotes}
+                onNameChange={setCustomerName}
+                onPhoneChange={setCustomerPhone}
+                onEmailChange={setCustomerEmail}
+                onNotesChange={setCustomerNotes}
+                errors={{
+                  name: hasTriedCustomerSubmit && !isNameValid ? "Informe seu nome" : undefined,
+                  phone: hasTriedCustomerSubmit && customerPhone && !isPhoneValid ? "Telefone inválido" : undefined,
+                  email: hasTriedCustomerSubmit && customerEmail && !isEmailValid ? "Informe um e-mail valido" : undefined,
+                }}
               />
             </div>
           )}
