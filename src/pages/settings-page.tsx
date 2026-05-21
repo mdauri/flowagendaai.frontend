@@ -97,7 +97,7 @@ export function SettingsPage() {
   if (auth.isBootstrapping || !tenant) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 size={24} className="animate-spin text-white/55" />
+        <Loader2 size={24} className="animate-spin text-text-soft" />
       </div>
     );
   }
@@ -106,25 +106,25 @@ export function SettingsPage() {
     <div className="mx-auto max-w-2xl space-y-6">
       <div>
         <h1
-          className="text-2xl font-black text-white"
+          className="text-2xl font-black text-[var(--theme-text-primary)]"
           style={{ letterSpacing: "-0.025em" }}
         >
           Configuracoes
         </h1>
-        <p className="mt-1 text-sm text-white/55">
+        <p className="mt-1 text-sm text-text-soft">
           Informacoes exibidas no catalogo.
         </p>
       </div>
 
       {/* Tenant Profile Section */}
-      <section className="space-y-4 rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
-        <h2 className="text-lg font-bold text-white">Perfil Publico</h2>
+      <section className="space-y-4 rounded-2xl border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-4 backdrop-blur-sm">
+        <h2 className="text-lg font-bold text-[var(--theme-text-primary)]">Perfil Publico</h2>
 
         {/* Tenant Name */}
         <div className="space-y-2">
           <label
             htmlFor="tenant-name"
-            className="block text-sm font-medium text-white/70"
+            className="block text-sm font-medium text-text-soft"
           >
             Nome do estabelecimento
           </label>
@@ -141,7 +141,7 @@ export function SettingsPage() {
 
         {/* Logo Upload */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-white/70">
+          <label className="block text-sm font-medium text-text-soft">
             Logo
           </label>
           <LogoUpload
@@ -165,7 +165,7 @@ export function SettingsPage() {
 
         {/* Cover Image Upload */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-white/70">
+          <label className="block text-sm font-medium text-text-soft">
             Imagem de Capa
           </label>
           <CoverImageUpload

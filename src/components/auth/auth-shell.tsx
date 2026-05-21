@@ -1,10 +1,14 @@
 import type { PropsWithChildren } from "react";
 import { Card } from "@/components/flow/card";
+import { ThemeSwitcher } from "@/components/app/theme-switcher";
 import { SectionHeading } from "@/components/flow/section-heading";
 
 export function AuthShell({ children }: PropsWithChildren) {
   return (
-    <main className="flex min-h-screen items-center justify-center px-6 py-10 md:px-10 lg:px-16">
+    <main className="relative flex min-h-screen items-center justify-center px-6 py-10 md:px-10 lg:px-16">
+      <div className="absolute right-6 top-6 z-10 md:right-10 lg:right-16">
+        <ThemeSwitcher compact />
+      </div>
       <div className="grid w-full max-w-6xl gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
         <section>
           <SectionHeading

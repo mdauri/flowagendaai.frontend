@@ -7,7 +7,7 @@ interface FeatureCardProps {
 
 export function FeatureCard({ title, description }: FeatureCardProps) {
   return (
-    <Card className="transition-transform hover:-translate-y-1 hover:border-white/20">
+    <Card className="transition-transform hover:-translate-y-1 hover:border-[var(--theme-border-strong)]">
       <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-(--radius-lg) bg-linear-to-br from-primary to-tertiary text-lg font-black text-dark">
         ✦
       </div>

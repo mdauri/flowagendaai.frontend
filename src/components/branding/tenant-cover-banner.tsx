@@ -46,7 +46,7 @@ const containerMaxWidthClasses = {
 };
 
 const FALLBACK_GRADIENT =
-  "linear-gradient(135deg, #19130F 0%, #141416 50%, #0F0F11 100%)";
+  "linear-gradient(135deg, color-mix(in srgb, var(--theme-surface-base) 88%, var(--theme-primary) 12%) 0%, color-mix(in srgb, var(--theme-surface-glass) 80%, var(--theme-primary) 20%) 52%, color-mix(in srgb, var(--theme-surface-elevated) 86%, var(--theme-primary) 14%) 100%)";
 
 function SkeletonBanner({ variant }: { variant: "full" | "compact" }) {
   return (
@@ -158,6 +158,8 @@ export function TenantCoverBanner({
       ? coverThumbnailUrl
       : coverImageUrl
     : null;
+  const textColor = hasCoverImage ? "rgba(255, 255, 255, 1)" : colors.text.primary;
+  const textShadow = hasCoverImage ? "0 1px 3px rgba(0, 0, 0, 0.5)" : "none";
 
   return (
     <div
@@ -188,7 +190,10 @@ export function TenantCoverBanner({
         <div
           className="absolute inset-0"
           aria-hidden="true"
-          style={{ backgroundImage: FALLBACK_GRADIENT }}
+          style={{
+            backgroundImage: FALLBACK_GRADIENT,
+            backdropFilter: "blur(var(--theme-blur-panel))",
+          }}
         />
       )}
 
@@ -198,7 +203,8 @@ export function TenantCoverBanner({
         aria-hidden="true"
         style={{
           background:
-            "linear-gradient(to top, rgba(10,10,11,0.92) 0%, rgba(10,10,11,0.65) 40%, transparent 100%)",
+            "linear-gradient(to top, color-mix(in srgb, var(--theme-background-base) 82%, transparent) 0%, color-mix(in srgb, var(--theme-surface-glass) 46%, transparent) 45%, color-mix(in srgb, var(--theme-primary) 10%, transparent) 100%)",
+          backdropFilter: "blur(var(--theme-blur-panel))",
         }}
       />
 
@@ -217,12 +223,10 @@ export function TenantCoverBanner({
 
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
           <h1
-            className={cn(
-              "font-black leading-[1.2] tracking-tight text-white",
-              nameSizeClasses[variant],
-            )}
+            className={cn("font-black leading-[1.2] tracking-tight", nameSizeClasses[variant])}
             style={{
-              textShadow: "0 1px 3px rgba(0, 0, 0, 0.5)",
+              color: textColor,
+              textShadow,
               fontFamily: typography.family.sans,
               letterSpacing: typography.tracking.tight,
               lineHeight: typography.leading.tight,
@@ -236,8 +240,8 @@ export function TenantCoverBanner({
             <p
               className="text-sm font-medium"
               style={{
-                color: "rgba(255, 255, 255, 1)",
-                textShadow: "0 1px 3px rgba(0, 0, 0, 0.5)",
+                color: textColor,
+                textShadow,
                 fontFamily: typography.family.sans,
                 lineHeight: typography.leading.relaxed,
                 fontWeight: typography.weight.black,
@@ -256,8 +260,8 @@ export function TenantCoverBanner({
               )}
               title={publicAddress}
               style={{
-                color: "rgba(255, 255, 255, 1)",
-                textShadow: "0 1px 3px rgba(0, 0, 0, 0.5)",
+                color: textColor,
+                textShadow,
                 fontFamily: typography.family.sans,
                 lineHeight: typography.leading.relaxed,
                 fontWeight: typography.weight.black,

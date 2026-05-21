@@ -4,7 +4,7 @@ import { cn } from "@/lib/cn";
 import { colors, radius, semanticTokens, typography } from "@/design-system";
 
 const textareaVariants = cva(
-  "w-full border text-sm outline-none transition-all placeholder:text-white/35 focus-visible:[border-color:var(--control-focus-border)] focus-visible:[box-shadow:var(--control-focus-ring)] disabled:pointer-events-none disabled:opacity-[var(--control-disabled-opacity)] disabled:[cursor:var(--control-disabled-cursor)] disabled:[filter:var(--control-disabled-filter)]",
+  "w-full border text-sm outline-none transition-all placeholder:text-[var(--theme-text-muted)] focus-visible:[border-color:var(--control-focus-border)] focus-visible:[box-shadow:var(--control-focus-ring)] disabled:pointer-events-none disabled:opacity-[var(--control-disabled-opacity)] disabled:[cursor:var(--control-disabled-cursor)] disabled:[filter:var(--control-disabled-filter)]",
   {
     variants: {
       variant: {

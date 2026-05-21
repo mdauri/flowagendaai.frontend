@@ -107,7 +107,7 @@ export function GeolocationAddressInput({
     <div className="space-y-2">
       <label
         htmlFor="geolocation-address-input"
-        className="block text-sm font-medium text-white/70"
+        className="block text-sm font-medium text-text-soft"
       >
         {label}
       </label>

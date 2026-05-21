@@ -50,6 +50,8 @@ const cardBaseStyle: React.CSSProperties = {
 const cardVariantStyles: Record<NonNullable<VariantProps<typeof cardVariants>["variant"]>, React.CSSProperties> = {
   glass: {
     backgroundColor: semanticTokens.surface.glass,
+    backgroundImage:
+      "linear-gradient(135deg, var(--theme-overlay-secondary-soft), transparent 40%)",
     backdropFilter: `blur(${semanticTokens.blur.panel})`,
   },
   surface: {
@@ -85,7 +87,7 @@ export function Card({ className, variant, padding, radiusSize, style, ...props 
 export function CardTitle({ className, style, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
   return (
     <h3
-      className={cn("text-xl text-white", className)}
+      className={cn("text-xl text-[var(--theme-text-primary)]", className)}
       style={{
         fontFamily: typography.family.sans,
         fontWeight: typography.weight.black,

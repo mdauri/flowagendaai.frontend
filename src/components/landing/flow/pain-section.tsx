@@ -55,7 +55,7 @@ export function PainSection() {
             <p className="text-sm font-semibold uppercase tracking-[0.22em] text-secondary">
               O problema
             </p>
-            <h2 className="mt-3 text-3xl font-black tracking-tight text-white md:text-5xl">
+            <h2 className="mt-3 text-3xl font-black tracking-tight text-[var(--theme-text-primary)] md:text-5xl">
               Agenda bagunçada é dinheiro saindo pelo ralo
             </h2>
             <p className="mt-4 text-base leading-7 text-text-soft">
@@ -68,7 +68,7 @@ export function PainSection() {
               {pains.map((pain) => (
                 <div
                   key={pain.problem}
-                  className="flex gap-4 rounded-(--radius-lg) border border-white/10 bg-white/5 p-5 backdrop-blur-xl"
+                  className="flex gap-4 rounded-(--radius-lg) border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-5 backdrop-blur-xl"
                 >
                   <div
                     className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-black"
@@ -81,7 +81,7 @@ export function PainSection() {
                     {pain.icon}
                   </div>
                   <div>
-                    <p className="font-bold text-white">{pain.problem}</p>
+                    <p className="font-bold text-[var(--theme-text-primary)]">{pain.problem}</p>
                     <p className="mt-1 text-sm leading-6 text-text-muted">
                       {pain.description}
                     </p>
@@ -96,7 +96,7 @@ export function PainSection() {
             <p className="text-sm font-semibold uppercase tracking-[0.22em] text-secondary">
               A solução
             </p>
-            <h3 className="mt-3 text-2xl font-black tracking-tight text-white md:text-3xl">
+            <h3 className="mt-3 text-2xl font-black tracking-tight text-[var(--theme-text-primary)] md:text-3xl">
               Organizamos seu negócio ou automatizamos seu crescimento.
             </h3>
             <p className="mt-4 text-sm leading-7 text-text-soft">

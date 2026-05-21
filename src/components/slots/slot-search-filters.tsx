@@ -123,7 +123,7 @@ export function SlotSearchFilters({
 
       <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         <label className="grid gap-2" htmlFor={professionalId}>
-          <span className="text-sm font-semibold text-white">Profissional</span>
+          <span className="text-sm font-semibold text-[var(--theme-text-primary)]">Profissional</span>
           <Select
             id={professionalId}
             value={filters.professionalId}
@@ -143,7 +143,7 @@ export function SlotSearchFilters({
         </label>
 
         <label className="grid gap-2" htmlFor={serviceId}>
-          <span className="text-sm font-semibold text-white">Servico</span>
+          <span className="text-sm font-semibold text-[var(--theme-text-primary)]">Servico</span>
           <Select
             id={serviceId}
             value={filters.serviceId}
@@ -163,7 +163,7 @@ export function SlotSearchFilters({
         </label>
 
         <label className="grid gap-2" htmlFor={dateId}>
-          <span className="text-sm font-semibold text-white">Data</span>
+          <span className="text-sm font-semibold text-[var(--theme-text-primary)]">Data</span>
           <div ref={calendarContainerRef} className="relative">
             <Input
               id={dateId}
@@ -239,7 +239,7 @@ export function SlotSearchFilters({
             />
 
             {isCalendarOpen ? (
-              <div className="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-20 grid gap-3 rounded-[1.25rem] border border-white/15 bg-slate-950/95 p-3 shadow-2xl backdrop-blur-md">
+              <div className="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-20 grid gap-3 rounded-[1.25rem] border border-[var(--theme-border-default)] bg-[var(--theme-surface-elevated)] p-3 shadow-2xl backdrop-blur-md">
                 <MonthNavigator
                   month={calendarMonth}
                   minDate={minDate}

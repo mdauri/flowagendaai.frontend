@@ -58,7 +58,7 @@ export function SlotGrid({ slots, selectedSlotStart, timezone, onSelect, isLoadi
     return (
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
         {[1, 2, 3, 4].map((item) => (
-          <div key={item} className="h-16 animate-pulse rounded-3xl bg-white/5" />
+          <div key={item} className="h-16 animate-pulse rounded-3xl bg-surface-glass" />
         ))}
       </div>
     );

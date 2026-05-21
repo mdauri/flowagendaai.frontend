@@ -63,14 +63,14 @@ export function DashboardUpcomingList({
           return (
           <li
             key={booking.bookingId}
-            className="rounded-[24px] border border-white/10 bg-white/5 p-4"
+            className="rounded-[24px] border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-4"
           >
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-sm font-semibold text-secondary">
                   {formatUtcTimeRangeInTenantTimezone(booking.start, booking.end, tenantTimezone)}
                 </p>
-                <p className="mt-2 text-sm font-semibold text-white">
+                <p className="mt-2 text-sm font-semibold text-[var(--theme-text-primary)]">
                   {resolveCustomerName(booking.customerName)}
                 </p>
                 {customerContacts.length > 0 && (

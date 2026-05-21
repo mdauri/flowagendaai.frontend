@@ -88,7 +88,7 @@ export function CustomerDataForm({
           id="customer-notes"
           value={notes}
           onChange={(event) => onNotesChange(event.target.value)}
-          className="w-full text-sm outline-none transition-all focus-visible:[border-color:var(--control-focus-border)] focus-visible:[box-shadow:var(--control-focus-ring)] placeholder:text-white/30"
+          className="w-full text-sm outline-none transition-all placeholder:text-text-muted/70 focus-visible:[border-color:var(--control-focus-border)] focus-visible:[box-shadow:var(--control-focus-ring)]"
           rows={4}
           maxLength={200}
           placeholder="Conte para o profissional sobre seu estilo, alergias, etc."

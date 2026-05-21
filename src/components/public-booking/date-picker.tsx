@@ -29,17 +29,17 @@ export function MonthNavigator({ month, minDate, maxDate, onPrevMonth, onNextMon
         type="button"
         onClick={onPrevMonth}
         disabled={prevDisabled}
-        className="text-2xl leading-none text-white/60 transition hover:text-white"
+        className="text-2xl leading-none text-text-muted transition hover:text-text-primary"
         aria-label="Mês anterior"
       >
         ◀
       </button>
-      <span className="text-base font-semibold text-white">{localeMonth.toFormat("LLLL yyyy")}</span>
+      <span className="text-base font-semibold text-text-primary">{localeMonth.toFormat("LLLL yyyy")}</span>
       <button
         type="button"
         onClick={onNextMonth}
         disabled={nextDisabled}
-        className="text-2xl leading-none text-white/60 transition hover:text-white"
+        className="text-2xl leading-none text-text-muted transition hover:text-text-primary"
         aria-label="Próximo mês"
       >
         ▶
@@ -77,7 +77,7 @@ export function CalendarGrid({
 
   return (
     <div className="space-y-3">
-      <div className="grid grid-cols-7 text-center text-xs font-semibold uppercase tracking-wide text-white/60">
+      <div className="grid grid-cols-7 text-center text-xs font-semibold uppercase tracking-wide text-text-muted">
         {WEEKDAY_NAMES.map((label) => (
           <span key={label}>{label}</span>
         ))}

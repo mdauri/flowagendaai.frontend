@@ -31,7 +31,7 @@ export function AvailableSlotItem({
       }}
     >
       <span className="flex flex-col gap-1">
-        <span className="text-base font-semibold text-white">
+        <span className="text-base font-semibold text-[var(--theme-text-primary)]">
           {formatUtcTimeRangeWithDateWhenCrossesDay(slot.start, slot.end, tenantTimezone)}
         </span>
         <span className="text-sm text-text-soft">{tenantTimezone}</span>

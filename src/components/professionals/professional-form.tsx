@@ -399,7 +399,7 @@ export function ProfessionalForm({
 
       <form className="mt-5 grid gap-4" onSubmit={handleSubmit}>
         <label className="grid gap-2" htmlFor={nameId}>
-          <span className="text-sm font-semibold text-white">Nome completo</span>
+          <span className="text-sm font-semibold text-[var(--theme-text-primary)]">Nome completo</span>
           <Input
             id={nameId}
             name="name"
@@ -419,7 +419,7 @@ export function ProfessionalForm({
         </label>
 
         <div className="grid gap-2">
-          <span className="text-sm font-semibold text-white">Acesso ao sistema</span>
+          <span className="text-sm font-semibold text-[var(--theme-text-primary)]">Acesso ao sistema</span>
           <label className="flex items-center gap-3 rounded-lg border border-white/10 bg-white/5 px-3 py-2">
             <Checkbox
               checked={form.hasSystemAccess}
@@ -427,13 +427,13 @@ export function ProfessionalForm({
               disabled={submitDisabled}
               aria-label="Possui acesso ao sistema"
             />
-            <span className="text-sm text-white">Possui acesso</span>
+            <span className="text-sm text-[var(--theme-text-primary)]">Possui acesso</span>
           </label>
         </div>
 
         {form.hasSystemAccess ? (
           <label className="grid gap-2" htmlFor={emailId}>
-            <span className="text-sm font-semibold text-white">Email do profissional</span>
+            <span className="text-sm font-semibold text-[var(--theme-text-primary)]">Email do profissional</span>
             <Input
               id={emailId}
               name="email"
@@ -450,7 +450,7 @@ export function ProfessionalForm({
 
         <label className="grid gap-2" htmlFor={descriptionId}>
           <div className="flex items-end justify-between gap-4">
-            <span className="text-sm font-semibold text-white">Descricao (opcional)</span>
+            <span className="text-sm font-semibold text-[var(--theme-text-primary)]">Descricao (opcional)</span>
             <span className="text-xs text-text-soft">{charCount}/1000</span>
           </div>
           <Textarea
@@ -472,7 +472,7 @@ export function ProfessionalForm({
 
         {isEditMode ? (
           <div className="grid gap-2">
-            <span className="text-sm font-semibold text-white">Foto</span>
+            <span className="text-sm font-semibold text-[var(--theme-text-primary)]">Foto</span>
             <ProfessionalImageUpload
               professionalId={editProfessional.id}
               currentThumbnailUrl={editProfessional.thumbnailUrl ?? null}
@@ -493,7 +493,7 @@ export function ProfessionalForm({
           </div>
         ) : (
           <div className="grid gap-2">
-            <span className="text-sm font-semibold text-white">Foto (opcional)</span>
+            <span className="text-sm font-semibold text-[var(--theme-text-primary)]">Foto (opcional)</span>
             <div
               className={`relative flex h-28 w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl border border-dashed transition-all ${
                 isDraggingImage ? "border-white/20 bg-white/5" : "border-white/10"

@@ -111,7 +111,7 @@ export function CardTitle({
 }: React.HTMLAttributes<HTMLHeadingElement>) {
   return (
     <h3
-      className={cn("text-xl text-white", className)}
+      className={cn("text-xl text-[var(--theme-text-primary)]", className)}
       style={{
         fontFamily: typography.family.sans,
         fontWeight: typography.weight.black,

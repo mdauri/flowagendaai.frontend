@@ -174,7 +174,7 @@ export function CoverImageUpload({
               </>
             )}
           </Button>
-          <p className="text-xs text-white/55">JPG, PNG ou WebP. Max 5MB.</p>
+          <p className="text-xs text-text-soft">JPG, PNG ou WebP. Max 5MB.</p>
         </div>
       )}
 

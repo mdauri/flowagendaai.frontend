@@ -65,7 +65,7 @@ function DayConfigRow({ config, onChange, disabled }: DayConfigRowProps) {
             }`}
           />
         </button>
-        <span className="text-sm font-medium text-white/90">
+        <span className="text-sm font-medium text-[var(--theme-text-primary)]">
           {dayLabels[config.dayName] || config.dayName}
         </span>
       </div>
@@ -76,12 +76,12 @@ function DayConfigRow({ config, onChange, disabled }: DayConfigRowProps) {
           value={config.startTime || "08:00"}
           onChange={handleStartTimeChange}
           disabled={disabled || !config.isOpen}
-          className={`rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-xs text-white outline-none transition-opacity focus:border-white/20 ${
+          className={`rounded-lg border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] px-2 py-1 text-xs text-[var(--theme-text-primary)] outline-none transition-opacity focus:border-[var(--theme-border-default)] ${
             !config.isOpen ? "opacity-30" : "opacity-100"
           }`}
         />
         <span
-          className={`text-xs text-white/40 ${!config.isOpen ? "opacity-30" : "opacity-100"}`}
+          className={`text-xs text-text-muted ${!config.isOpen ? "opacity-30" : "opacity-100"}`}
         >
           até
         </span>
@@ -90,7 +90,7 @@ function DayConfigRow({ config, onChange, disabled }: DayConfigRowProps) {
           value={config.endTime || "18:00"}
           onChange={handleEndTimeChange}
           disabled={disabled || !config.isOpen}
-          className={`rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-xs text-white outline-none transition-opacity focus:border-white/20 ${
+          className={`rounded-lg border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] px-2 py-1 text-xs text-[var(--theme-text-primary)] outline-none transition-opacity focus:border-[var(--theme-border-default)] ${
             !config.isOpen ? "opacity-30" : "opacity-100"
           }`}
         />
@@ -168,17 +168,17 @@ export function BusinessHoursConfig() {
 
   if (loading) {
     return (
-      <div className="flex h-48 items-center justify-center rounded-2xl border border-white/10 bg-white/5">
-        <Loader2 size={24} className="animate-spin text-white/20" />
+      <div className="flex h-48 items-center justify-center rounded-2xl border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)]">
+        <Loader2 size={24} className="animate-spin text-text-muted" />
       </div>
     );
   }
 
   return (
-    <section className="space-y-4 rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
+    <section className="space-y-4 rounded-2xl border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-4 backdrop-blur-sm">
       <div className="flex items-center gap-2">
         <Clock size={20} style={{ color: colors.brand.primary }} />
-        <h2 className="text-lg font-bold text-white">
+        <h2 className="text-lg font-bold text-[var(--theme-text-primary)]">
           Horário de Funcionamento
         </h2>
       </div>

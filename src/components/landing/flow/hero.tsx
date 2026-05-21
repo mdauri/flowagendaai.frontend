@@ -73,7 +73,7 @@ function HeroAgendaItem({
 }) {
   return (
     <div
-      className="flex items-center justify-between border border-white/10 bg-white/5 p-4"
+      className="flex items-center justify-between border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-4"
       style={{ borderRadius: radius.xs }}
     >
       <div className="flex items-center gap-4">
@@ -84,7 +84,7 @@ function HeroAgendaItem({
           {time}
         </div>
         <div>
-          <p className="font-semibold text-white">{title}</p>
+          <p className="font-semibold text-[var(--theme-text-primary)]">{title}</p>
           <p className="text-sm text-text-muted">
             Confirmação enviada via WhatsApp
           </p>
@@ -107,7 +107,7 @@ function HeroMetricCard({
   return (
     <Card padding="sm" radiusSize="xs">
       <p className="text-sm text-text-muted">{label}</p>
-      <p className="mt-2 text-3xl font-black text-white">{value}</p>
+      <p className="mt-2 text-3xl font-black text-[var(--theme-text-primary)]">{value}</p>
       <p className="mt-1 text-sm text-secondary">{detail}</p>
     </Card>
   );
@@ -125,7 +125,7 @@ export function Hero() {
             Sua agenda organizada · WhatsApp · Link próprio
           </Badge>
 
-          <h1 className="max-w-4xl text-4xl font-black leading-tight tracking-tight text-white md:text-6xl lg:text-7xl">
+          <h1 className="max-w-4xl text-4xl font-black leading-tight tracking-tight text-[var(--theme-text-primary)] md:text-6xl lg:text-7xl">
             Sua agenda organizada.
             <span className="bg-linear-to-r from-primary via-secondary to-tertiary bg-clip-text text-transparent">
               {" "}
@@ -177,10 +177,10 @@ export function Hero() {
               radiusSize="shell"
               className="p-5"
             >
-              <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div className="flex items-center justify-between border-b border-[var(--theme-border-subtle)] pb-4">
                 <div>
                   <p className="text-sm text-text-muted">Agendoro</p>
-                  <h3 className="text-xl font-bold text-white">
+                  <h3 className="text-xl font-bold text-[var(--theme-text-primary)]">
                     Agenda do dia
                   </h3>
                 </div>

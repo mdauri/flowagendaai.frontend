@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { X } from "lucide-react";
-import { colors, typography, shadows } from "@/design-system";
+import { colors, typography, shadows, semanticTokens } from "@/design-system";
 import { Button } from "@/components/flow/button";
 
 export interface ProfessionalOption {
@@ -88,8 +88,12 @@ export function ProfessionalSelectionModal({
       aria-labelledby="modal-title"
     >
       <div
-        className="relative mx-auto my-4 w-full max-w-md rounded-2xl border border-white/10 bg-gray-900 p-6 shadow-2xl"
+        className="relative mx-auto my-4 w-full max-w-md rounded-2xl border p-6 shadow-2xl"
         style={{
+          backgroundColor: semanticTokens.surface.base,
+          borderColor: semanticTokens.border.subtle,
+          color: colors.text.primary,
+          backdropFilter: `blur(${semanticTokens.blur.panel})`,
           boxShadow: shadows.depth,
         }}
       >
@@ -120,7 +124,7 @@ export function ProfessionalSelectionModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-2 text-white/60 transition-colors hover:bg-white/5 hover:text-white"
+            className="rounded-lg p-2 text-text-muted transition-colors hover:bg-surface-glass-subtle hover:text-text-primary"
             aria-label="Fechar modal"
           >
             <X className="h-5 w-5" />
@@ -134,7 +138,11 @@ export function ProfessionalSelectionModal({
               key={professional.id}
               type="button"
               onClick={() => handleSelect(professional.slug)}
-              className="flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/5 p-4 transition-all hover:border-white/20 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/20"
+              className="flex w-full items-center justify-between rounded-xl border bg-surface-glass-subtle p-4 transition-all hover:bg-surface-glass focus:outline-none focus:ring-2"
+              style={{
+                borderColor: semanticTokens.border.subtle,
+                boxShadow: semanticTokens.interaction.focus.ring,
+              }}
             >
               <div className="flex items-center gap-3">
                 <div
@@ -165,10 +173,11 @@ export function ProfessionalSelectionModal({
                 </div>
               </div>
               <div
-                className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white/20"
+                className="flex h-8 w-8 items-center justify-center rounded-full border-2"
+                style={{ borderColor: semanticTokens.border.subtle }}
                 aria-hidden="true"
               >
-                <div className="h-3 w-3 rounded-full bg-white/20" />
+                <div className="h-3 w-3 rounded-full" style={{ backgroundColor: semanticTokens.border.strong }} />
               </div>
             </button>
           ))}

@@ -31,7 +31,7 @@ export function DashboardOccupancyCard({ occupancy }: DashboardOccupancyCardProp
       </p>
       <div className="mt-5 flex items-end justify-between gap-4">
         <div>
-          <p className="text-5xl font-black tracking-tight text-white md:text-6xl">
+          <p className="text-5xl font-black tracking-tight text-[var(--theme-text-primary)] md:text-6xl">
             {occupancy.percentage.toFixed(2)}%
           </p>
           <CardDescription className="mt-3">{resolveInsight(occupancy.percentage)}</CardDescription>
@@ -40,7 +40,7 @@ export function DashboardOccupancyCard({ occupancy }: DashboardOccupancyCardProp
 
       <div
         className="mt-8 h-3 overflow-hidden rounded-full"
-        style={{ backgroundColor: "rgba(255,255,255,0.1)" }}
+        style={{ backgroundColor: "var(--theme-border-subtle)" }}
         aria-label={`Ocupacao do dia em ${occupancy.percentage.toFixed(2)} por cento`}
         role="progressbar"
         aria-valuemin={0}

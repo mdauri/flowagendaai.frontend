@@ -70,7 +70,7 @@ const testimonials = [
 
 export function LandingPage() {
   return (
-    <main className="min-h-screen overflow-x-hidden bg-background text-white">
+    <main className="min-h-screen overflow-x-hidden bg-background text-[var(--theme-text-primary)]">
       <div
         className="pointer-events-none absolute inset-0"
         style={{ backgroundImage: compositionPatterns.overlay.marketingPage }}
@@ -104,7 +104,7 @@ export function LandingPage() {
                 <p className="text-sm font-semibold uppercase tracking-[0.22em] text-secondary">
                   Por que funciona
                 </p>
-                <h3 className="mt-3 text-2xl font-black text-white md:text-4xl">
+                <h3 className="mt-3 text-2xl font-black text-[var(--theme-text-primary)] md:text-4xl">
                   Simples pra você, profissional pro seu cliente
                 </h3>
               </div>
@@ -154,7 +154,7 @@ export function LandingPage() {
                   className="p-6"
                 >
                   <div className="text-sm text-secondary">Agendoro</div>
-                  <div className="mt-2 text-xl font-bold text-white">
+                  <div className="mt-2 text-xl font-bold text-[var(--theme-text-primary)]">
                     {audience}
                   </div>
                   <p className="mt-2 text-sm leading-6 text-text-muted">
@@ -184,15 +184,15 @@ export function LandingPage() {
         <CTASection />
 
         <footer className="px-6 pb-10 md:px-10 lg:px-16">
-          <div className="mx-auto flex max-w-7xl items-center justify-center gap-4 border-t border-white/10 pt-6 text-sm text-text-muted">
+          <div className="mx-auto flex max-w-7xl items-center justify-center gap-4 border-t border-[var(--theme-border-subtle)] pt-6 text-sm text-text-muted">
             <Link
               to="/politica-de-privacidade"
-              className="transition hover:text-white"
+              className="transition hover:text-[var(--theme-text-primary)]"
             >
               Política de Privacidade
             </Link>
-            <span className="text-white/20">•</span>
-            <Link to="/termos-de-uso" className="transition hover:text-white">
+            <span className="text-text-muted">•</span>
+            <Link to="/termos-de-uso" className="transition hover:text-[var(--theme-text-primary)]">
               Termos de Uso
             </Link>
           </div>

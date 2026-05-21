@@ -53,9 +53,9 @@ function SlotSummary({
   serviceName?: string;
 }) {
   return (
-    <div className="grid gap-3 rounded-[28px] border border-white/10 bg-white/5 p-4">
+    <div className="grid gap-3 rounded-[28px] border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-4">
       <div className="flex items-center justify-between gap-3">
-        <span className="text-sm font-semibold text-white">Horario</span>
+        <span className="text-sm font-semibold text-[var(--theme-text-primary)]">Horario</span>
         <Badge variant="info">
           {formatUtcTimeRangeInTenantTimezone(start, end, tenantTimezone)}
         </Badge>
@@ -67,13 +67,13 @@ function SlotSummary({
       {professionalName ? (
         <p className="text-sm leading-6 text-text-soft">
           Profissional:{" "}
-          <span className="font-semibold text-white">{professionalName}</span>
+          <span className="font-semibold text-[var(--theme-text-primary)]">{professionalName}</span>
         </p>
       ) : null}
       {serviceName ? (
         <p className="text-sm leading-6 text-text-soft">
           Servico:{" "}
-          <span className="font-semibold text-white">{serviceName}</span>
+          <span className="font-semibold text-[var(--theme-text-primary)]">{serviceName}</span>
         </p>
       ) : null}
     </div>
@@ -191,7 +191,7 @@ export function BookingConfirmationPanel({
           />
         )
       ) : (
-        <div className="rounded-[28px] border border-dashed border-white/10 bg-white/5 p-4 text-sm leading-6 text-text-soft">
+        <div className="rounded-[28px] border border-dashed border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-4 text-sm leading-6 text-text-soft">
           Selecione um horario para continuar.
         </div>
       )}

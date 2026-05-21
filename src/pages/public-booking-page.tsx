@@ -4,6 +4,7 @@ import { DateTime } from "luxon";
 import { useSearchParams, useParams } from "react-router-dom";
 import { Button } from "@/components/flow/button";
 import { FeedbackBanner } from "@/components/shared/feedback-banner";
+import { ThemeSwitcher } from "@/components/app/theme-switcher";
 import { PublicBookingHeader } from "@/components/public-booking/public-booking-header";
 import { TenantCoverBanner } from "@/components/branding/tenant-cover-banner";
 import { SlotGrid } from "@/components/public-booking/slots";
@@ -381,6 +382,9 @@ export function PublicBookingPage() {
   if (professionalQuery.isLoading) {
     return (
       <div className="px-4 py-6">
+        <div className="mx-auto mb-4 flex max-w-2xl justify-end">
+          <ThemeSwitcher compact />
+        </div>
         <ProfessionalSkeleton />
       </div>
     );
@@ -389,9 +393,23 @@ export function PublicBookingPage() {
   if (professionalQuery.isError) {
     const error = professionalQuery.error as ApiError;
     if (error?.status === 404) {
-      return <ProfessionalNotFoundState />;
+      return (
+        <div className="px-4 py-6">
+          <div className="mx-auto mb-4 flex max-w-2xl justify-end">
+            <ThemeSwitcher compact />
+          </div>
+          <ProfessionalNotFoundState />
+        </div>
+      );
     }
-    return <ConnectionErrorState onRetry={() => professionalQuery.refetch()} />;
+    return (
+      <div className="px-4 py-6">
+        <div className="mx-auto mb-4 flex max-w-2xl justify-end">
+          <ThemeSwitcher compact />
+        </div>
+        <ConnectionErrorState onRetry={() => professionalQuery.refetch()} />
+      </div>
+    );
   }
 
   if (!professional) {
@@ -404,13 +422,16 @@ export function PublicBookingPage() {
 
   return (
     <div
-      className="min-h-screen pb-32 text-white transition-colors duration-500"
+      className="min-h-screen pb-32 text-text-primary transition-colors duration-500"
       style={{
         backgroundColor: colors.background.base,
         fontFamily: typography.family.sans,
       }}
     >
       <div className="mx-auto flex max-w-2xl flex-col gap-6 px-4 py-6 transition-all duration-300 sm:px-6 lg:px-8">
+        <div className="flex justify-end">
+          <ThemeSwitcher compact />
+        </div>
         {/* Cover Banner */}
         <TenantCoverBanner
           tenantName={professional.tenantName}
@@ -437,14 +458,14 @@ export function PublicBookingPage() {
             ) : (
               <div />
             )}
-            <p className="text-xs uppercase tracking-[0.4em] text-white/60">
+            <p className="text-xs uppercase tracking-[0.4em] text-text-muted">
               Etapa {displayedStep} de {stepOrder.length}
             </p>
           </div>
           <div>
             <h2 className="text-2xl font-black">{stepSubtitle}</h2>
             {currentStep === "date" && selectedService ? (
-              <p className="mt-1 text-sm text-white/70">
+              <p className="mt-1 text-sm text-text-soft">
                 Serviço selecionado: {selectedService.name}
               </p>
             ) : null}
@@ -487,7 +508,7 @@ export function PublicBookingPage() {
                 onSelectDate={handleDateSelect}
               />
               {availableDatesQuery.isLoading ? (
-                <p className="text-sm text-white/70">Carregando disponibilidade do mês...</p>
+                <p className="text-sm text-text-soft">Carregando disponibilidade do mês...</p>
               ) : null}
               {availableDatesError ? (
                 <div className="space-y-3">
@@ -509,14 +530,14 @@ export function PublicBookingPage() {
                   </Button>
                 </div>
               ) : null}
-              <p className="text-sm text-white/70">Horários em: {timezone}</p>
+              <p className="text-sm text-text-soft">Horários em: {timezone}</p>
             </div>
           )}
           {showSlotsSection && (
             <div className="space-y-4">
               <div>
-                <p className="text-sm uppercase tracking-[0.3em] text-white/60">Horários disponíveis</p>
-                <p className="text-sm text-white/70">Selecione o horário que prefere</p>
+                <p className="text-sm uppercase tracking-[0.3em] text-text-muted">Horários disponíveis</p>
+                <p className="text-sm text-text-soft">Selecione o horário que prefere</p>
               </div>
               {slotBanner}
               {multiDayConflictError && (

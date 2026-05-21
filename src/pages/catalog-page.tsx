@@ -7,6 +7,7 @@ import { CatalogEmptyState } from "@/components/catalog/catalog-empty-state";
 import { CatalogErrorState } from "@/components/catalog/catalog-error-state";
 import { ProfessionalSelectionModal } from "@/components/public-booking/professional-selection-modal";
 import { TenantCoverBanner } from "@/components/branding/tenant-cover-banner";
+import { ThemeSwitcher } from "@/components/app/theme-switcher";
 import { usePublicCatalogQuery } from "@/hooks/use-public-catalog-query";
 import { useProfessionalsByServiceQuery } from "@/hooks/use-professionals-by-service-query";
 import { ApiError } from "@/types/api";
@@ -115,6 +116,9 @@ export function CatalogPage() {
         }
       >
         <div className="mx-auto max-w-300">
+          <div className="mb-4 flex justify-end">
+            <ThemeSwitcher compact />
+          </div>
           <CatalogSkeleton count={6} />
         </div>
       </div>
@@ -133,6 +137,9 @@ export function CatalogPage() {
         }
       >
         <div className="mx-auto max-w-300">
+          <div className="mb-4 flex justify-end px-4 pt-6">
+            <ThemeSwitcher compact />
+          </div>
           <CatalogErrorState
             error={error}
             onRetry={handleRetry}
@@ -155,6 +162,9 @@ export function CatalogPage() {
         }
       >
         <div className="mx-auto max-w-300">
+          <div className="mb-4 flex justify-end px-4 pt-6">
+            <ThemeSwitcher compact />
+          </div>
           <CatalogEmptyState onBack={handleBack} />
         </div>
       </div>
@@ -172,6 +182,9 @@ export function CatalogPage() {
       }
     >
       <div className="mx-auto max-w-300">
+        <div className="mb-4 flex justify-end">
+          <ThemeSwitcher compact />
+        </div>
         {/* Cover Banner */}
         {catalog.tenant && (
           <TenantCoverBanner
