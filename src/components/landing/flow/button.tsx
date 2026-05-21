@@ -14,8 +14,8 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        primary: "hover:translate-y-[var(--control-hover-lift-y)]",
-        secondary: "hover:[background-color:var(--control-hover-glass-background)]",
+        primary: "hover:translate-y-[var(--control-hover-lift-y)] hover:[box-shadow:var(--control-hover-shadow)]",
+        secondary: "hover:translate-y-[var(--control-hover-lift-y)] hover:[background-color:var(--control-hover-glass-background)] hover:[border-color:var(--control-hover-border)]",
         ghost: "hover:[color:var(--control-hover-ghost-text)]",
       },
       size: {
@@ -39,6 +39,8 @@ const buttonBaseStyle: React.CSSProperties = {
 
 const buttonStateStyle = {
   "--control-hover-lift-y": semanticTokens.interaction.hover.liftY,
+  "--control-hover-shadow": shadows.glow,
+  "--control-hover-border": semanticTokens.border.strong,
   "--control-hover-glass-background":
     semanticTokens.interaction.hover.glassBackground,
   "--control-hover-ghost-text": semanticTokens.interaction.hover.ghostText,
@@ -55,12 +57,12 @@ const buttonVariantStyles: Record<
 > = {
   primary: {
     backgroundImage: `linear-gradient(to right, ${colors.brand.primary}, ${colors.brand.secondary})`,
-    boxShadow: shadows.glow,
+    boxShadow: shadows.card,
     color: colors.text.dark,
   },
   secondary: {
     backgroundColor: semanticTokens.surface.glass,
-    borderColor: semanticTokens.border.default,
+    borderColor: semanticTokens.border.strong,
     color: colors.text.primary,
     backdropFilter: `blur(${semanticTokens.blur.panel})`,
   },

@@ -15,10 +15,10 @@ export function SectionHeading({
 }: SectionHeadingProps) {
   return (
     <div className={cn("max-w-2xl", className)}>
-      <p className="text-sm font-semibold uppercase tracking-[0.22em] text-secondary">
+      <p className="text-xs font-bold uppercase tracking-[0.18em] text-secondary md:text-sm">
         {eyebrow}
       </p>
-      <h2 className="mt-3 text-3xl font-black tracking-tight text-[var(--theme-text-primary)] md:text-5xl">
+      <h2 className="mt-3 text-3xl font-black tracking-[-0.04em] text-[var(--theme-text-primary)] md:text-5xl">
         {title}
       </h2>
       {description ? (

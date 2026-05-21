@@ -61,6 +61,8 @@ const cardVariantStyles: Record<
 > = {
   glass: {
     backgroundColor: semanticTokens.surface.glass,
+    backgroundImage:
+      "linear-gradient(145deg, var(--theme-surface-glass), color-mix(in srgb, var(--theme-primary) 7%, transparent))",
     backdropFilter: `blur(${semanticTokens.blur.panel})`,
   },
   surface: {

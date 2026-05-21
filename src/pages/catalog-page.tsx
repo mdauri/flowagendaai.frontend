@@ -104,6 +104,20 @@ export function CatalogPage() {
     catalogQuery.refetch();
   };
 
+  const publicTopbar = (
+    <div className="mb-5 flex items-center justify-between rounded-full border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] px-4 py-3 shadow-[var(--theme-shadow-card)] backdrop-blur-[var(--theme-blur-panel)]">
+      <div className="min-w-0">
+        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-secondary">
+          Agendoro
+        </p>
+        <p className="truncate text-sm font-semibold text-[var(--theme-text-primary)]">
+          Catalogo publico
+        </p>
+      </div>
+      <ThemeSwitcher compact />
+    </div>
+  );
+
   // Loading state
   if (catalogQuery.isLoading) {
     return (
@@ -116,9 +130,7 @@ export function CatalogPage() {
         }
       >
         <div className="mx-auto max-w-300">
-          <div className="mb-4 flex justify-end">
-            <ThemeSwitcher compact />
-          </div>
+          {publicTopbar}
           <CatalogSkeleton count={6} />
         </div>
       </div>
@@ -137,9 +149,7 @@ export function CatalogPage() {
         }
       >
         <div className="mx-auto max-w-300">
-          <div className="mb-4 flex justify-end px-4 pt-6">
-            <ThemeSwitcher compact />
-          </div>
+          {publicTopbar}
           <CatalogErrorState
             error={error}
             onRetry={handleRetry}
@@ -162,9 +172,7 @@ export function CatalogPage() {
         }
       >
         <div className="mx-auto max-w-300">
-          <div className="mb-4 flex justify-end px-4 pt-6">
-            <ThemeSwitcher compact />
-          </div>
+          {publicTopbar}
           <CatalogEmptyState onBack={handleBack} />
         </div>
       </div>
@@ -182,9 +190,7 @@ export function CatalogPage() {
       }
     >
       <div className="mx-auto max-w-300">
-        <div className="mb-4 flex justify-end">
-          <ThemeSwitcher compact />
-        </div>
+        {publicTopbar}
         {/* Cover Banner */}
         {catalog.tenant && (
           <TenantCoverBanner

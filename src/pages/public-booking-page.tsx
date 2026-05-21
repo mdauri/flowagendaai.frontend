@@ -419,6 +419,19 @@ export function PublicBookingPage() {
   const shouldShowBookingNotification =
     bookingNotification && currentStep !== "confirm" && currentStep !== "success";
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
+  const publicTopbar = (
+    <div className="flex items-center justify-between rounded-full border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] px-4 py-3 shadow-[var(--theme-shadow-card)] backdrop-blur-[var(--theme-blur-panel)]">
+      <div className="min-w-0">
+        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-secondary">
+          Agendoro
+        </p>
+        <p className="truncate text-sm font-semibold text-[var(--theme-text-primary)]">
+          Agendamento publico
+        </p>
+      </div>
+      <ThemeSwitcher compact />
+    </div>
+  );
 
   return (
     <div
@@ -429,9 +442,7 @@ export function PublicBookingPage() {
       }}
     >
       <div className="mx-auto flex max-w-2xl flex-col gap-6 px-4 py-6 transition-all duration-300 sm:px-6 lg:px-8">
-        <div className="flex justify-end">
-          <ThemeSwitcher compact />
-        </div>
+        {publicTopbar}
         {/* Cover Banner */}
         <TenantCoverBanner
           tenantName={professional.tenantName}

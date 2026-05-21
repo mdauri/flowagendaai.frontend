@@ -7,8 +7,8 @@ interface FeatureCardProps {
 
 export function FeatureCard({ title, description }: FeatureCardProps) {
   return (
-    <Card className="transition-transform hover:-translate-y-1 hover:border-[var(--theme-border-strong)]">
-      <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-(--radius-lg) bg-linear-to-br from-primary to-tertiary text-lg font-black text-dark">
+    <Card className="relative overflow-hidden transition-all duration-300 before:absolute before:left-6 before:right-6 before:top-0 before:h-px before:bg-linear-to-r before:from-transparent before:via-primary/45 before:to-transparent hover:-translate-y-0.5 hover:border-[var(--theme-border-strong)] hover:shadow-[var(--theme-shadow-card)]">
+      <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-(--radius-lg) border border-[var(--theme-border-accent)] bg-linear-to-br from-primary to-tertiary text-lg font-black text-dark shadow-[var(--theme-shadow-card)]">
         ✦
       </div>
       <CardTitle>{title}</CardTitle>

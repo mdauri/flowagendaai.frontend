@@ -8,17 +8,17 @@ const FRONTEND_URL =
 
 export function Navbar() {
   return (
-    <header className="sticky top-0 z-50 px-6 pt-6 md:px-10 lg:px-16">
-      <div className="mx-auto flex max-w-7xl items-center justify-between rounded-full border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] px-4 py-3 backdrop-blur-xl">
-        <div className="flex items-center gap-3">
+    <header className="sticky top-0 z-50 px-4 pt-4 md:px-10 md:pt-6 lg:px-16">
+      <div className="mx-auto flex max-w-7xl items-center justify-between rounded-full border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] px-3 py-2.5 shadow-[var(--theme-shadow-card)] backdrop-blur-xl md:px-4 md:py-3">
+        <div className="flex min-w-0 items-center gap-2.5 md:gap-3">
           <Link to="/" className="flex items-center ">
             <img
               src="/agendoro-logo.png"
               alt="Agendoro"
-              className="h-20 w-20"
+              className="h-14 w-14 md:h-16 md:w-16"
             />
           </Link>
-          <div>
+          <div className="min-w-0">
             <p className="text-sm font-semibold tracking-wide text-[var(--theme-text-primary)]">
               Agend
               <span className="bg-linear-to-r from-primary via-secondary to-tertiary bg-clip-text text-transparent">
