@@ -178,6 +178,52 @@ export function AppShell({
             ) : null}
             {user.role === "system-admin" && !isProfessional ? (
               <NavLink
+                to="/app/system-admin/tenants/whatsapp"
+                className={({ isActive }) =>
+                  cn(
+                    "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
+                    isActive
+                      ? "border-primary bg-primary text-black"
+                      : "border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] text-text-soft hover:border-[var(--theme-border-default)] hover:text-[var(--theme-text-primary)]",
+                  )
+                }
+              >
+                WhatsApp
+              </NavLink>
+            ) : null}
+            {user.role === "system-admin" && !isProfessional ? (
+              <NavLink
+                to="/app/system-admin/meta-whatsapp"
+                className={({ isActive }) =>
+                  cn(
+                    "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
+                    isActive
+                      ? "border-primary bg-primary text-black"
+                      : "border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] text-text-soft hover:border-[var(--theme-border-default)] hover:text-[var(--theme-text-primary)]",
+                  )
+                }
+              >
+                Billing WhatsApp
+              </NavLink>
+            ) : null}
+            {["admin", "system-admin"].includes(user.role) &&
+            !isProfessional ? (
+              <NavLink
+                to="/app/meta-whatsapp"
+                className={({ isActive }) =>
+                  cn(
+                    "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
+                    isActive
+                      ? "border-primary bg-primary text-black"
+                      : "border-(--theme-border-subtle) bg-(--theme-surface-glass) text-text-soft hover:border-(--theme-border-default) hover:text-(--theme-text-primary)",
+                  )
+                }
+              >
+                Meu WhatsApp
+              </NavLink>
+            ) : null}
+            {user.role === "system-admin" && !isProfessional ? (
+              <NavLink
                 to="/app/system-admin/tenants/provision"
                 className={({ isActive }) =>
                   cn(

@@ -18,6 +18,11 @@ import { BookingsPage } from "@/pages/bookings-page";
 import { HolidaysPage } from "@/pages/holidays-page";
 import { MeuDiaPage } from "@/pages/meu-dia-page";
 import { SystemAdminTenantProvisionPage } from "@/pages/system-admin-tenant-provision-page";
+import { SystemAdminTenantWhatsAppPage } from "@/pages/system-admin-tenant-whatsapp-page";
+import {
+  MetaWhatsAppBillingSystemAdminPage,
+  MetaWhatsAppBillingTenantPage,
+} from "@/pages/meta-whatsapp-billing-page";
 import { TermsPage } from "@/pages/terms-page";
 import { ProfessionalServiceManager } from "@/components/professional-service-manager";
 import { ProtectedRoute } from "@/components/app/protected-route";
@@ -98,6 +103,9 @@ export function AppRouter() {
           />
           <Route path="api-tokens" element={<ApiTokensPage />} />
           <Route path="system-admin/tenants/provision" element={<SystemAdminTenantProvisionPage />} />
+          <Route path="system-admin/tenants/whatsapp" element={<SystemAdminTenantWhatsAppPage />} />
+          <Route path="system-admin/meta-whatsapp" element={<MetaWhatsAppBillingSystemAdminPage />} />
+          <Route path="meta-whatsapp" element={<MetaWhatsAppBillingTenantPage />} />
           <Route path="*" element={<AppIndexRedirect />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />

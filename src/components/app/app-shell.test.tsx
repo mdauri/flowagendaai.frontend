@@ -37,6 +37,7 @@ describe("AppShell", () => {
     renderShell("system-admin");
 
     expect(screen.getByRole("link", { name: "API Tokens" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "WhatsApp" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Dashboard" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Profissionais" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Servicos" })).toBeInTheDocument();
@@ -50,6 +51,7 @@ describe("AppShell", () => {
     renderShell("admin");
 
     expect(screen.queryByRole("link", { name: "API Tokens" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "WhatsApp" })).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Meu Dia" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Dashboard" })).toBeInTheDocument();
   });
