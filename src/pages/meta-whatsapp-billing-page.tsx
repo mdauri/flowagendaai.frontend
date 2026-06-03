@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { AlertTriangle, Loader2, Plus, Trash2 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Badge } from "@/components/flow/badge";
@@ -22,6 +22,11 @@ import type {
   MetaWhatsAppBillingSummaryResponse,
   MetaWhatsAppBillingTenantSummaryResponse,
 } from "@/types/meta-whatsapp-billing";
+import {
+  formatMetaWhatsAppCurrency,
+  META_WHATSAPP_BILLING_CURRENCY_OPTIONS,
+  normalizeMetaWhatsAppCurrency,
+} from "@/lib/meta-whatsapp-currency";
 
 type Scope = "system-admin" | "tenant";
 type ViewTab = "overview" | "events" | "pricing" | "policy";
@@ -56,19 +61,6 @@ const MARKUP_OPTIONS: SelectOption[] = [
   { value: "PERCENTAGE", label: "Percentual" },
   { value: "FIXED", label: "Taxa fixa" },
 ];
-
-function formatCurrency(
-  value: string | number | null | undefined,
-  currency: string,
-) {
-  const numeric = typeof value === "string" ? Number(value) : (value ?? 0);
-  return new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency,
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(Number.isFinite(numeric) ? numeric : 0);
-}
 
 function formatMonthLabel(month: string) {
   const [year, monthPart] = month.split("-");
@@ -152,7 +144,7 @@ function BillingGraph({
               <div className="flex items-center justify-between text-sm text-text-soft">
                 <span>{formatMonthLabel(item.month)}</span>
                 <span>
-                  {formatCurrency(item.repassedCost, summary.currency)}
+                  {formatMetaWhatsAppCurrency(item.repassedCost, summary.currency)}
                 </span>
               </div>
               <div className="h-3 overflow-hidden rounded-full bg-[rgba(255,255,255,0.08)]">
@@ -217,10 +209,10 @@ function EventsTable({
                   <td className="py-3 pr-4">{item.recipientCountry ?? "-"}</td>
                   <td className="py-3 pr-4">{item.recipientPhone ?? "-"}</td>
                   <td className="py-3 pr-4">
-                    {formatCurrency(item.estimatedCost, currency)}
+                    {formatMetaWhatsAppCurrency(item.estimatedCost, currency)}
                   </td>
                   <td className="py-3 pr-4">
-                    {formatCurrency(item.repassedCost, currency)}
+                    {formatMetaWhatsAppCurrency(item.repassedCost, currency)}
                   </td>
                   <td className="py-3 pr-4">
                     <Badge
@@ -263,7 +255,7 @@ function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
   const [pricingForm, setPricingForm] = useState({
     countryCode: "BR",
     messageCategory: "service",
-    currency: "BRL",
+    currency: "USD",
     baseCost: "0.0000",
     effectiveFrom: `${new Date().toISOString().slice(0, 10)}T00:00`,
     effectiveTo: "",
@@ -274,7 +266,7 @@ function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
     fixedFeeValue: "0.0000",
     monthlyLimitValue: "0.0000",
     alertThresholdValue: "0.8000",
-    currency: "BRL",
+    currency: "USD",
     isActive: true,
   });
 
@@ -336,7 +328,7 @@ function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
       fixedFeeValue: tenantSettingsQuery.data.fixedFeeValue,
       monthlyLimitValue: tenantSettingsQuery.data.monthlyLimitValue,
       alertThresholdValue: tenantSettingsQuery.data.alertThresholdValue,
-      currency: tenantSettingsQuery.data.currency,
+      currency: normalizeMetaWhatsAppCurrency(tenantSettingsQuery.data.currency),
       isActive: tenantSettingsQuery.data.isActive,
     });
   }, [tenantSettingsQuery.data]);
@@ -416,7 +408,7 @@ function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
       await metaWhatsAppBillingService.createPricingRate({
         countryCode: pricingForm.countryCode,
         messageCategory: pricingForm.messageCategory,
-        currency: pricingForm.currency,
+        currency: normalizeMetaWhatsAppCurrency(pricingForm.currency),
         baseCost: pricingForm.baseCost,
         effectiveFrom: new Date(pricingForm.effectiveFrom).toISOString(),
         effectiveTo: pricingForm.effectiveTo
@@ -452,7 +444,7 @@ function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
         fixedFeeValue: settingsForm.fixedFeeValue,
         monthlyLimitValue: settingsForm.monthlyLimitValue,
         alertThresholdValue: settingsForm.alertThresholdValue,
-        currency: settingsForm.currency,
+        currency: normalizeMetaWhatsAppCurrency(settingsForm.currency),
         isActive: settingsForm.isActive,
       });
       await queryClient.invalidateQueries({
@@ -568,7 +560,7 @@ function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <SummaryMetricCard
               title="Custo do mês"
-              value={formatCurrency(
+              value={formatMetaWhatsAppCurrency(
                 summary.current.repassedCost,
                 summary.currency,
               )}
@@ -592,7 +584,7 @@ function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
                 value={topTenant?.tenantName ?? "—"}
                 description={
                   topTenant
-                    ? formatCurrency(topTenant.repassedCost, summary.currency)
+                    ? formatMetaWhatsAppCurrency(topTenant.repassedCost, summary.currency)
                     : "Sem dados"
                 }
                 variant={topTenant?.isNearLimit ? "danger" : "neutral"}
@@ -622,13 +614,13 @@ function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
                       <div className="flex items-center justify-between">
                         <span>Custo bruto</span>
                         <span>
-                          {formatCurrency(item.grossCost, summary.currency)}
+                          {formatMetaWhatsAppCurrency(item.grossCost, summary.currency)}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span>Repasse</span>
                         <span>
-                          {formatCurrency(item.repassedCost, summary.currency)}
+                          {formatMetaWhatsAppCurrency(item.repassedCost, summary.currency)}
                         </span>
                       </div>
                     </div>
@@ -735,12 +727,13 @@ function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
                 <label className="mb-2 block text-sm font-semibold text-text-soft">
                   Moeda
                 </label>
-                <Input
+                <Select
                   value={pricingForm.currency}
-                  onChange={(e) =>
+                  options={META_WHATSAPP_BILLING_CURRENCY_OPTIONS}
+                  onValueChange={(value) =>
                     setPricingForm((current) => ({
                       ...current,
-                      currency: e.target.value,
+                      currency: normalizeMetaWhatsAppCurrency(value),
                     }))
                   }
                 />
@@ -827,7 +820,7 @@ function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
                         <td className="py-3 pr-4">{rate.countryCode}</td>
                         <td className="py-3 pr-4">{rate.messageCategory}</td>
                         <td className="py-3 pr-4">
-                          {formatCurrency(rate.baseCost, rate.currency)}
+                          {formatMetaWhatsAppCurrency(rate.baseCost, rate.currency)}
                           {rate.isFree ? " (grátis)" : ""}
                         </td>
                         <td className="py-3 pr-4 text-text-soft">
@@ -946,12 +939,13 @@ function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
                   <label className="mb-2 block text-sm font-semibold text-text-soft">
                     Moeda
                   </label>
-                  <Input
+                  <Select
                     value={settingsForm.currency}
-                    onChange={(event) =>
+                    options={META_WHATSAPP_BILLING_CURRENCY_OPTIONS}
+                    onValueChange={(value) =>
                       setSettingsForm((current) => ({
                         ...current,
-                        currency: event.target.value,
+                        currency: normalizeMetaWhatsAppCurrency(value),
                       }))
                     }
                   />
