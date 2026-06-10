@@ -18,6 +18,7 @@ const authState = {
     id: "tenant-platform",
     name: "Agendoro Platform",
     timezone: "America/Sao_Paulo",
+    slug: "platform",
     logoUrl: null,
     coverImageUrl: null,
     publicAddress: null,

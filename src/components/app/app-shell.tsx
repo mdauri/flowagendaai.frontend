@@ -2,6 +2,7 @@ import type { PropsWithChildren } from "react";
 import { NavLink } from "react-router-dom";
 import { Card } from "@/components/flow/card";
 import { UserIdentityHeaderCard } from "@/components/app/user-identity-header-card";
+import { DemoEnvironmentBanner } from "@/components/shared/demo-environment-banner";
 import { cn } from "@/lib/cn";
 import type { AuthTenant, AuthUser } from "@/types/auth";
 
@@ -25,6 +26,7 @@ export function AppShell({
     <div className="min-h-screen px-6 py-6 md:px-10 lg:px-16">
       <header className="mx-auto grid max-w-7xl gap-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-start">
         <div>
+          <DemoEnvironmentBanner tenantSlug={tenant.slug} className="mb-4" />
           <p className="text-sm font-semibold uppercase tracking-[0.22em] text-secondary">
             Agendoro
           </p>

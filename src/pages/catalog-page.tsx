@@ -7,6 +7,7 @@ import { CatalogEmptyState } from "@/components/catalog/catalog-empty-state";
 import { CatalogErrorState } from "@/components/catalog/catalog-error-state";
 import { ProfessionalSelectionModal } from "@/components/public-booking/professional-selection-modal";
 import { TenantCoverBanner } from "@/components/branding/tenant-cover-banner";
+import { DemoEnvironmentBanner } from "@/components/shared/demo-environment-banner";
 import { ThemeSwitcher } from "@/components/app/theme-switcher";
 import { usePublicCatalogQuery } from "@/hooks/use-public-catalog-query";
 import { useProfessionalsByServiceQuery } from "@/hooks/use-professionals-by-service-query";
@@ -117,6 +118,9 @@ export function CatalogPage() {
       <ThemeSwitcher compact />
     </div>
   );
+  const demoBanner = catalog?.tenant?.slug ? (
+    <DemoEnvironmentBanner tenantSlug={catalog.tenant.slug} className="mb-5" />
+  ) : null;
 
   // Loading state
   if (catalogQuery.isLoading) {
@@ -131,6 +135,7 @@ export function CatalogPage() {
       >
         <div className="mx-auto max-w-300">
           {publicTopbar}
+          {demoBanner}
           <CatalogSkeleton count={6} />
         </div>
       </div>
@@ -150,6 +155,7 @@ export function CatalogPage() {
       >
         <div className="mx-auto max-w-300">
           {publicTopbar}
+          {demoBanner}
           <CatalogErrorState
             error={error}
             onRetry={handleRetry}
@@ -173,6 +179,7 @@ export function CatalogPage() {
       >
         <div className="mx-auto max-w-300">
           {publicTopbar}
+          {demoBanner}
           <CatalogEmptyState onBack={handleBack} />
         </div>
       </div>
@@ -191,6 +198,7 @@ export function CatalogPage() {
     >
       <div className="mx-auto max-w-300">
         {publicTopbar}
+        {demoBanner}
         {/* Cover Banner */}
         {catalog.tenant && (
           <TenantCoverBanner

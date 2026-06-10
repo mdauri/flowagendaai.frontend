@@ -20,6 +20,7 @@ const authState = {
     id: "tenant-1",
     name: "Agendoro Clinic",
     timezone: "America/Sao_Paulo",
+    slug: "clinic",
   },
   isAuthenticated: true,
   isBootstrapping: false,

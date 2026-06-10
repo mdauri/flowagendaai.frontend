@@ -4,6 +4,7 @@ import { DateTime } from "luxon";
 import { useSearchParams, useParams } from "react-router-dom";
 import { Button } from "@/components/flow/button";
 import { FeedbackBanner } from "@/components/shared/feedback-banner";
+import { DemoEnvironmentBanner } from "@/components/shared/demo-environment-banner";
 import { ThemeSwitcher } from "@/components/app/theme-switcher";
 import { PublicBookingHeader } from "@/components/public-booking/public-booking-header";
 import { SlotGrid } from "@/components/public-booking/slots";
@@ -134,6 +135,9 @@ export function PublicBookingPage() {
   const createBookingMutation = useCreatePublicBookingMutation();
 
   const professional = professionalQuery.data;
+  const demoBanner = professional?.tenantSlug ? (
+    <DemoEnvironmentBanner tenantSlug={professional.tenantSlug} className="mb-5" />
+  ) : null;
   const tenantTimezone = professional?.tenantTimezone ?? "UTC";
   const minDate = useMemo(() => DateTime.now().setZone(tenantTimezone).startOf("day"), [tenantTimezone]);
   const maxDate = useMemo(() => minDate.plus({ days: 30 }), [minDate]);
@@ -488,6 +492,7 @@ export function PublicBookingPage() {
     >
       <div className="mx-auto flex max-w-2xl flex-col gap-6 px-4 py-6 transition-all duration-300 sm:px-6 lg:px-8">
         <PublicTenantTopbar professional={professional} />
+        {demoBanner}
         <PublicBookingHeader professional={professional} />
         <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
           <div className="flex items-center justify-between">

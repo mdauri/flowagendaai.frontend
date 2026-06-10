@@ -11,6 +11,7 @@ export interface AuthTenant {
   id: string;
   name: string;
   timezone: string;
+  slug: string | null;
   logoUrl: string | null;
   coverImageUrl: string | null;
   publicAddress: string | null;

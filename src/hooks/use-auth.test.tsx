@@ -21,6 +21,7 @@ const currentUserQueryState = {
       id: "tenant-1",
       name: "Agendoro Clinic",
       timezone: "America/Sao_Paulo",
+      slug: "clinic",
     },
   },
   isLoading: false,
@@ -73,6 +74,7 @@ describe("useAuth", () => {
         id: "tenant-1",
         name: "Agendoro Clinic",
         timezone: "America/Sao_Paulo",
+        slug: "clinic",
       },
     };
     currentUserQueryState.isLoading = false;

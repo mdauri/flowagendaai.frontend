@@ -17,6 +17,7 @@ const authState = {
     id: "tenant-1",
     name: "Tenant Demo",
     timezone: "America/Sao_Paulo",
+    slug: "demo",
     logoUrl: null,
     coverImageUrl: null,
     publicAddress: null,

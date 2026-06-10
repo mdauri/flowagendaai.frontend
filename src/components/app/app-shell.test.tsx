@@ -9,6 +9,7 @@ const tenant: AuthTenant = {
   id: "tenant-1",
   name: "Agendoro Clinic",
   timezone: "America/Sao_Paulo",
+  slug: "clinic",
   logoUrl: null,
   coverImageUrl: null,
   publicAddress: null,
@@ -65,5 +66,31 @@ describe("AppShell", () => {
     expect(screen.queryByRole("link", { name: "Profissionais" })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Servicos" })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Configuracoes" })).not.toBeInTheDocument();
+  });
+
+  test("exibe banner de demo somente no tenant demo", () => {
+    renderWithProviders(
+      <MemoryRouter initialEntries={["/app/dashboard"]}>
+        <AppShell
+          user={{
+            id: "user-1",
+            name: "User Test",
+            email: "user@test.com",
+            role: "admin",
+            professionalId: null,
+          }}
+          tenant={{
+            ...tenant,
+            slug: "demo",
+          }}
+          onLogout={vi.fn()}
+        >
+          <div>Conteudo</div>
+        </AppShell>
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText("⚠ Ambiente de Demonstração")).toBeInTheDocument();
+    expect(screen.getByText("Os dados podem ser restaurados automaticamente.")).toBeInTheDocument();
   });
 });
