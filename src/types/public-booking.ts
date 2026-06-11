@@ -86,4 +86,39 @@ export interface CreatePublicBookingResponse {
   daysAffected?: DaySegment[];
 }
 
+export interface PublicManageBookingResponse {
+  tenantName: string;
+  tenantTimezone: string;
+  serviceName: string;
+  professionalName: string | null;
+  startAt: string;
+  endAt: string;
+  status: string;
+  customerName: string;
+  canConfirm: boolean;
+  canCancel: boolean;
+  publicBookingUrl: string;
+  manageTokenExpiresAt: string | null;
+}
+
+export interface PublicManageBookingConfirmResponse {
+  booking: {
+    id: string;
+    status: "CONFIRMED";
+    confirmedAt: string;
+    confirmedByType: "PUBLIC";
+    confirmedById?: string | null;
+  };
+}
+
+export interface PublicManageBookingCancelResponse {
+  booking: {
+    id: string;
+    status: "CANCELLED";
+    cancelledAt: string;
+    cancelledByType: "PUBLIC";
+    cancelReason?: string | null;
+  };
+}
+
 export type PublicBookingStep = "service" | "date" | "slot" | "customer" | "confirm" | "success";

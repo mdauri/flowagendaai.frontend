@@ -9,6 +9,7 @@ import { ProfessionalsPage } from "@/pages/professionals-page";
 import { ProfessionalRemovalPage } from "@/pages/professional-removal-page";
 import { PrivacyPolicyPage } from "@/pages/privacy-policy-page";
 import { PublicBookingPage } from "@/pages/public-booking-page";
+import { ManageBookingPage } from "@/pages/manage-booking-page";
 import { ResetPasswordPage } from "@/pages/reset-password-page";
 import { ServicesPage } from "@/pages/services-page";
 import { SlotsPage } from "@/pages/slots-page";
@@ -64,6 +65,7 @@ export function AppRouter() {
         <Route path="/forgot-password" element={<ForgotPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/p/:slug" element={<PublicBookingPage />} />
+        <Route path="/manage/:token" element={<ManageBookingPage />} />
         <Route path="/c/:slug/catalog" element={<CatalogPage />} />
 
         <Route

@@ -3,6 +3,9 @@ import type {
   CreatePublicBookingInput,
   CreatePublicBookingResponse,
   PublicAvailableDatesResponse,
+  PublicManageBookingCancelResponse,
+  PublicManageBookingConfirmResponse,
+  PublicManageBookingResponse,
   PublicProfessional,
   PublicServicesResponse,
   PublicSlotsResponse,
@@ -68,6 +71,34 @@ export const publicBookingService = {
     input: { cancelToken: string; reason?: string }
   ): Promise<CancelBookingResponse> {
     return httpClient<CancelBookingResponse>(`/public/bookings/${bookingId}/cancel`, {
+      method: "POST",
+      skipAuth: true,
+      body: JSON.stringify(input),
+    });
+  },
+
+  async getManagedBooking(token: string): Promise<PublicManageBookingResponse> {
+    return httpClient<PublicManageBookingResponse>(`/public/bookings/manage/${encodeURIComponent(token)}`, {
+      skipAuth: true,
+    });
+  },
+
+  async confirmManagedBooking(token: string): Promise<PublicManageBookingConfirmResponse> {
+    return httpClient<PublicManageBookingConfirmResponse>(
+      `/public/bookings/manage/${encodeURIComponent(token)}/confirm`,
+      {
+        method: "POST",
+        skipAuth: true,
+        body: JSON.stringify({}),
+      }
+    );
+  },
+
+  async cancelManagedBooking(
+    token: string,
+    input: { reason?: string }
+  ): Promise<PublicManageBookingCancelResponse> {
+    return httpClient<PublicManageBookingCancelResponse>(`/public/bookings/manage/${encodeURIComponent(token)}/cancel`, {
       method: "POST",
       skipAuth: true,
       body: JSON.stringify(input),
