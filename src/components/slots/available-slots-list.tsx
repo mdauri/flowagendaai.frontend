@@ -18,14 +18,14 @@ export function AvailableSlotsList({
   onSelect,
 }: AvailableSlotsListProps) {
   return (
-    <Card variant="glass" padding="md" className="grid gap-4">
+    <Card variant="glass" padding="md" className="grid min-w-0 gap-4">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <CardTitle>Horarios disponiveis ({slots.length})</CardTitle>
         </div>
       </div>
 
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className="grid min-w-0 gap-3 md:grid-cols-2">
         {slots.map((slot) => (
           <AvailableSlotItem
             key={slot.start}

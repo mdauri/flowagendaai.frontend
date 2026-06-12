@@ -235,7 +235,13 @@ export function PublicBookingPage() {
   const inSlotStep = currentStep === "slot";
   const showSlotsSection = inSlotStep;
 
-  const stepSubtitle = useMemo(() => stepTitles[currentStep], [currentStep]);
+  const stepSubtitle = useMemo(() => {
+    if (currentStep === "success" && bookingResult?.status === "AWAITING_DEPOSIT") {
+      return "Aguardando sinal";
+    }
+
+    return stepTitles[currentStep];
+  }, [bookingResult?.status, currentStep]);
   const stepIndex = stepOrder.indexOf(currentStep);
   const displayedStep = stepIndex >= 0 ? stepIndex + 1 : stepOrder.length;
 

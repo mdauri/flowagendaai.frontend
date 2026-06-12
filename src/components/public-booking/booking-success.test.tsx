@@ -9,6 +9,11 @@ const singleDayBooking = {
   serviceId: "svc-1",
   start: "2026-04-18T08:00:00.000Z",
   end: "2026-04-18T09:00:00.000Z",
+  status: "CONFIRMED" as const,
+  depositRequired: false,
+  depositStatus: "NOT_REQUIRED" as const,
+  depositAmountCents: null,
+  depositPaymentProvider: "MANUAL" as const,
   customerName: "Roberto",
   customerPhone: "+55 (11) 98765-4321",
   customerEmail: null,
@@ -62,5 +67,25 @@ describe("BookingSuccess", () => {
     renderWithProviders(<BookingSuccess {...baseProps} booking={multiDayBooking} />);
 
     expect(screen.getByText("Agendamento confirmado!")).toBeInTheDocument();
+  });
+
+  it("shows awaiting deposit copy when booking requires sinal", () => {
+    renderWithProviders(
+      <BookingSuccess
+        {...baseProps}
+        booking={{
+          ...singleDayBooking,
+          status: "AWAITING_DEPOSIT",
+          depositRequired: true,
+          depositStatus: "PENDING",
+          depositAmountCents: 5000,
+        }}
+      />
+    );
+
+    expect(screen.getByText("Agendamento aguardando sinal")).toBeInTheDocument();
+    expect(
+      screen.getByText(/aguardando a confirmação do sinal/i)
+    ).toBeInTheDocument();
   });
 });

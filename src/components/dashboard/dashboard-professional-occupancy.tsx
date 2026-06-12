@@ -21,21 +21,21 @@ export function DashboardProfessionalOccupancy({ items }: DashboardProfessionalO
   }
 
   return (
-    <Card variant="glass" padding="lg">
+    <Card variant="glass" padding="lg" className="min-w-0">
       <CardTitle>Ocupacao por profissional</CardTitle>
       <ul className="mt-5 grid gap-4" aria-label="Ocupacao por profissional">
         {items.map((item) => (
           <li
             key={item.professionalId}
-            className="rounded-[24px] border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-4"
+            className="min-w-0 rounded-[24px] border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-4"
           >
             <div className="flex items-start justify-between gap-3">
-              <div>
+              <div className="min-w-0">
                 <p className="font-semibold text-[var(--theme-text-primary)]">{item.professionalName}</p>
-                <p className="mt-1 text-sm text-text-soft">
+                <p className="mt-1 break-words text-sm text-text-soft">
                   {item.bookedMinutes} min ocupados de {item.availableMinutes} min disponiveis
                 </p>
-                <p className="mt-1 text-xs uppercase tracking-[0.2em] text-text-soft">
+                <p className="mt-1 break-words text-xs uppercase tracking-[0.2em] text-text-soft">
                   {item.totalBookings} agendamentos
                 </p>
               </div>

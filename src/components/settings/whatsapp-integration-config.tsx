@@ -376,11 +376,11 @@ export function WhatsAppIntegrationConfig({ tenantId }: WhatsAppIntegrationConfi
   }
 
   return (
-    <div className="space-y-4 rounded-2xl border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-4 backdrop-blur-sm">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="space-y-2">
+    <div className="min-w-0 space-y-4 rounded-2xl border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-4 backdrop-blur-sm">
+      <div className="grid gap-4 sm:flex sm:items-start sm:justify-between">
+        <div className="min-w-0 space-y-2">
           <p className="text-sm font-semibold uppercase tracking-[0.22em] text-secondary">WhatsApp</p>
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex min-w-0 flex-wrap items-center gap-3">
             <h2 className="text-2xl font-black text-[var(--theme-text-primary)]">Integração WhatsApp</h2>
             <Badge variant={statusVariantMap[status]}>{statusLabelMap[status]}</Badge>
           </div>
@@ -390,7 +390,13 @@ export function WhatsAppIntegrationConfig({ tenantId }: WhatsAppIntegrationConfi
         </div>
 
         {whatsapp?.webhookUrl ? (
-          <Button type="button" variant="secondary" size="sm" onClick={() => void handleCopyWebhookUrl()}>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            className="w-full sm:w-auto"
+            onClick={() => void handleCopyWebhookUrl()}
+          >
             <Copy size={14} aria-hidden="true" />
             {copyState === "copied" ? "Copiado" : "Copiar webhook"}
           </Button>
@@ -415,8 +421,14 @@ export function WhatsAppIntegrationConfig({ tenantId }: WhatsAppIntegrationConfi
             Webhook da Meta
           </label>
           <div className="flex flex-col gap-3 md:flex-row">
-            <Input id="webhook-url" value={whatsapp.webhookUrl} readOnly />
-            <Button type="button" variant="secondary" size="md" onClick={() => void handleCopyWebhookUrl()}>
+            <Input id="webhook-url" className="min-w-0" value={whatsapp.webhookUrl} readOnly />
+            <Button
+              type="button"
+              variant="secondary"
+              size="md"
+              className="w-full md:w-auto"
+              onClick={() => void handleCopyWebhookUrl()}
+            >
               <Copy size={14} aria-hidden="true" />
               {copyState === "copied" ? "Copiado" : "Copiar"}
             </Button>
@@ -551,7 +563,7 @@ export function WhatsAppIntegrationConfig({ tenantId }: WhatsAppIntegrationConfi
               />
             </div>
 
-            <label className="flex items-center gap-3 rounded-2xl border border-[var(--theme-border-subtle)] bg-black/10 p-4 text-sm text-[var(--theme-text-primary)]">
+            <label className="flex min-w-0 items-center gap-3 rounded-2xl border border-[var(--theme-border-subtle)] bg-black/10 p-4 text-sm text-[var(--theme-text-primary)]">
               <Checkbox
                 checked={form.n8nEnabled}
                 onCheckedChange={(checked) => updateField("n8nEnabled", checked)}
@@ -561,7 +573,7 @@ export function WhatsAppIntegrationConfig({ tenantId }: WhatsAppIntegrationConfi
           </div>
         </details>
 
-        <label className={cn("flex items-center gap-3 rounded-2xl border border-[var(--theme-border-subtle)] bg-black/10 p-4 text-sm text-[var(--theme-text-primary)]")}>
+        <label className={cn("flex min-w-0 items-center gap-3 rounded-2xl border border-[var(--theme-border-subtle)] bg-black/10 p-4 text-sm text-[var(--theme-text-primary)]")}>
           <Checkbox
             checked={form.isActive}
             onCheckedChange={(checked) => updateField("isActive", checked)}
@@ -569,8 +581,13 @@ export function WhatsAppIntegrationConfig({ tenantId }: WhatsAppIntegrationConfi
           Integracao ativa
         </label>
 
-        <div className="flex items-center gap-3">
-          <Button type="submit" disabled={saveMutation.isPending} size="md">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <Button
+            type="submit"
+            disabled={saveMutation.isPending}
+            size="md"
+            className="w-full sm:w-auto"
+          >
             {saveMutation.isPending ? (
               <>
                 <Loader2 size={16} className="animate-spin" aria-hidden="true" />

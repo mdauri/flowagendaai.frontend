@@ -82,6 +82,15 @@ export function ServicesList({
                 >
                   {service.isActive ? "Ativo" : "Inativo"}
                 </Badge>
+                {service.requiresDeposit ? (
+                  <Badge variant="warning" className="justify-center md:justify-start">
+                    Exige sinal
+                  </Badge>
+                ) : (
+                  <Badge variant="neutral" className="justify-center md:justify-start">
+                    Sem sinal
+                  </Badge>
+                )}
                 <Badge variant="info" className="justify-center text-xs md:justify-start">
                   {service.durationInMinutes} min
                 </Badge>

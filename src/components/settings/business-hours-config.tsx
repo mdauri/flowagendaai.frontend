@@ -42,8 +42,8 @@ function DayConfigRow({ config, onChange, disabled }: DayConfigRowProps) {
   };
 
   return (
-    <div className="flex flex-col gap-3 border-b border-white/5 pb-3 last:border-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
-      <div className="flex items-center gap-3">
+    <div className="grid gap-3 border-b border-white/5 pb-3 last:border-0 last:pb-0 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+      <div className="flex min-w-0 items-center gap-3">
         {/* Custom Switch Implementation */}
         <button
           type="button"
@@ -70,13 +70,13 @@ function DayConfigRow({ config, onChange, disabled }: DayConfigRowProps) {
         </span>
       </div>
 
-      <div className="flex items-center gap-2 pl-14 sm:pl-0">
+      <div className="flex min-w-0 flex-wrap items-center gap-2 sm:justify-end">
         <input
           type="time"
           value={config.startTime || "08:00"}
           onChange={handleStartTimeChange}
           disabled={disabled || !config.isOpen}
-          className={`rounded-lg border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] px-2 py-1 text-xs text-[var(--theme-text-primary)] outline-none transition-opacity focus:border-[var(--theme-border-default)] ${
+          className={`w-full max-w-[7rem] rounded-lg border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] px-2 py-1 text-xs text-[var(--theme-text-primary)] outline-none transition-opacity focus:border-[var(--theme-border-default)] ${
             !config.isOpen ? "opacity-30" : "opacity-100"
           }`}
         />
@@ -90,7 +90,7 @@ function DayConfigRow({ config, onChange, disabled }: DayConfigRowProps) {
           value={config.endTime || "18:00"}
           onChange={handleEndTimeChange}
           disabled={disabled || !config.isOpen}
-          className={`rounded-lg border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] px-2 py-1 text-xs text-[var(--theme-text-primary)] outline-none transition-opacity focus:border-[var(--theme-border-default)] ${
+          className={`w-full max-w-[7rem] rounded-lg border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] px-2 py-1 text-xs text-[var(--theme-text-primary)] outline-none transition-opacity focus:border-[var(--theme-border-default)] ${
             !config.isOpen ? "opacity-30" : "opacity-100"
           }`}
         />
@@ -194,8 +194,8 @@ export function BusinessHoursConfig() {
         ))}
       </div>
 
-      <div className="flex items-center gap-3 pt-2">
-        <Button onClick={handleSave} disabled={saving} size="md">
+      <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center">
+        <Button onClick={handleSave} disabled={saving} size="md" className="w-full sm:w-auto">
           {saving ? (
             <>
               <Loader2 size={16} className="animate-spin" aria-hidden="true" />

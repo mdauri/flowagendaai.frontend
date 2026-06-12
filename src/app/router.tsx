@@ -15,10 +15,10 @@ import { ServicesPage } from "@/pages/services-page";
 import { SlotsPage } from "@/pages/slots-page";
 import { SettingsPage } from "@/pages/settings-page";
 import { ApiTokensPage } from "@/pages/api-tokens-page";
-import { BookingsPage } from "@/pages/bookings-page";
 import { HolidaysPage } from "@/pages/holidays-page";
 import { MeuDiaPage } from "@/pages/meu-dia-page";
 import { SystemAdminTenantProvisionPage } from "@/pages/system-admin-tenant-provision-page";
+import { SystemAdminTenantDepositFeePage } from "@/pages/system-admin-tenant-deposit-fee-page";
 import { SystemAdminTenantWhatsAppPage } from "@/pages/system-admin-tenant-whatsapp-page";
 import {
   MetaWhatsAppBillingSystemAdminPage,
@@ -78,7 +78,7 @@ export function AppRouter() {
         >
           <Route index element={<AppIndexRedirect />} />
           <Route path="dashboard" element={<DashboardPage />} />
-          <Route path="bookings" element={<BookingsPage />} />
+          <Route path="bookings" element={<Navigate to="/app/dashboard" replace />} />
           <Route path="meu-dia" element={<MeuDiaPage />} />
           <Route path="minha-agenda" element={<Navigate to="/app/meu-dia" replace />} />
           <Route path="professionals" element={<ProfessionalsPage />} />
@@ -104,6 +104,7 @@ export function AppRouter() {
             }
           />
           <Route path="api-tokens" element={<ApiTokensPage />} />
+          <Route path="system-admin/tenants/deposit-fee" element={<SystemAdminTenantDepositFeePage />} />
           <Route path="system-admin/tenants/provision" element={<SystemAdminTenantProvisionPage />} />
           <Route path="system-admin/tenants/whatsapp" element={<SystemAdminTenantWhatsAppPage />} />
           <Route path="system-admin/meta-whatsapp" element={<MetaWhatsAppBillingSystemAdminPage />} />

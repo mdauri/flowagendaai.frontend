@@ -30,14 +30,14 @@ export function FeedbackBanner({ title, description, tone = "danger", className 
     <Card
       padding="sm"
       radiusSize="lg"
-      className={cn("border", className)}
+      className={cn("min-w-0 border", className)}
       style={toneStyles[tone]}
       role="alert"
       aria-live="polite"
     >
-      <div className="flex items-start gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
         <Badge variant={tone}>{tone === "danger" ? "Erro" : tone === "warning" ? "Aviso" : "Info"}</Badge>
-        <div>
+        <div className="min-w-0">
           <p className="font-semibold text-[var(--theme-text-primary)]">{title}</p>
           <p className="mt-1 text-sm leading-6 text-text-soft">{description}</p>
         </div>

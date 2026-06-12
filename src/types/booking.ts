@@ -11,10 +11,15 @@ export interface CreateBookingResponse {
   serviceId: string;
   start: string;
   end: string;
-  status: "CONFIRMED";
+  status: "CONFIRMED" | "AWAITING_DEPOSIT";
+  depositRequired: boolean;
+  depositStatus: "NOT_REQUIRED" | "PENDING";
+  depositAmountCents: number | null;
+  depositPaymentProvider: "MANUAL" | "MERCADO_PAGO";
 }
 
-export type BookingStatus = "PENDING" | "CONFIRMED" | "CANCELLED" | "COMPLETED";
+export type BookingStatus = "PENDING" | "AWAITING_DEPOSIT" | "CONFIRMED" | "CANCELLED" | "COMPLETED";
+export type BookingDepositStatus = "NOT_REQUIRED" | "PENDING" | "PAID" | "WAIVED" | "EXPIRED";
 
 export interface BookingReadItem {
   id: string;
@@ -28,6 +33,15 @@ export interface BookingReadItem {
   customerName: string | null;
   customerPhone: string | null;
   customerEmail: string | null;
+  depositRequired: boolean;
+  depositStatus: BookingDepositStatus;
+  depositAmountCents: number | null;
+  depositPaymentProvider: "MANUAL" | "MERCADO_PAGO";
+  depositPaymentUrl: string | null;
+  depositExternalId: string | null;
+  depositPaidAt: string | null;
+  depositMarkedPaidByUserId: string | null;
+  depositNotes: string | null;
   servicePriceSnapshot?: number | null;
   servicePrice?: number | null;
   createdAt: string;
@@ -87,5 +101,17 @@ export interface ConfirmPendingBookingResponse {
   booking: {
     id: string;
     status: "CONFIRMED";
+  };
+}
+
+export interface MarkBookingDepositPaidResponse {
+  booking: {
+    id: string;
+    status: "CONFIRMED";
+    depositStatus: "PAID";
+    depositPaidAt: string;
+    depositMarkedPaidByUserId: string;
+    confirmedAt: string;
+    confirmedById: string;
   };
 }

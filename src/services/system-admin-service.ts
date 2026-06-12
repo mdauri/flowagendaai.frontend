@@ -3,6 +3,8 @@ import type {
   ListSystemAdminTenantsResponse,
   ProvisionTenantInput,
   ProvisionTenantResponse,
+  SystemAdminTenantDepositFeeSettings,
+  UpdateSystemAdminTenantDepositFeeInput,
 } from "@/types/system-admin";
 
 export const systemAdminService = {
@@ -15,5 +17,22 @@ export const systemAdminService = {
       method: "POST",
       body: JSON.stringify(input),
     });
+  },
+
+  async getTenantDepositFeeSettings(tenantId: string): Promise<SystemAdminTenantDepositFeeSettings> {
+    return httpClient<SystemAdminTenantDepositFeeSettings>(`/system-admin/tenants/${tenantId}/deposit-fee`);
+  },
+
+  async updateTenantDepositFeeSettings(
+    tenantId: string,
+    input: UpdateSystemAdminTenantDepositFeeInput
+  ): Promise<SystemAdminTenantDepositFeeSettings> {
+    return httpClient<SystemAdminTenantDepositFeeSettings>(
+      `/system-admin/tenants/${tenantId}/deposit-fee`,
+      {
+        method: "PUT",
+        body: JSON.stringify(input),
+      }
+    );
   },
 };

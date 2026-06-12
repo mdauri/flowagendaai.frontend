@@ -115,13 +115,13 @@ export function SlotSearchFilters({
   }
 
   return (
-    <Card variant="premium" padding="md">
+    <Card variant="premium" padding="md" className="min-w-0">
       <div>
         <CardTitle>Buscar horarios</CardTitle>
         <CardDescription className="mt-2">Escolha profissional, servico e data.</CardDescription>
       </div>
 
-      <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <div className="mt-5 grid min-w-0 gap-4 md:grid-cols-2 xl:grid-cols-3">
         <label className="grid gap-2" htmlFor={professionalId}>
           <span className="text-sm font-semibold text-[var(--theme-text-primary)]">Profissional</span>
           <Select
@@ -164,7 +164,7 @@ export function SlotSearchFilters({
 
         <label className="grid gap-2" htmlFor={dateId}>
           <span className="text-sm font-semibold text-[var(--theme-text-primary)]">Data</span>
-          <div ref={calendarContainerRef} className="relative">
+          <div ref={calendarContainerRef} className="relative min-w-0">
             <Input
               id={dateId}
               type="text"
@@ -239,7 +239,7 @@ export function SlotSearchFilters({
             />
 
             {isCalendarOpen ? (
-              <div className="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-20 grid gap-3 rounded-[1.25rem] border border-[var(--theme-border-default)] bg-[var(--theme-surface-elevated)] p-3 shadow-2xl backdrop-blur-md">
+              <div className="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-20 grid min-w-0 gap-3 rounded-[1.25rem] border border-[var(--theme-border-default)] bg-[var(--theme-surface-elevated)] p-3 shadow-2xl backdrop-blur-md">
                 <MonthNavigator
                   month={calendarMonth}
                   minDate={minDate}
@@ -293,8 +293,8 @@ export function SlotSearchFilters({
           <Button
             type="button"
             size="md"
-            className="w-full sm:w-auto"
-            onClick={onSearch}
+          className="w-full sm:w-auto"
+          onClick={onSearch}
             disabled={!canSearch || isSearching || disabled || searchDisabled}
             aria-disabled={!canSearch || isSearching || disabled || searchDisabled}
           >

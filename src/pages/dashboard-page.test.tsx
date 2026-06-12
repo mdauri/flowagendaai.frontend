@@ -20,6 +20,7 @@ vi.mock("@/services/bookings-service", () => ({
     create: vi.fn(),
     cancel: vi.fn(),
     reschedule: vi.fn(),
+    markDepositPaid: vi.fn(),
     getById: vi.fn(),
     list: vi.fn(),
   },
@@ -72,7 +73,7 @@ const successResponse = {
       bookingId: "booking-2",
       start: "2026-03-30T14:00:00.000Z",
       end: "2026-03-30T15:00:00.000Z",
-      status: "PENDING",
+      status: "AWAITING_DEPOSIT",
       customerName: "Bruno",
       customerEmail: "bruno@example.com",
       customerPhone: "+55 (11) 91234-5678",
@@ -255,6 +256,40 @@ describe("DashboardPage", () => {
     });
 
     expect(await screen.findByText("Agendamento reagendado com sucesso.")).toBeInTheDocument();
+  });
+
+  test("marca sinal como pago no dashboard e exibe feedback de sucesso", async () => {
+    mockedDashboardService.getSummary.mockResolvedValue(successResponse);
+    mockedBookingsService.markDepositPaid.mockResolvedValue({
+      booking: {
+        id: "booking-2",
+        status: "CONFIRMED",
+        depositStatus: "PAID",
+        depositPaidAt: "2026-03-30T13:10:00.000Z",
+        depositMarkedPaidByUserId: "user-1",
+        confirmedAt: "2026-03-30T13:10:00.000Z",
+        confirmedById: "user-1",
+      },
+    });
+
+    renderWithProviders(<DashboardPage />);
+
+    await screen.findByText("Agenda do dia");
+
+    const user = userEvent.setup();
+    await user.click(screen.getAllByLabelText("Acoes do agendamento")[1]);
+    await screen.findByRole("menu");
+    await user.click(screen.getByRole("menuitem", { name: "Marcar sinal como pago" }));
+
+    await user.click(screen.getByRole("button", { name: "Confirmar" }));
+
+    await waitFor(() => {
+      expect(mockedBookingsService.markDepositPaid).toHaveBeenCalledWith("booking-2", {
+        notes: undefined,
+      });
+    });
+
+    expect(await screen.findByText("Sinal marcado como pago com sucesso.")).toBeInTheDocument();
   });
 
   test("exibe erro especifico quando a API retorna BOOKING_CONFLICT", async () => {

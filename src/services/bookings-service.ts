@@ -8,6 +8,7 @@ import type {
   CreatePendingBookingResponse,
   GetBookingByIdResponse,
   ListBookingsResponse,
+  MarkBookingDepositPaidResponse,
   RescheduleBookingResponse,
 } from "@/types/booking";
 
@@ -53,6 +54,16 @@ export const bookingsService = {
   async confirmPending(bookingId: string): Promise<ConfirmPendingBookingResponse> {
     return httpClient<ConfirmPendingBookingResponse>(`/bookings/${bookingId}/confirm`, {
       method: "POST",
+    });
+  },
+
+  async markDepositPaid(
+    bookingId: string,
+    input: { notes?: string }
+  ): Promise<MarkBookingDepositPaidResponse> {
+    return httpClient<MarkBookingDepositPaidResponse>(`/bookings/${bookingId}/deposit/mark-paid`, {
+      method: "POST",
+      body: JSON.stringify(input),
     });
   },
 

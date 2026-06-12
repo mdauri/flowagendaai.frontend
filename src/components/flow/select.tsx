@@ -156,7 +156,7 @@ export function Select({
     <SelectContext.Provider
       value={{ value, onValueChange, isOpen, setIsOpen, options, placeholder }}
     >
-      <div ref={rootRef} className="relative">
+      <div ref={rootRef} className="relative min-w-0">
         <button
           ref={triggerRef}
           id={id}
@@ -165,7 +165,7 @@ export function Select({
           aria-haspopup="listbox"
           aria-expanded={isOpen}
           className={cn(
-            "flex h-12 w-full items-center justify-between border px-4 text-left text-sm outline-none transition-all focus-visible:[border-color:var(--control-focus-border)] focus-visible:[box-shadow:var(--control-focus-ring)] disabled:pointer-events-none disabled:opacity-[var(--control-disabled-opacity)] disabled:[cursor:var(--control-disabled-cursor)] disabled:[filter:var(--control-disabled-filter)]"
+            "flex h-12 w-full min-w-0 items-center justify-between border px-4 text-left text-sm outline-none transition-all focus-visible:[border-color:var(--control-focus-border)] focus-visible:[box-shadow:var(--control-focus-ring)] disabled:pointer-events-none disabled:opacity-[var(--control-disabled-opacity)] disabled:[cursor:var(--control-disabled-cursor)] disabled:[filter:var(--control-disabled-filter)]"
           )}
           style={{
             ...triggerStyle,
@@ -180,7 +180,12 @@ export function Select({
           }}
           {...props}
         >
-          <span className={cn(selectedOption ? "text-[var(--theme-text-primary)]" : "text-text-soft")}>
+          <span
+            className={cn(
+              "min-w-0 flex-1 truncate",
+              selectedOption ? "text-[var(--theme-text-primary)]" : "text-text-soft"
+            )}
+          >
             {selectedOption?.label ?? placeholder}
           </span>
           <span

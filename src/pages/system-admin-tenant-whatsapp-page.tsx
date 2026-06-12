@@ -38,7 +38,7 @@ export function SystemAdminTenantWhatsAppPage() {
         description="Selecione um tenant para configurar o numero WhatsApp, webhook e segredos da Meta."
       />
 
-      <Card variant="premium" padding="lg" className="mt-8">
+      <Card variant="premium" padding="lg" className="mt-8 min-w-0">
         <CardTitle>Tenant alvo</CardTitle>
         <CardDescription className="mt-2">
           Selecione o tenant para carregar e editar a integracao WhatsApp.
@@ -75,7 +75,9 @@ export function SystemAdminTenantWhatsAppPage() {
       </Card>
 
       <div className="mt-6">
-        <WhatsAppIntegrationConfig tenantId={selectedTenantId || null} />
+        <div className="min-w-0">
+          <WhatsAppIntegrationConfig tenantId={selectedTenantId || null} />
+        </div>
       </div>
     </SystemAdminGate>
   );

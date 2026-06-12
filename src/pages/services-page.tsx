@@ -88,11 +88,13 @@ export function ServicesPage() {
                   setEditingService(null);
                 }}
                 isSubmitting={updateServiceMutation.isPending}
+                depositModuleEnabled={auth.tenant?.depositModuleEnabled ?? false}
               />
             ) : (
               <ServiceForm
                 onSubmit={handleCreateService}
                 isSubmitting={createServiceMutation.isPending}
+                depositModuleEnabled={auth.tenant?.depositModuleEnabled ?? false}
               />
             )}
           </div>

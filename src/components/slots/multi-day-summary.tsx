@@ -32,19 +32,22 @@ export function MultiDaySummary({
     <Card
       variant="glass"
       padding="lg"
-      className={`space-y-4 ${className ?? ""}`}
+      className={`min-w-0 space-y-4 ${className ?? ""}`}
       style={{
         borderColor: semanticTokens.border.default,
         backgroundColor: semanticTokens.surface.glass,
       }}
       aria-live="polite"
     >
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <CardDescription>Resumo do agendamento</CardDescription>
         <MultiDayBadge daysCount={daysCount} variant="compact" />
       </div>
 
-      <div className="rounded-2xl border p-5" style={{ borderColor: semanticTokens.border.subtle, backgroundColor: semanticTokens.surface.glassSubtle }}>
+      <div
+        className="rounded-2xl border p-5"
+        style={{ borderColor: semanticTokens.border.subtle, backgroundColor: semanticTokens.surface.glassSubtle }}
+      >
         {serviceName && (
           <p className="text-lg font-semibold" style={{ color: colors.text.primary }}>
             {serviceName}
@@ -58,7 +61,7 @@ export function MultiDaySummary({
               {startDate.setLocale("pt-BR").toFormat("ccc dd/MM HH:mm")}
             </span>
           </p>
-          <p className="flex items-baseline gap-2">
+          <p className="flex flex-wrap items-baseline gap-2">
             <span className="text-xl font-bold" style={{ color: colors.brand.primary }}>
               {startDate.toFormat("HH:mm")}
             </span>

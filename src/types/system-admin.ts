@@ -32,3 +32,18 @@ export interface SystemAdminTenantListItem {
 export interface ListSystemAdminTenantsResponse {
   items: SystemAdminTenantListItem[];
 }
+
+export interface SystemAdminTenantDepositFeeSettings {
+  tenant: {
+    id: string;
+    name: string;
+    slug: string | null;
+    depositModuleEnabled: boolean;
+    depositConvenienceFeeEnabled: boolean;
+  };
+}
+
+export interface UpdateSystemAdminTenantDepositFeeInput {
+  depositModuleEnabled: boolean;
+  depositConvenienceFeeEnabled: boolean;
+}

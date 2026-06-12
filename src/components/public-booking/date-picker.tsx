@@ -17,13 +17,13 @@ export function MonthNavigator({ month, minDate, maxDate, onPrevMonth, onNextMon
   const nextDisabled = month.startOf("month") >= maxDate.startOf("month");
 
   return (
-    <div 
-      className="flex items-center justify-between border px-4 py-2"
+    <div
+      className="grid grid-cols-[auto,minmax(0,1fr),auto] items-center gap-2 border px-3 py-2 sm:px-4"
       style={{
         borderRadius: radius.xl,
         backgroundColor: semanticTokens.surface.glass,
         borderColor: semanticTokens.border.subtle,
-        backdropFilter: `blur(${semanticTokens.blur.panel})`
+        backdropFilter: `blur(${semanticTokens.blur.panel})`,
       }}
     >
       <button
@@ -35,7 +35,9 @@ export function MonthNavigator({ month, minDate, maxDate, onPrevMonth, onNextMon
       >
         <ChevronLeft size={20} aria-hidden="true" />
       </button>
-      <span className="text-base font-semibold text-text-primary">{localeMonth.toFormat("LLLL yyyy")}</span>
+      <span className="min-w-0 truncate text-sm font-semibold text-text-primary sm:text-base">
+        {localeMonth.toFormat("LLLL yyyy")}
+      </span>
       <button
         type="button"
         onClick={onNextMonth}
@@ -78,12 +80,12 @@ export function CalendarGrid({
 
   return (
     <div className="space-y-3">
-      <div className="grid grid-cols-7 text-center text-xs font-semibold uppercase tracking-wide text-text-muted">
+      <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-semibold uppercase tracking-wide text-text-muted sm:text-xs">
         {WEEKDAY_NAMES.map((label) => (
           <span key={label}>{label}</span>
         ))}
       </div>
-      <div className="grid grid-cols-7 gap-2">
+      <div className="grid grid-cols-7 gap-1 sm:gap-2">
         {days.map((day) => {
           const isCurrentMonth = day.hasSame(month, "month");
           const isSelected = selectedDate ? day.hasSame(selectedDate, "day") : false;
@@ -99,8 +101,8 @@ export function CalendarGrid({
               type="button"
               onClick={() => !disabled && onSelectDate(day)}
               disabled={disabled}
-              className={cn(
-                "relative flex h-10 w-10 items-center justify-center rounded-full text-sm transition-all focus-visible:outline-none focus-visible:[box-shadow:var(--control-focus-ring)]",
+            className={cn(
+                "relative flex h-9 w-9 items-center justify-center rounded-full text-sm transition-all focus-visible:outline-none focus-visible:[box-shadow:var(--control-focus-ring)] sm:h-10 sm:w-10",
                 disabled
                   ? "cursor-not-allowed"
                   : "cursor-pointer hover:bg-[var(--theme-overlay-primary-soft)] active:scale-95",

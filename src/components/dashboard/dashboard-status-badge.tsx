@@ -6,6 +6,7 @@ interface DashboardStatusBadgeProps {
 
 const STATUS_LABELS_PT_BR: Record<string, string> = {
   CONFIRMED: "Confirmado",
+  AWAITING_DEPOSIT: "Aguardando sinal",
   PENDING: "Pendente",
   CANCELLED: "Cancelado",
   COMPLETED: "Concluido",
@@ -15,6 +16,8 @@ function resolveBadgeVariant(status: string) {
   switch (status.toUpperCase()) {
     case "CONFIRMED":
       return "success";
+    case "AWAITING_DEPOSIT":
+      return "warning";
     case "PENDING":
       return "warning";
     case "CANCELLED":

@@ -31,6 +31,7 @@ export function BookingSuccess({ booking, timezone, shareUrl, onNewBooking }: Bo
   const isMultiDay = booking.daysAffected && booking.daysAffected.length > 0;
   const daysAffected = booking.daysAffected as DaySegment[] | undefined;
   const canCancel = Boolean(booking.cancelToken) && !isCancelled;
+  const isAwaitingDeposit = booking.status === "AWAITING_DEPOSIT";
 
   const handleAddToCalendar = () => {
     const blob = generatePublicBookingICS({
@@ -76,8 +77,19 @@ export function BookingSuccess({ booking, timezone, shareUrl, onNewBooking }: Bo
            style={{ backgroundColor: "rgba(16, 185, 129, 0.2)", color: semanticTokens.feedback.success.text }}
         >✓</div>
         <div>
-           <h2 className="text-2xl font-black" style={{ color: colors.text.primary }}>Agendamento confirmado!</h2>
-           <p className="mt-2 text-sm font-medium" style={{ color: semanticTokens.feedback.success.text }}>Recebemos a confirmação do seu horário.</p>
+           <h2 className="text-2xl font-black" style={{ color: colors.text.primary }}>
+             {isAwaitingDeposit ? "Agendamento aguardando sinal" : "Agendamento confirmado!"}
+           </h2>
+           <p className="mt-2 text-sm font-medium" style={{ color: semanticTokens.feedback.success.text }}>
+             {isAwaitingDeposit
+               ? "Recebemos seu pedido e ele segue aguardando a confirmação do sinal."
+               : "Recebemos a confirmação do seu horário."}
+           </p>
+           {isAwaitingDeposit ? (
+             <p className="mt-2 text-xs font-medium" style={{ color: semanticTokens.feedback.success.text }}>
+               O estabelecimento vai confirmar o pagamento manualmente nesta etapa.
+             </p>
+           ) : null}
            {isMultiDay && (
              <div className="mt-2">
                <MultiDayBadge daysCount={booking.daysAffected!.length} variant="full" />

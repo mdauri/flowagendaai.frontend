@@ -113,17 +113,18 @@ export function LogoUpload({
       />
 
       {logoUrl ? (
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <img
             src={logoUrl}
             alt="Current tenant logo"
             className="h-12 w-12 rounded-full border border-[rgba(255,255,255,0.10)] object-cover sm:h-16 sm:w-16"
           />
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col gap-2 sm:flex-row">
             <Button
               type="button"
               variant="primary"
               size="sm"
+              className="w-full sm:w-auto"
               onClick={handleClickUpload}
               disabled={disabled || isUploading}
               aria-label="Trocar logo"
@@ -151,7 +152,7 @@ export function LogoUpload({
               onClick={handleRemove}
               disabled={disabled || isUploading}
               aria-label="Remover logo"
-              className="text-text-soft transition-colors duration-150 hover:text-[#F87171]"
+              className="w-full sm:w-auto text-text-soft transition-colors duration-150 hover:text-[#F87171]"
             >
               Remover
             </Button>
@@ -169,6 +170,7 @@ export function LogoUpload({
             type="button"
             variant="primary"
             size="sm"
+            className="w-full sm:w-auto"
             onClick={handleClickUpload}
             disabled={disabled || isUploading}
             aria-label="Enviar logo"

@@ -103,7 +103,7 @@ export function SettingsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <div className="mx-auto w-full max-w-2xl min-w-0 space-y-6">
       <div>
         <h1
           className="text-2xl font-black text-[var(--theme-text-primary)]"
@@ -200,11 +200,12 @@ export function SettingsPage() {
       <BusinessHoursConfig />
 
       {/* Save Button and Feedback */}
-      <div className="flex items-center gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <Button
           onClick={handleSave}
           disabled={saveState === "saving"}
           size="md"
+          className="w-full sm:w-auto"
         >
           {saveState === "saving" ? (
             <>

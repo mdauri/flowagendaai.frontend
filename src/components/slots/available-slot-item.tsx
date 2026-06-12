@@ -23,7 +23,7 @@ export function AvailableSlotItem({
       type="button"
       variant="secondary"
       size="md"
-      className="h-auto w-full justify-between gap-4 px-5 py-4 text-left"
+      className="h-auto w-full flex-col items-start justify-between gap-3 px-5 py-4 text-left sm:flex-row sm:items-center sm:gap-4"
       aria-pressed={selected}
       disabled={disabled}
       onClick={() => {
@@ -37,7 +37,7 @@ export function AvailableSlotItem({
         <span className="text-sm text-text-soft">{tenantTimezone}</span>
       </span>
 
-      <Badge variant={selected ? "success" : "subtle"}>
+      <Badge variant={selected ? "success" : "subtle"} className="shrink-0">
         {selected ? "Selecionado" : "Selecionar"}
       </Badge>
     </Button>

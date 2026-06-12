@@ -13,6 +13,12 @@ const tenant: AuthTenant = {
   logoUrl: null,
   coverImageUrl: null,
   publicAddress: null,
+  description: null,
+  depositModuleEnabled: false,
+  depositPaymentProvider: "MANUAL",
+  depositProviderConfigured: false,
+  mercadoPagoPublicKey: null,
+  depositConvenienceFeeEnabled: false,
 };
 
 function renderShell(role: string) {
@@ -39,6 +45,7 @@ describe("AppShell", () => {
 
     expect(screen.getByRole("link", { name: "API Tokens" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "WhatsApp" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Sinal Online" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Dashboard" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Profissionais" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Servicos" })).toBeInTheDocument();

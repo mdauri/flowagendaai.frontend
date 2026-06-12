@@ -27,7 +27,7 @@ describe("ServiceForm", () => {
 
     render(
       <QueryClientProvider client={queryClient}>
-        <ServiceForm onSubmit={vi.fn()} isSubmitting={false} />
+        <ServiceForm onSubmit={vi.fn()} isSubmitting={false} depositModuleEnabled={false} />
       </QueryClientProvider>,
     );
 
@@ -58,7 +58,7 @@ describe("ServiceForm", () => {
 
     render(
       <QueryClientProvider client={queryClient}>
-        <ServiceForm onSubmit={vi.fn()} isSubmitting={false} />
+        <ServiceForm onSubmit={vi.fn()} isSubmitting={false} depositModuleEnabled={false} />
       </QueryClientProvider>,
     );
 
@@ -71,6 +71,57 @@ describe("ServiceForm", () => {
     expect(screen.getByPlaceholderText("Ex.: 60")).toBeInTheDocument();
     expect(screen.getByText("Preco")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Criar servico" })).toBeInTheDocument();
+    expect(screen.queryByText("Exigir sinal para este servico")).not.toBeInTheDocument();
+  });
+
+  it("shows deposit configuration only when module is enabled", () => {
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
+    });
+
+    const { rerender } = render(
+      <QueryClientProvider client={queryClient}>
+        <ServiceForm onSubmit={vi.fn()} isSubmitting={false} depositModuleEnabled={false} />
+      </QueryClientProvider>,
+    );
+
+    expect(screen.queryByText("Exigir sinal para este servico")).not.toBeInTheDocument();
+
+    rerender(
+      <QueryClientProvider client={queryClient}>
+        <ServiceForm onSubmit={vi.fn()} isSubmitting={false} depositModuleEnabled={true} />
+      </QueryClientProvider>,
+    );
+
+    expect(screen.getByText("Exigir sinal para este servico")).toBeInTheDocument();
+  });
+
+  it("shows deposit type and value only after enabling deposit", () => {
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
+    });
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <ServiceForm onSubmit={vi.fn()} isSubmitting={false} depositModuleEnabled={true} />
+      </QueryClientProvider>,
+    );
+
+    expect(screen.getByText("Exigir sinal para este servico")).toBeInTheDocument();
+    expect(screen.queryByText("Tipo de sinal")).not.toBeInTheDocument();
+    expect(screen.queryByText("Valor do sinal")).not.toBeInTheDocument();
+    expect(screen.queryByText("Percentual do sinal")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getAllByRole("checkbox")[0]);
+
+    expect(screen.getByText("Tipo de sinal")).toBeInTheDocument();
+    expect(screen.getByText("Valor do sinal")).toBeInTheDocument();
   });
 
   it("loads edit values and allows canceling inline edit", () => {
@@ -104,6 +155,7 @@ describe("ServiceForm", () => {
           onSubmit={vi.fn(async () => ({ service }))}
           isSubmitting={false}
           onCancelEdit={cancelEdit}
+          depositModuleEnabled={false}
         />
       </QueryClientProvider>,
     );
@@ -123,7 +175,7 @@ describe("ServiceForm", () => {
 
     render(
       <QueryClientProvider client={queryClient}>
-        <ServiceForm onSubmit={vi.fn()} isSubmitting={false} />
+        <ServiceForm onSubmit={vi.fn()} isSubmitting={false} depositModuleEnabled={false} />
       </QueryClientProvider>,
     );
 
@@ -143,7 +195,7 @@ describe("ServiceForm", () => {
 
     render(
       <QueryClientProvider client={queryClient}>
-        <ServiceForm onSubmit={vi.fn()} isSubmitting={false} />
+        <ServiceForm onSubmit={vi.fn()} isSubmitting={false} depositModuleEnabled={false} />
       </QueryClientProvider>,
     );
 
@@ -163,7 +215,7 @@ describe("ServiceForm", () => {
 
     render(
       <QueryClientProvider client={queryClient}>
-        <ServiceForm onSubmit={vi.fn()} isSubmitting={false} />
+        <ServiceForm onSubmit={vi.fn()} isSubmitting={false} depositModuleEnabled={false} />
       </QueryClientProvider>,
     );
 

@@ -9,14 +9,20 @@ const mockRefetchCurrentUser = vi.fn();
 vi.mock("@/hooks/use-auth", () => ({
   useAuth: () => ({
     user: { id: "user-1", name: "Admin", email: "admin@test.com", role: "admin", professionalId: null },
-    tenant: {
-      id: "tenant-1",
-      name: "Test Studio",
-      timezone: "America/Sao_Paulo",
-      logoUrl: "https://example.com/logo.png",
-      coverImageUrl: null,
-      publicAddress: null,
-    },
+      tenant: {
+        id: "tenant-1",
+        name: "Test Studio",
+        timezone: "America/Sao_Paulo",
+        logoUrl: "https://example.com/logo.png",
+        coverImageUrl: null,
+        publicAddress: null,
+        description: null,
+        depositModuleEnabled: false,
+        depositPaymentProvider: "MANUAL",
+        depositProviderConfigured: false,
+        mercadoPagoPublicKey: null,
+        depositConvenienceFeeEnabled: false,
+      },
     isBootstrapping: false,
     refetchCurrentUser: mockRefetchCurrentUser,
   }),
@@ -73,6 +79,12 @@ describe("SettingsPage", () => {
       logoUrl: "https://example.com/logo.png",
       coverImageUrl: null,
       publicAddress: null,
+      description: null,
+      depositModuleEnabled: false,
+      depositPaymentProvider: "MANUAL",
+      depositProviderConfigured: false,
+      mercadoPagoPublicKey: null,
+      depositConvenienceFeeEnabled: false,
     });
 
     const user = userEvent.setup();
@@ -112,6 +124,12 @@ describe("SettingsPage", () => {
       logoUrl: null,
       coverImageUrl: null,
       publicAddress: null,
+      description: null,
+      depositModuleEnabled: false,
+      depositPaymentProvider: "MANUAL",
+      depositProviderConfigured: false,
+      mercadoPagoPublicKey: null,
+      depositConvenienceFeeEnabled: false,
     });
 
     renderWithProviders(<SettingsPage />, {
@@ -161,6 +179,12 @@ describe("SettingsPage", () => {
                 logoUrl: null,
                 coverImageUrl: null,
                 publicAddress: null,
+                description: null,
+                depositModuleEnabled: false,
+                depositPaymentProvider: "MANUAL",
+                depositProviderConfigured: false,
+                mercadoPagoPublicKey: null,
+                depositConvenienceFeeEnabled: false,
               }),
             100
           )

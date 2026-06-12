@@ -105,7 +105,7 @@ function SummaryMetricCard({
   return (
     <Card variant="glass" padding="md" className="h-full">
       <CardDescription>{title}</CardDescription>
-      <CardTitle className="mt-3 text-3xl">{value}</CardTitle>
+      <CardTitle className="mt-3 break-words text-3xl">{value}</CardTitle>
       <div className="mt-3 flex items-center gap-2">
         <Badge variant={badgeVariant}>{description}</Badge>
       </div>
@@ -496,10 +496,10 @@ function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
       />
 
       <div className="mt-6 grid gap-4 lg:grid-cols-[minmax(0,1fr)_280px]">
-        <Card variant="premium" padding="lg">
-          <div className="flex flex-wrap items-end gap-4">
+        <Card variant="premium" padding="lg" className="min-w-0">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_180px]">
             {scope === "system-admin" ? (
-              <div className="min-w-[240px] flex-1">
+              <div className="min-w-0">
                 <label className="mb-2 block text-sm font-semibold text-text-soft">
                   Tenant
                 </label>
@@ -514,7 +514,7 @@ function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
                 />
               </div>
             ) : null}
-            <div className="min-w-[180px]">
+            <div className="min-w-0">
               <label className="mb-2 block text-sm font-semibold text-text-soft">
                 Mês
               </label>
@@ -524,12 +524,13 @@ function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
                 onChange={(event) => setSelectedMonth(event.target.value)}
               />
             </div>
-            <div className="ml-auto flex gap-2">
+            <div className="flex flex-wrap gap-2 sm:col-span-2 lg:col-span-1 lg:justify-end">
               {allowedTabs.map((tab) => (
                 <Button
                   key={tab}
                   size="sm"
                   variant={activeTab === tab ? "primary" : "secondary"}
+                  className="w-full sm:w-auto"
                   onClick={() => setActiveTab(tab)}
                 >
                   {tab === "overview"
@@ -594,7 +595,7 @@ function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
 
           <div className="grid gap-6 xl:grid-cols-[1.25fr_0.75fr]">
             <BillingGraph summary={summary} />
-            <Card variant="glass" padding="lg">
+            <Card variant="glass" padding="lg" className="min-w-0">
               <CardTitle>Custo por categoria</CardTitle>
               <div className="mt-6 grid gap-4">
                 {summary.byCategory.map((item) => (
@@ -634,7 +635,7 @@ function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
 
       {activeTab === "events" ? (
         <div className="mt-6 space-y-6">
-          <Card variant="glass" padding="lg">
+          <Card variant="glass" padding="lg" className="min-w-0">
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
               <div>
                 <label className="mb-2 block text-sm font-semibold text-text-soft">
@@ -668,9 +669,10 @@ function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
                   placeholder="+5511999999999"
                 />
               </div>
-              <div className="xl:col-span-2 flex items-end gap-3">
+              <div className="xl:col-span-2 flex flex-col gap-3 sm:flex-row sm:items-end">
                 <Button
                   variant="secondary"
+                  className="w-full sm:w-auto"
                   onClick={() => {
                     setCategoryFilter("");
                     setStatusFilter("");
@@ -679,7 +681,7 @@ function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
                 >
                   Limpar filtros
                 </Button>
-                <Button onClick={() => void eventsQuery.refetch()}>
+                <Button className="w-full sm:w-auto" onClick={() => void eventsQuery.refetch()}>
                   Atualizar
                 </Button>
               </div>
@@ -692,9 +694,9 @@ function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
 
       {activeTab === "pricing" && scope === "system-admin" ? (
         <div className="mt-6 space-y-6">
-          <Card variant="glass" padding="lg">
+          <Card variant="glass" padding="lg" className="min-w-0">
             <CardTitle>Tabela de preços Meta</CardTitle>
-            <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+              <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
               <div>
                 <label className="mb-2 block text-sm font-semibold text-text-soft">
                   País
@@ -791,7 +793,7 @@ function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
             </div>
           </Card>
 
-          <Card variant="glass" padding="lg">
+          <Card variant="glass" padding="lg" className="min-w-0">
             <CardTitle>Tarifas registradas</CardTitle>
             <div className="mt-4 overflow-x-auto">
               <table className="min-w-full text-sm">

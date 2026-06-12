@@ -12,6 +12,7 @@ interface DashboardAgendaListProps {
   onCancelBooking?: (booking: DashboardSummaryBookingItem) => void;
   onRescheduleBooking?: (booking: DashboardSummaryBookingItem) => void;
   onViewBookingDetails?: (booking: DashboardSummaryBookingItem) => void;
+  onMarkDepositPaid?: (booking: DashboardSummaryBookingItem) => void;
 }
 
 function resolveCustomerName(customerName: string | null) {
@@ -39,6 +40,7 @@ export function DashboardAgendaList({
   onCancelBooking,
   onRescheduleBooking,
   onViewBookingDetails,
+  onMarkDepositPaid,
 }: DashboardAgendaListProps) {
   if (bookings.length === 0) {
     return (
@@ -50,12 +52,13 @@ export function DashboardAgendaList({
   }
 
   return (
-    <Card variant="glass" padding="lg">
+    <Card variant="glass" padding="lg" className="min-w-0">
       <CardTitle>Agenda do dia</CardTitle>
 
       <ul className="mt-5 grid gap-4" aria-label="Agenda do dia">
         {bookings.map((booking) => {
           const customerContacts = resolveCustomerContacts(booking);
+          const canMarkDepositPaid = booking.status === "AWAITING_DEPOSIT";
           const isEligible = booking.status === "CONFIRMED" || booking.status === "PENDING";
           const isEligibleForReschedule = booking.status === "CONFIRMED";
           const isCancelled = booking.status === "CANCELLED";
@@ -64,25 +67,27 @@ export function DashboardAgendaList({
           return (
           <li
             key={booking.bookingId}
-            className="grid gap-4 rounded-[28px] border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-5 xl:grid-cols-[11rem_minmax(0,1fr)_12rem_auto]"
+            className="grid min-w-0 gap-4 rounded-[28px] border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-5 xl:grid-cols-[11rem_minmax(0,1fr)_12rem_auto]"
           >
-            <div className="text-sm font-semibold text-secondary">
+            <div className="min-w-0 text-sm font-semibold text-secondary">
               {formatUtcTimeRangeInTenantTimezone(booking.start, booking.end, tenantTimezone)}
             </div>
 
-            <div>
+            <div className="min-w-0">
               <p className="text-base font-semibold text-[var(--theme-text-primary)]">
                 {resolveCustomerName(booking.customerName)}
               </p>
               {customerContacts.length > 0 && (
-                <p className="mt-1 text-xs text-text-soft">{customerContacts.join(" • ")}</p>
+                <p className="mt-1 break-words text-xs text-text-soft">
+                  {customerContacts.join(" • ")}
+                </p>
               )}
-              <p className="mt-1 text-sm text-text-soft">{booking.serviceName}</p>
+              <p className="mt-1 break-words text-sm text-text-soft">{booking.serviceName}</p>
             </div>
 
-            <div>
+            <div className="min-w-0">
               <p className="text-sm font-medium text-[var(--theme-text-primary)]">{booking.professionalName}</p>
-              <p className="mt-1 text-xs uppercase tracking-[0.2em] text-text-soft">
+              <p className="mt-1 break-words text-xs uppercase tracking-[0.2em] text-text-soft">
                 {tenantTimezone}
               </p>
             </div>
@@ -92,14 +97,20 @@ export function DashboardAgendaList({
                 <DashboardStatusBadge status={booking.status} />
                 {onCancelBooking ? (
                   <DashboardBookingActionsMenu
-                    disabled={busyBookingId === booking.bookingId}
-                    onViewDetails={() => onViewBookingDetails?.(booking)}
-                    onReschedule={onRescheduleBooking ? () => onRescheduleBooking(booking) : undefined}
-                    onCancel={() => onCancelBooking(booking)}
-                    viewDetailsDisabled={false}
-                    rescheduleDisabled={!isEligibleForReschedule || busyBookingId === booking.bookingId}
-                    rescheduleLabel={
-                      busyBookingId === booking.bookingId
+                  disabled={busyBookingId === booking.bookingId}
+                  onViewDetails={() => onViewBookingDetails?.(booking)}
+                  onMarkDepositPaid={
+                    onMarkDepositPaid && canMarkDepositPaid
+                      ? () => onMarkDepositPaid(booking)
+                      : undefined
+                  }
+                  onReschedule={onRescheduleBooking ? () => onRescheduleBooking(booking) : undefined}
+                  onCancel={() => onCancelBooking(booking)}
+                  viewDetailsDisabled={false}
+                  markDepositPaidDisabled={busyBookingId === booking.bookingId}
+                  rescheduleDisabled={!isEligibleForReschedule || busyBookingId === booking.bookingId}
+                  rescheduleLabel={
+                    busyBookingId === booking.bookingId
                         ? "Reagendando..."
                         : isEligibleForReschedule
                           ? "Reagendar"

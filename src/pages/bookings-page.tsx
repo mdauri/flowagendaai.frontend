@@ -7,6 +7,7 @@ import { Badge } from "@/components/flow/badge";
 import { useBookingsQuery } from "@/hooks/use-bookings-query";
 import { useBookingByIdQuery } from "@/hooks/use-booking-by-id-query";
 import { useProfessionalsQuery } from "@/hooks/use-professionals-query";
+import { useMarkBookingDepositPaidMutation } from "@/hooks/use-mark-booking-deposit-paid-mutation";
 import { formatUtcTimeRangeInTenantTimezone } from "@/lib/date-time";
 import { useAuth } from "@/hooks/use-auth";
 import type { BookingReadItem, BookingStatus } from "@/types/booking";
@@ -31,6 +32,8 @@ function statusLabel(status: BookingStatus) {
   switch (status) {
     case "CONFIRMED":
       return "Confirmado";
+    case "AWAITING_DEPOSIT":
+      return "Aguardando sinal";
     case "PENDING":
       return "Pendente";
     case "CANCELLED":
@@ -44,11 +47,45 @@ function statusVariant(status: BookingStatus) {
   switch (status) {
     case "CONFIRMED":
       return "success";
+    case "AWAITING_DEPOSIT":
+      return "warning";
     case "PENDING":
       return "warning";
     case "CANCELLED":
       return "danger";
     case "COMPLETED":
+      return "neutral";
+  }
+}
+
+function depositStatusLabel(status: string) {
+  switch (status) {
+    case "NOT_REQUIRED":
+      return "Sem sinal";
+    case "PENDING":
+      return "Aguardando sinal";
+    case "PAID":
+      return "Sinal pago";
+    case "WAIVED":
+      return "Sinal dispensado";
+    case "EXPIRED":
+      return "Sinal expirado";
+    default:
+      return status;
+  }
+}
+
+function depositStatusVariant(status: string) {
+  switch (status) {
+    case "PAID":
+      return "success";
+    case "PENDING":
+      return "warning";
+    case "WAIVED":
+      return "neutral";
+    case "EXPIRED":
+      return "danger";
+    default:
       return "neutral";
   }
 }
@@ -77,9 +114,12 @@ export function BookingsPage() {
   const tenantTimezone = auth.tenant?.timezone ?? "UTC";
 
   const bookingsQuery = useBookingsQuery(applied);
+  const markDepositPaidMutation = useMarkBookingDepositPaidMutation();
 
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
   const bookingByIdQuery = useBookingByIdQuery(selectedBookingId);
+  const [depositActionMessage, setDepositActionMessage] = useState<string | null>(null);
+  const [depositActionError, setDepositActionError] = useState<string | null>(null);
 
   const professionalOptions = useMemo(() => {
     const items = professionalsQuery.data?.professionals ?? [];
@@ -271,7 +311,12 @@ export function BookingsPage() {
                       <div className="text-sm font-semibold text-secondary">
                         {formatUtcTimeRangeInTenantTimezone(item.start, item.end, tenantTimezone)}
                       </div>
-                      <Badge variant={statusVariant(item.status)}>{statusLabel(item.status)}</Badge>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Badge variant={statusVariant(item.status)}>{statusLabel(item.status)}</Badge>
+                        <Badge variant={depositStatusVariant(item.depositStatus)}>
+                          {depositStatusLabel(item.depositStatus)}
+                        </Badge>
+                      </div>
                     </div>
                     <div className="mt-2">
                       <p className="text-base font-semibold text-white">{resolveCustomerName(item.customerName)}</p>
@@ -328,11 +373,14 @@ export function BookingsPage() {
               </div>
             ) : bookingByIdQuery.data ? (
               <div className="grid gap-4 md:grid-cols-2">
-                <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
+              <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
                   <p className="text-xs uppercase tracking-[0.2em] text-text-soft">Resumo</p>
                   <div className="mt-3 flex flex-wrap items-center gap-3">
                     <Badge variant={statusVariant(bookingByIdQuery.data.booking.status)}>
                       {statusLabel(bookingByIdQuery.data.booking.status)}
+                    </Badge>
+                    <Badge variant={depositStatusVariant(bookingByIdQuery.data.booking.depositStatus)}>
+                      {depositStatusLabel(bookingByIdQuery.data.booking.depositStatus)}
                     </Badge>
                     <span className="text-sm font-semibold text-secondary">
                       {formatUtcTimeRangeInTenantTimezone(
@@ -374,7 +422,61 @@ export function BookingsPage() {
                     <span className="font-medium text-white">{bookingByIdQuery.data.booking.createdAt}</span>
                   </p>
                 </div>
+
+                {bookingByIdQuery.data.booking.depositStatus === "PENDING" ? (
+                  <div className="rounded-3xl border border-white/10 bg-white/5 p-4 md:col-span-2">
+                    <p className="text-xs uppercase tracking-[0.2em] text-text-soft">Sinal</p>
+                    <p className="mt-3 text-sm text-text-soft">
+                      Este agendamento esta aguardando o sinal ser registrado manualmente.
+                    </p>
+                    <div className="mt-3 flex flex-wrap items-center gap-3">
+                      <Button
+                        size="sm"
+                        onClick={async () => {
+                          setDepositActionError(null);
+                          setDepositActionMessage(null);
+
+                          const confirmed = window.confirm(
+                            "Marcar o sinal como pago para este agendamento?"
+                          );
+
+                          if (!confirmed) {
+                            return;
+                          }
+
+                          const notes = window.prompt(
+                            "Observacao opcional do recebimento do sinal:",
+                            ""
+                          );
+
+                          try {
+                            await markDepositPaidMutation.mutateAsync({
+                              bookingId: bookingByIdQuery.data.booking.id,
+                              notes: notes?.trim() ? notes.trim() : undefined,
+                            });
+                            setDepositActionMessage("Sinal marcado como pago.");
+                          } catch (error) {
+                            setDepositActionError(
+                              error instanceof Error
+                                ? error.message
+                                : "Nao foi possivel marcar o sinal como pago."
+                            );
+                          }
+                        }}
+                        disabled={markDepositPaidMutation.isPending}
+                      >
+                        Marcar sinal como pago
+                      </Button>
+                    </div>
+                  </div>
+                ) : null}
               </div>
+            ) : null}
+            {depositActionMessage ? (
+              <p className="mt-3 text-sm text-green-300">{depositActionMessage}</p>
+            ) : null}
+            {depositActionError ? (
+              <p className="mt-3 text-sm text-red-300">{depositActionError}</p>
             ) : null}
           </div>
         </Card>

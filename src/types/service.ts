@@ -7,6 +7,10 @@ export interface Service {
   price: number;
   imageUrl?: string | null;
   thumbnailUrl?: string | null;
+  requiresDeposit?: boolean;
+  depositType?: "FIXED" | "PERCENTAGE" | null;
+  depositAmountCents?: number | null;
+  depositPercentage?: number | null;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -24,6 +28,10 @@ export interface CreateServiceInput {
   durationInMinutes: number;
   price: number;
   imageUrl?: string | null;
+  requiresDeposit?: boolean;
+  depositType?: "FIXED" | "PERCENTAGE" | null;
+  depositAmountCents?: number | null;
+  depositPercentage?: number | null;
   isActive?: boolean;
 }
 
@@ -33,6 +41,10 @@ export interface UpdateServiceInput {
   durationInMinutes?: number;
   price?: number;
   imageUrl?: string | null;
+  requiresDeposit?: boolean;
+  depositType?: "FIXED" | "PERCENTAGE" | null;
+  depositAmountCents?: number | null;
+  depositPercentage?: number | null;
   isActive?: boolean;
 }
 

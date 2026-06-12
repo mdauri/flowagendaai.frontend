@@ -114,6 +114,10 @@ const confirmedBooking = {
   start: "2026-04-01T12:00:00.000Z",
   end: "2026-04-01T13:00:00.000Z",
   status: "CONFIRMED" as const,
+  depositRequired: false,
+  depositStatus: "NOT_REQUIRED" as const,
+  depositAmountCents: null,
+  depositPaymentProvider: "MANUAL" as const,
 };
 
 function createDeferredPromise<T>() {

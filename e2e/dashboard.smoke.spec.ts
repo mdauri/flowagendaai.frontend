@@ -17,7 +17,7 @@ test.describe("Dashboard smoke", () => {
     test.info().annotations.push({ type: "consoleErrorsRef", description: "Collected console errors in-memory." });
 
     await page.goto("/app/dashboard");
-    await expect(page.getByRole("heading", { name: "Dashboard operacional" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
 
     await test.step("assert no console errors on load", async () => {
       expect(consoleErrors, consoleErrors.join("\n")).toEqual([]);
@@ -25,7 +25,7 @@ test.describe("Dashboard smoke", () => {
   });
 
   test("loads dashboard and navigates dates", async ({ page }) => {
-    await expect(page.getByText(/timezone America\/Sao_Paulo\./)).toBeVisible();
+    await expect(page.getByText("America/Sao_Paulo").first()).toBeVisible();
 
     const dateInput = page.getByLabel("Selecionar data do dashboard");
     const initialDate = await dateInput.inputValue();

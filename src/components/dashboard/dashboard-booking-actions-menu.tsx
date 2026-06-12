@@ -7,10 +7,13 @@ import { cn } from "@/lib/cn";
 interface DashboardBookingActionsMenuProps {
   disabled?: boolean;
   onViewDetails?: () => void;
+  onMarkDepositPaid?: () => void;
   onReschedule?: () => void;
   onCancel: () => void;
   viewDetailsDisabled?: boolean;
   viewDetailsLabel?: string;
+  markDepositPaidDisabled?: boolean;
+  markDepositPaidLabel?: string;
   rescheduleDisabled?: boolean;
   rescheduleLabel?: string;
   cancelDisabled?: boolean;
@@ -18,14 +21,18 @@ interface DashboardBookingActionsMenuProps {
 }
 
 const MENU_WIDTH_PX = 220;
+const VIEWPORT_GUTTER_PX = 12;
 
 export function DashboardBookingActionsMenu({
   disabled = false,
   onViewDetails,
+  onMarkDepositPaid,
   onReschedule,
   onCancel,
   viewDetailsDisabled = false,
   viewDetailsLabel = "Ver detalhes",
+  markDepositPaidDisabled = false,
+  markDepositPaidLabel = "Marcar sinal como pago",
   rescheduleDisabled = false,
   rescheduleLabel = "Reagendar",
   cancelDisabled = false,
@@ -40,9 +47,14 @@ export function DashboardBookingActionsMenu({
   const updateMenuRect = React.useCallback(() => {
     const rect = triggerRef.current?.getBoundingClientRect();
     if (!rect) return;
+    const viewportWidth = window.innerWidth;
+    const left = Math.min(
+      Math.max(VIEWPORT_GUTTER_PX, rect.right - MENU_WIDTH_PX),
+      Math.max(VIEWPORT_GUTTER_PX, viewportWidth - MENU_WIDTH_PX - VIEWPORT_GUTTER_PX)
+    );
     setMenuRect({
       top: rect.bottom + 8,
-      left: rect.right - MENU_WIDTH_PX,
+      left,
     });
   }, []);
 
@@ -105,8 +117,8 @@ export function DashboardBookingActionsMenu({
             <div
               ref={menuRef}
               role="menu"
-              className="fixed z-[999] w-[220px] rounded-[24px] border border-white/10 bg-[#121216] p-2 shadow-lg"
-              style={{ top: menuRect.top, left: Math.max(12, menuRect.left) }}
+              className="fixed z-[999] w-[min(220px,calc(100vw-24px))] rounded-[24px] border border-white/10 bg-[#121216] p-2 shadow-lg"
+              style={{ top: menuRect.top, left: menuRect.left }}
             >
               <Button
                 type="button"
@@ -122,6 +134,22 @@ export function DashboardBookingActionsMenu({
               >
                 {viewDetailsLabel}
               </Button>
+              {onMarkDepositPaid ? (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  className="mb-2 w-full justify-start"
+                  role="menuitem"
+                  disabled={markDepositPaidDisabled}
+                  onClick={() => {
+                    setIsOpen(false);
+                    onMarkDepositPaid();
+                  }}
+                >
+                  {markDepositPaidLabel}
+                </Button>
+              ) : null}
               {onReschedule ? (
                 <Button
                   type="button"

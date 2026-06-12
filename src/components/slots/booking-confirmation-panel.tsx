@@ -53,14 +53,14 @@ function SlotSummary({
   serviceName?: string;
 }) {
   return (
-    <div className="grid gap-3 rounded-[28px] border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-4">
-      <div className="flex items-center justify-between gap-3">
+    <div className="grid min-w-0 gap-3 rounded-[28px] border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <span className="text-sm font-semibold text-[var(--theme-text-primary)]">Horario</span>
-        <Badge variant="info">
+        <Badge variant="info" className="max-w-full truncate">
           {formatUtcTimeRangeInTenantTimezone(start, end, tenantTimezone)}
         </Badge>
       </div>
-      <p className="text-sm leading-6 text-text-soft">
+      <p className="break-words text-sm leading-6 text-text-soft">
         {formatDateTimeInTenantTimezone(start, tenantTimezone)} (
         {tenantTimezone})
       </p>
@@ -97,14 +97,14 @@ function SuccessState({
     <Card
       variant="glass"
       padding="lg"
-      className="grid gap-4 border"
+      className="grid min-w-0 gap-4 border"
       style={{
         borderColor: semanticTokens.feedback.success.border,
         backgroundColor: semanticTokens.feedback.success.background,
       }}
       aria-live="polite"
     >
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <CardTitle>Agendamento confirmado</CardTitle>
           <CardDescription className="mt-3">
@@ -164,7 +164,7 @@ export function BookingConfirmationPanel({
     <Card
       variant="glass"
       padding="lg"
-      className="grid gap-5"
+      className="grid min-w-0 gap-5"
       aria-live="polite"
     >
       <div>
@@ -231,6 +231,7 @@ export function BookingConfirmationPanel({
         <Button
           type="button"
           size="md"
+          className="w-full sm:w-auto"
           onClick={onRetry}
           disabled={!selectedSlot}
         >
@@ -240,6 +241,7 @@ export function BookingConfirmationPanel({
         <Button
           type="button"
           size="md"
+          className="w-full sm:w-auto"
           onClick={onConfirm}
           disabled={!canConfirm}
         >

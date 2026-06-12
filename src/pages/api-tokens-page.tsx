@@ -301,8 +301,8 @@ export function ApiTokensPage() {
   }
 
   return (
-    <div className="grid gap-6">
-      <Card variant="premium" padding="lg">
+    <div className="grid min-w-0 gap-6">
+      <Card variant="premium" padding="lg" className="min-w-0">
         <CardTitle>API Tokens M2M</CardTitle>
         <CardDescription className="mt-3">
           Crie e gerencie tokens para tenants especificos com menor
@@ -310,7 +310,7 @@ export function ApiTokensPage() {
         </CardDescription>
       </Card>
 
-      <Card variant="glass" padding="lg">
+      <Card variant="glass" padding="lg" className="min-w-0">
         <CardTitle>Tenant alvo</CardTitle>
         <CardDescription className="mt-2">
           Selecione o tenant para criar, listar e revogar tokens.
@@ -346,7 +346,7 @@ export function ApiTokensPage() {
         )}
       </Card>
 
-      <Card variant="glass" padding="lg">
+      <Card variant="glass" padding="lg" className="min-w-0">
         <CardTitle>Criar novo token</CardTitle>
         <CardDescription className="mt-2">
           O token sera exibido uma unica vez. Exemplo n8n: configure header
@@ -356,7 +356,7 @@ export function ApiTokensPage() {
           </span>{" "}
           no HTTP Request node.
         </CardDescription>
-        <form className="mt-5 grid gap-4" onSubmit={handleCreate}>
+        <form className="mt-5 grid min-w-0 gap-4" onSubmit={handleCreate}>
           <div className="grid gap-2">
             <label
               className="text-sm font-semibold text-[var(--theme-text-primary)]"
@@ -445,10 +445,11 @@ export function ApiTokensPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <Button
               type="submit"
               size="md"
+              className="w-full sm:w-auto"
               disabled={
                 createMutation.isPending ||
                 !selectedTenantId ||
@@ -469,14 +470,14 @@ export function ApiTokensPage() {
       </Card>
 
       {oneTimeToken ? (
-        <Card variant="premium" padding="lg">
+        <Card variant="premium" padding="lg" className="min-w-0">
           <CardTitle>Token gerado (exibicao unica)</CardTitle>
           <CardDescription className="mt-2">
             Copie e armazene agora. Este token nao sera exibido novamente.
           </CardDescription>
           <div className="mt-4 flex flex-col gap-3 md:flex-row md:items-center">
-            <Input readOnly value={oneTimeToken} />
-            <Button type="button" size="md" onClick={copyOneTimeToken}>
+            <Input readOnly value={oneTimeToken} className="min-w-0" />
+            <Button type="button" size="md" className="w-full md:w-auto" onClick={copyOneTimeToken}>
               <Copy size={16} />
               Copiar token
             </Button>
@@ -484,6 +485,7 @@ export function ApiTokensPage() {
               type="button"
               size="md"
               variant="secondary"
+              className="w-full md:w-auto"
               onClick={() => setOneTimeToken(null)}
             >
               Entendi
@@ -492,7 +494,7 @@ export function ApiTokensPage() {
         </Card>
       ) : null}
 
-      <Card variant="glass" padding="lg">
+      <Card variant="glass" padding="lg" className="min-w-0">
         <CardTitle>Tokens cadastrados</CardTitle>
         {!selectedTenantId ? (
           <PageState
@@ -523,14 +525,14 @@ export function ApiTokensPage() {
                 key={item.id}
                 variant="surface"
                 padding="md"
-                className="grid gap-3"
+                className="grid min-w-0 gap-3"
               >
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="min-w-0">
                     <p className="text-sm font-semibold text-white">
                       {item.name}
                     </p>
-                    <p className="text-xs text-text-soft">
+                    <p className="break-words text-xs text-text-soft">
                       Prefixo: {item.prefix}_ | Status: {item.status}
                     </p>
                   </div>
@@ -538,6 +540,7 @@ export function ApiTokensPage() {
                     type="button"
                     size="sm"
                     variant="secondary"
+                    className="w-full sm:w-auto"
                     disabled={
                       item.status === "revoked" || revokeMutation.isPending
                     }
@@ -547,13 +550,13 @@ export function ApiTokensPage() {
                     Revogar
                   </Button>
                 </div>
-                <p className="text-xs text-text-soft">
+                <p className="break-words text-xs text-text-soft">
                   Escopos: {item.scopes.join(", ")}
                 </p>
-                <p className="text-xs text-text-soft">
+                <p className="break-words text-xs text-text-soft">
                   Expira em: {formatDateTimeBr(item.expiresAt)}
                 </p>
-                <p className="text-xs text-text-soft">
+                <p className="break-words text-xs text-text-soft">
                   Ultimo uso:{" "}
                   {item.lastUsedAt
                     ? formatDateTimeBr(item.lastUsedAt)

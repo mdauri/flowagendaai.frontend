@@ -18,7 +18,7 @@ export function SystemAdminGate({
   }
 
   return (
-    <Card variant="premium" padding="lg" className="mx-auto max-w-3xl">
+    <Card variant="premium" padding="lg" className="mx-auto w-full max-w-3xl min-w-0">
       <CardTitle>{fallbackTitle}</CardTitle>
       <CardDescription className="mt-3">{fallbackDescription}</CardDescription>
     </Card>

@@ -21,6 +21,10 @@ export interface PublicServiceItem {
   durationInMinutes: number;
   imageUrl?: string | null;
   thumbnailUrl?: string | null;
+  requiresDeposit?: boolean;
+  depositType?: "FIXED" | "PERCENTAGE" | null;
+  depositAmountCents?: number | null;
+  depositPercentage?: number | null;
   /** True when durationInMinutes > 960 (multi-day service) */
   isMultiDay?: boolean;
 }
@@ -75,6 +79,11 @@ export interface CreatePublicBookingResponse {
   serviceId: string;
   start: string;
   end: string;
+  status: "CONFIRMED" | "AWAITING_DEPOSIT";
+  depositRequired: boolean;
+  depositStatus: "NOT_REQUIRED" | "PENDING";
+  depositAmountCents: number | null;
+  depositPaymentProvider: "MANUAL" | "MERCADO_PAGO";
   customerName: string;
   customerPhone: string;
   customerEmail?: string | null;
@@ -94,6 +103,9 @@ export interface PublicManageBookingResponse {
   startAt: string;
   endAt: string;
   status: string;
+  depositRequired?: boolean;
+  depositStatus?: string;
+  depositAmountCents?: number | null;
   customerName: string;
   canConfirm: boolean;
   canCancel: boolean;

@@ -25,6 +25,7 @@ function resolveStatusVariant(status: string) {
   if (normalized === "CANCELLED") return "danger" as const;
   if (normalized === "COMPLETED") return "neutral" as const;
   if (normalized === "PENDING") return "warning" as const;
+  if (normalized === "AWAITING_DEPOSIT") return "warning" as const;
   return "success" as const;
 }
 
@@ -33,6 +34,7 @@ function resolveStatusLabel(status: string) {
   if (normalized === "CANCELLED") return "Cancelado";
   if (normalized === "COMPLETED") return "Concluido";
   if (normalized === "PENDING") return "Pendente de confirmacao";
+  if (normalized === "AWAITING_DEPOSIT") return "Aguardando sinal";
   return "Confirmado";
 }
 
@@ -76,7 +78,26 @@ function resolveStatusNotice(status: string) {
     };
   }
 
+  if (normalized === "AWAITING_DEPOSIT") {
+    return {
+      title: "Aguardando sinal",
+      description: "Este agendamento foi criado e aguarda a baixa manual do sinal.",
+    };
+  }
+
   return null;
+}
+
+function resolveDepositStatusLabel(status?: string) {
+  const normalized = status?.toUpperCase() ?? "";
+
+  if (normalized === "NOT_REQUIRED") return "Sem sinal";
+  if (normalized === "PENDING") return "Aguardando sinal";
+  if (normalized === "PAID") return "Sinal pago";
+  if (normalized === "WAIVED") return "Sinal dispensado";
+  if (normalized === "EXPIRED") return "Sinal expirado";
+
+  return "Nao informado";
 }
 
 export function ManageBookingPage() {
@@ -238,6 +259,10 @@ export function ManageBookingPage() {
               value={startDateTimeText ?? "Nao informado"}
             />
             <Detail label="Status" value={resolveStatusLabel(booking.status)} />
+            <Detail
+              label="Sinal"
+              value={resolveDepositStatusLabel(booking.depositStatus)}
+            />
           </div>
 
           {showStatusNotice && statusNotice ? (

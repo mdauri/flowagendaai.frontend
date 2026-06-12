@@ -154,6 +154,7 @@ export function GeolocationAddressInput({
           type="button"
           variant="primary"
           size="sm"
+          className="w-full sm:w-auto"
           onClick={handleDetectLocation}
           disabled={disabled || isGeocoding}
           aria-label={

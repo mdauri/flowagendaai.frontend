@@ -9,6 +9,7 @@ import { DashboardOccupancyCard } from "@/components/dashboard/dashboard-occupan
 import { DashboardProfessionalOccupancy } from "@/components/dashboard/dashboard-professional-occupancy";
 import { DashboardUpcomingList } from "@/components/dashboard/dashboard-upcoming-list";
 import { DashboardBookingDetailsDialog } from "@/components/dashboard/dashboard-booking-details-dialog";
+import { MarkDepositPaidDialog } from "@/components/bookings/mark-deposit-paid-dialog";
 import { CancelBookingDialog } from "@/components/bookings/cancel-booking-dialog";
 import { RescheduleBookingDialog } from "@/components/bookings/reschedule-booking-dialog";
 import { useDashboardSummaryQuery } from "@/hooks/use-dashboard-summary-query";
@@ -16,6 +17,7 @@ import { useProfessionalsQuery } from "@/hooks/use-professionals-query";
 import { useServicesQuery } from "@/hooks/use-services-query";
 import { useBookingByIdQuery } from "@/hooks/use-booking-by-id-query";
 import { useCancelBookingMutation } from "@/hooks/use-cancel-booking-mutation";
+import { useMarkBookingDepositPaidMutation } from "@/hooks/use-mark-booking-deposit-paid-mutation";
 import { useRescheduleBookingMutation } from "@/hooks/use-reschedule-booking-mutation";
 import type { DashboardSummaryBookingItem } from "@/types/dashboard";
 import { FeedbackBanner } from "@/components/shared/feedback-banner";
@@ -25,7 +27,7 @@ function getInitialDashboardDate() {
   return DateTime.local().toISODate() ?? "";
 }
 
-type DashboardStatusFilter = "" | "PENDING" | "CONFIRMED" | "CANCELLED" | "COMPLETED";
+type DashboardStatusFilter = "" | "AWAITING_DEPOSIT" | "PENDING" | "CONFIRMED" | "CANCELLED" | "COMPLETED";
 
 export function DashboardPage() {
   const [date, setDate] = React.useState(getInitialDashboardDate);
@@ -51,6 +53,7 @@ export function DashboardPage() {
     customerPhone,
   });
   const cancelBookingMutation = useCancelBookingMutation();
+  const markDepositPaidMutation = useMarkBookingDepositPaidMutation();
   const rescheduleBookingMutation = useRescheduleBookingMutation();
   const [busyBookingId, setBusyBookingId] = React.useState<string | null>(null);
   const [cancelDialogBooking, setCancelDialogBooking] = React.useState<DashboardSummaryBookingItem | null>(
@@ -58,12 +61,15 @@ export function DashboardPage() {
   );
   const [rescheduleDialogBooking, setRescheduleDialogBooking] =
     React.useState<DashboardSummaryBookingItem | null>(null);
+  const [markDepositDialogBooking, setMarkDepositDialogBooking] =
+    React.useState<DashboardSummaryBookingItem | null>(null);
   const [detailsBookingId, setDetailsBookingId] = React.useState<string | null>(null);
   const [detailsBookingSummary, setDetailsBookingSummary] =
     React.useState<DashboardSummaryBookingItem | null>(null);
   const bookingDetailsQuery = useBookingByIdQuery(detailsBookingId);
   const [feedback, setFeedback] = React.useState<string | null>(null);
   const [cancelError, setCancelError] = React.useState<string | null>(null);
+  const [markDepositError, setMarkDepositError] = React.useState<string | null>(null);
   const [rescheduleError, setRescheduleError] = React.useState<string | null>(null);
   const isBootstrapLoading = professionalsQuery.isLoading || servicesQuery.isLoading;
   const isBootstrapError = professionalsQuery.isError || servicesQuery.isError;
@@ -127,6 +133,12 @@ export function DashboardPage() {
     setFeedback(null);
     setRescheduleError(null);
     setRescheduleDialogBooking(booking);
+  }, []);
+
+  const handleRequestMarkDepositPaid = React.useCallback((booking: DashboardSummaryBookingItem) => {
+    setFeedback(null);
+    setMarkDepositError(null);
+    setMarkDepositDialogBooking(booking);
   }, []);
 
   const handleViewBookingDetails = React.useCallback((booking: DashboardSummaryBookingItem) => {
@@ -210,6 +222,40 @@ export function DashboardPage() {
     [rescheduleBookingMutation, rescheduleDialogBooking]
   );
 
+  const handleConfirmMarkDepositPaid = React.useCallback(
+    async (input: { notes?: string }) => {
+      if (!markDepositDialogBooking) {
+        return;
+      }
+
+      setMarkDepositError(null);
+      setBusyBookingId(markDepositDialogBooking.bookingId);
+
+      try {
+        await markDepositPaidMutation.mutateAsync({
+          bookingId: markDepositDialogBooking.bookingId,
+          notes: input.notes,
+        });
+        setMarkDepositDialogBooking(null);
+        setFeedback("Sinal marcado como pago com sucesso.");
+      } catch (error) {
+        if (isBookingAlreadyResolvedApiError(error)) {
+          setMarkDepositError(
+            "Este agendamento ja foi resolvido. Atualize a lista e tente novamente."
+          );
+          return;
+        }
+
+        setMarkDepositError(
+          error instanceof ApiError ? error.message : "Nao foi possivel marcar o sinal agora. Tente novamente."
+        );
+      } finally {
+        setBusyBookingId(null);
+      }
+    },
+    [markDepositDialogBooking, markDepositPaidMutation]
+  );
+
   if (isBootstrapLoading || dashboardSummaryQuery.isLoading) {
     return <DashboardLoadingState />;
   }
@@ -238,7 +284,7 @@ export function DashboardPage() {
   }
 
   return (
-    <div className="grid gap-6">
+    <div className="grid min-w-0 gap-6">
       {feedback ? (
         <FeedbackBanner
           tone="info"
@@ -266,6 +312,7 @@ export function DashboardPage() {
         onStatusChange={(nextStatus) => {
           if (
             nextStatus === "" ||
+            nextStatus === "AWAITING_DEPOSIT" ||
             nextStatus === "PENDING" ||
             nextStatus === "CONFIRMED" ||
             nextStatus === "CANCELLED" ||
@@ -277,8 +324,8 @@ export function DashboardPage() {
         onCustomerQueryChange={setCustomerQuery}
         onClearFilters={handleClearFilters}
       />
-      <div className="grid gap-6 xl:grid-cols-12">
-        <div className="xl:col-span-8">
+      <div className="grid min-w-0 gap-6 xl:grid-cols-12">
+        <div className="min-w-0 xl:col-span-8">
           <DashboardAgendaList
             bookings={summary.todayBookings}
             tenantTimezone={summary.tenantTimezone}
@@ -286,10 +333,11 @@ export function DashboardPage() {
             onCancelBooking={handleRequestCancelBooking}
             onRescheduleBooking={handleRequestRescheduleBooking}
             onViewBookingDetails={handleViewBookingDetails}
+            onMarkDepositPaid={handleRequestMarkDepositPaid}
           />
         </div>
 
-        <div className="grid gap-6 xl:col-span-4">
+        <div className="grid min-w-0 gap-6 xl:col-span-4">
           <DashboardUpcomingList
             bookings={summary.upcomingBookings}
             tenantTimezone={summary.tenantTimezone}
@@ -297,16 +345,17 @@ export function DashboardPage() {
             onCancelBooking={handleRequestCancelBooking}
             onRescheduleBooking={handleRequestRescheduleBooking}
             onViewBookingDetails={handleViewBookingDetails}
+            onMarkDepositPaid={handleRequestMarkDepositPaid}
           />
           <DashboardProfessionalOccupancy items={summary.professionalOccupancy} />
         </div>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-12">
-        <div className="xl:col-span-4">
+      <div className="grid min-w-0 gap-6 xl:grid-cols-12">
+        <div className="min-w-0 xl:col-span-4">
           <DashboardOccupancyCard occupancy={summary.occupancy} />
         </div>
-        <div className="xl:col-span-8">
+        <div className="min-w-0 xl:col-span-8">
           <DashboardKpiGrid summary={summary} />
         </div>
       </div>
@@ -379,6 +428,27 @@ export function DashboardPage() {
           setRescheduleError(null);
         }}
         onConfirm={handleConfirmRescheduleBooking}
+      />
+
+      <MarkDepositPaidDialog
+        isOpen={Boolean(markDepositDialogBooking)}
+        bookingSummary={{
+          customerName: markDepositDialogBooking?.customerName ?? null,
+          customerPhone: markDepositDialogBooking?.customerPhone ?? null,
+          customerEmail: markDepositDialogBooking?.customerEmail ?? null,
+          professionalName: markDepositDialogBooking?.professionalName ?? null,
+          serviceName: markDepositDialogBooking?.serviceName ?? null,
+        }}
+        isSubmitting={markDepositPaidMutation.isPending}
+        errorMessage={markDepositError}
+        onClose={() => {
+          if (markDepositPaidMutation.isPending) {
+            return;
+          }
+          setMarkDepositDialogBooking(null);
+          setMarkDepositError(null);
+        }}
+        onConfirm={handleConfirmMarkDepositPaid}
       />
     </div>
   );

@@ -121,11 +121,12 @@ export function CoverImageUpload({
               style={{ objectPosition: "center" }}
             />
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col gap-2 sm:flex-row">
             <Button
               type="button"
               variant="primary"
               size="sm"
+              className="w-full sm:w-auto"
               onClick={handleClickUpload}
               disabled={disabled || isUploading}
             >
@@ -145,6 +146,7 @@ export function CoverImageUpload({
               type="button"
               variant="secondary"
               size="sm"
+              className="w-full sm:w-auto"
               onClick={handleRemove}
               disabled={disabled || isUploading}
             >
@@ -159,6 +161,7 @@ export function CoverImageUpload({
             type="button"
             variant="primary"
             size="sm"
+            className="w-full sm:w-auto"
             onClick={handleClickUpload}
             disabled={disabled || isUploading}
           >

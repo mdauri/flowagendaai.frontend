@@ -72,7 +72,7 @@ export function Card({ className, variant, padding, radiusSize, style, ...props 
 
   return (
     <div
-      className={cn(cardVariants({ variant, padding, radiusSize }), className)}
+      className={cn("min-w-0 max-w-full", cardVariants({ variant, padding, radiusSize }), className)}
       style={{
         ...cardBaseStyle,
         ...cardRadiusStyles[resolvedRadiusSize],

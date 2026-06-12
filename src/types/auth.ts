@@ -15,6 +15,12 @@ export interface AuthTenant {
   logoUrl: string | null;
   coverImageUrl: string | null;
   publicAddress: string | null;
+  description: string | null;
+  depositModuleEnabled: boolean;
+  depositPaymentProvider: "MANUAL" | "MERCADO_PAGO";
+  depositProviderConfigured: boolean;
+  mercadoPagoPublicKey: string | null;
+  depositConvenienceFeeEnabled: boolean;
 }
 
 export interface LoginRequest {

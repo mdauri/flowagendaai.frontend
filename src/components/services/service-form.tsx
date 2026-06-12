@@ -11,7 +11,9 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/flow/button";
 import { Card, CardDescription, CardTitle } from "@/components/flow/card";
+import { Checkbox } from "@/components/flow/checkbox";
 import { Input } from "@/components/flow/input";
+import { Select } from "@/components/flow/select";
 import { Textarea } from "@/components/flow/textarea";
 import { FeedbackBanner } from "@/components/shared/feedback-banner";
 import { PriceInput } from "@/components/services/price-input";
@@ -33,6 +35,10 @@ const initialForm = {
   description: "",
   durationInMinutes: "",
   price: "",
+  requiresDeposit: false,
+  depositType: "FIXED" as "FIXED" | "PERCENTAGE",
+  depositAmount: "",
+  depositPercentage: "",
   isActive: true,
 };
 
@@ -42,6 +48,7 @@ const IMAGE_ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 interface ServiceCreateProps {
   onSubmit: (input: CreateServiceInput) => Promise<CreateServiceResponse>;
   isSubmitting: boolean;
+  depositModuleEnabled: boolean;
 }
 
 interface ServiceEditFormProps {
@@ -50,6 +57,7 @@ interface ServiceEditFormProps {
   onSubmit: (input: UpdateServiceInput) => Promise<UpdateServiceResponse>;
   onCancelEdit: () => void;
   isSubmitting: boolean;
+  depositModuleEnabled: boolean;
 }
 
 interface ServiceCreateModeProps extends ServiceCreateProps {
@@ -71,11 +79,22 @@ function validateImageFile(file: File): string | null {
 }
 
 function getFormFromService(service: Service | null) {
+  const depositType = service?.depositType ?? "FIXED";
   return {
     name: service?.name ?? "",
     description: service?.description ?? "",
     durationInMinutes: service ? String(service.durationInMinutes) : "",
     price: service ? String(service.price) : "",
+    requiresDeposit: service?.requiresDeposit ?? false,
+    depositType,
+    depositAmount:
+      service?.depositAmountCents !== undefined && service?.depositAmountCents !== null
+        ? String(service.depositAmountCents / 100)
+        : "",
+    depositPercentage:
+      service?.depositPercentage !== undefined && service?.depositPercentage !== null
+        ? String(service.depositPercentage)
+        : "",
     isActive: service?.isActive ?? true,
   };
 }
@@ -86,6 +105,7 @@ export function ServiceForm(props: ServiceFormProps) {
   const createProps = props as ServiceCreateModeProps;
   const editProps = isEditMode ? (props as ServiceEditFormProps) : null;
   const editService = editProps?.initialValues ?? null;
+  const depositModuleEnabled = props.depositModuleEnabled;
 
   const [form, setForm] = useState(initialForm);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -275,6 +295,15 @@ export function ServiceForm(props: ServiceFormProps) {
     const trimmedName = form.name.trim();
     const parsedDuration = Number(form.durationInMinutes);
     const parsedPrice = Number.parseFloat(form.price.replace(",", "."));
+    const parsedDepositAmount = Number.parseFloat(form.depositAmount.replace(",", "."));
+    const parsedDepositPercentage = Number.parseFloat(form.depositPercentage.replace(",", "."));
+    const depositValid = !form.requiresDeposit
+      || !depositModuleEnabled
+      || (
+        form.depositType === "FIXED"
+          ? Number.isFinite(parsedDepositAmount) && parsedDepositAmount > 0
+          : Number.isFinite(parsedDepositPercentage) && parsedDepositPercentage > 0 && parsedDepositPercentage <= 100
+      );
 
     return (
       trimmedName.length >= 2 &&
@@ -285,9 +314,20 @@ export function ServiceForm(props: ServiceFormProps) {
       parsedDuration <= 4320 &&
       Number.isFinite(parsedPrice) &&
       parsedPrice > 0 &&
-      parsedPrice <= 99999.99
+      parsedPrice <= 99999.99 &&
+      depositValid
     );
-  }, [form.description.length, form.durationInMinutes, form.name, form.price]);
+  }, [
+    depositModuleEnabled,
+    form.depositAmount,
+    form.depositPercentage,
+    form.depositType,
+    form.description.length,
+    form.durationInMinutes,
+    form.name,
+    form.price,
+    form.requiresDeposit,
+  ]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -297,6 +337,8 @@ export function ServiceForm(props: ServiceFormProps) {
 
     const parsedDurationInMinutes = Number(form.durationInMinutes);
     const parsedPrice = Number.parseFloat(form.price.replace(",", "."));
+    const parsedDepositAmount = Number.parseFloat(form.depositAmount.replace(",", "."));
+    const parsedDepositPercentage = Number.parseFloat(form.depositPercentage.replace(",", "."));
 
     if (
       !Number.isInteger(parsedDurationInMinutes) ||
@@ -311,6 +353,43 @@ export function ServiceForm(props: ServiceFormProps) {
       return;
     }
 
+    let requiresDeposit = false;
+    let depositType: "FIXED" | "PERCENTAGE" | null = null;
+    let depositAmountCents: number | null = null;
+    let depositPercentage: number | null = null;
+
+    if (!depositModuleEnabled) {
+      if (isEditMode && editService?.requiresDeposit) {
+        requiresDeposit = true;
+        depositType = editService.depositType ?? null;
+        depositAmountCents = editService.depositAmountCents ?? null;
+        depositPercentage = editService.depositPercentage ?? null;
+      }
+    } else if (form.requiresDeposit) {
+      requiresDeposit = true;
+      depositType = form.depositType;
+
+      if (form.depositType === "FIXED") {
+        if (!Number.isFinite(parsedDepositAmount) || parsedDepositAmount <= 0) {
+          setErrorMessage("Informe um valor de sinal fixo maior que zero.");
+          return;
+        }
+
+        depositAmountCents = Math.round(parsedDepositAmount * 100);
+      } else {
+        if (
+          !Number.isFinite(parsedDepositPercentage) ||
+          parsedDepositPercentage <= 0 ||
+          parsedDepositPercentage > 100
+        ) {
+          setErrorMessage("Informe um percentual de sinal maior que zero e menor ou igual a 100.");
+          return;
+        }
+
+        depositPercentage = parsedDepositPercentage;
+      }
+    }
+
     if (isEditMode) {
       try {
         await editProps!.onSubmit({
@@ -318,6 +397,10 @@ export function ServiceForm(props: ServiceFormProps) {
           description: form.description.trim() === "" ? null : form.description,
           durationInMinutes: parsedDurationInMinutes,
           price: parsedPrice,
+          requiresDeposit,
+          depositType,
+          depositAmountCents,
+          depositPercentage,
           isActive: form.isActive,
         });
 
@@ -341,6 +424,10 @@ export function ServiceForm(props: ServiceFormProps) {
         description: form.description.trim() === "" ? null : form.description,
         durationInMinutes: parsedDurationInMinutes,
         price: parsedPrice,
+        requiresDeposit,
+        depositType,
+        depositAmountCents,
+        depositPercentage,
       });
 
       setForm(initialForm);
@@ -503,8 +590,109 @@ export function ServiceForm(props: ServiceFormProps) {
               disabled={props.isSubmitting}
               required
               placeholder="R$ 0,00"
-            />
-          </label>
+              />
+            </label>
+
+          {depositModuleEnabled ? (
+            <div className="grid gap-3 rounded-2xl border border-white/10 bg-white/5 p-4">
+              <div className="flex items-start gap-3">
+                <Checkbox
+                  checked={form.requiresDeposit}
+                  onCheckedChange={(checked) => {
+                    setForm((current) => ({
+                      ...current,
+                      requiresDeposit: checked,
+                      depositType: checked ? current.depositType || "FIXED" : "FIXED",
+                      depositAmount: checked ? current.depositAmount : "",
+                      depositPercentage: checked ? current.depositPercentage : "",
+                    }));
+                  }}
+                  disabled={props.isSubmitting}
+                />
+                <div className="grid gap-1">
+                  <span className="text-sm font-semibold text-white">
+                    Exigir sinal para este servico
+                  </span>
+                  <span className="text-xs text-text-soft">
+                    Quando ativo, o agendamento fica aguardando pagamento do sinal.
+                  </span>
+                </div>
+              </div>
+
+              {form.requiresDeposit ? (
+                <div className="grid gap-4">
+                  <label className="grid gap-2">
+                    <span className="text-sm font-semibold text-white">Tipo de sinal</span>
+                    <Select
+                      id={`${nameId}-deposit-type`}
+                      value={form.depositType}
+                      options={[
+                        { label: "Valor fixo", value: "FIXED" },
+                        { label: "Percentual", value: "PERCENTAGE" },
+                      ]}
+                      onValueChange={(value) => {
+                        setForm((current) => ({
+                          ...current,
+                          depositType: value as "FIXED" | "PERCENTAGE",
+                        }));
+                      }}
+                      disabled={props.isSubmitting}
+                      placeholder="Selecione"
+                    />
+                  </label>
+
+                  {form.depositType === "FIXED" ? (
+                    <label className="grid gap-2">
+                      <span className="text-sm font-semibold text-white">
+                        Valor do sinal
+                      </span>
+                      <PriceInput
+                        value={
+                          form.depositAmount
+                            ? Number.parseFloat(form.depositAmount.replace(",", "."))
+                            : null
+                        }
+                        onChange={(value) => {
+                          setForm((current) => ({
+                            ...current,
+                            depositAmount: value !== null ? value.toString() : "",
+                          }));
+                        }}
+                        disabled={props.isSubmitting}
+                        required
+                        placeholder="R$ 0,00"
+                        />
+                      </label>
+                  ) : (
+                    <label className="grid gap-2">
+                      <span className="text-sm font-semibold text-white">
+                        Percentual do sinal
+                      </span>
+                      <Input
+                        type="number"
+                        min={0.01}
+                        max={100}
+                        step={0.01}
+                        inputSize="md"
+                        value={form.depositPercentage}
+                        onChange={(event) => {
+                          setForm((current) => ({
+                            ...current,
+                            depositPercentage: event.target.value,
+                          }));
+                        }}
+                        placeholder="Ex.: 20"
+                        disabled={props.isSubmitting}
+                      />
+                      <p className="text-xs text-text-soft">
+                        Informe um percentual entre 0,01 e 100.
+                      </p>
+                    </label>
+                  )}
+                </div>
+              ) : null}
+            </div>
+          ) : null}
         </div>
 
         {isEditMode ? (

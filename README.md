@@ -7,6 +7,7 @@
 - `npm run e2e`: smoke E2E do dashboard com Playwright (headless por padrao)
 - `npm run e2e:ui`: runner interativo do Playwright
 - `npm run e2e:report`: abre o report HTML do Playwright
+- `npm run verify`: build + testes unitarios + E2E em um unico comando para local e CI
 
 ## Playwright (E2E)
 
@@ -19,8 +20,8 @@
 
 Defina no shell antes de rodar:
 
-- `E2E_EMAIL` (ex.: `admin@agendoro.com`)
-- `E2E_PASSWORD`
+- `E2E_EMAIL` (opcional; default `system-admin@agendoro.com`)
+- `E2E_PASSWORD` (opcional; default `123456`)
 - `E2E_BASE_URL` (opcional; default `http://localhost:5173`)
 
 ### Rodar

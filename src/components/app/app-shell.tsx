@@ -23,21 +23,21 @@ export function AppShell({
   const isProfessional = user.role === "professional";
 
   return (
-    <div className="min-h-screen px-6 py-6 md:px-10 lg:px-16">
-      <header className="mx-auto grid max-w-7xl gap-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-start">
-        <div>
+    <div className="min-h-screen px-4 py-4 sm:px-6 md:px-10 lg:px-16">
+      <header className="mx-auto grid max-w-7xl min-w-0 gap-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-start">
+        <div className="min-w-0">
           <DemoEnvironmentBanner tenantSlug={tenant.slug} className="mb-4" />
           <p className="text-sm font-semibold uppercase tracking-[0.22em] text-secondary">
             Agendoro
           </p>
-          <p className="mt-2 text-sm leading-6 text-text-soft">
+          <p className="mt-2 max-w-full text-sm leading-6 text-text-soft">
             <span className="font-semibold text-(--theme-text-primary)">
               {tenant.name}
             </span>
           </p>
           <nav
             aria-label="Navegacao principal da operacao"
-            className="mt-5 flex flex-wrap gap-3"
+            className="mt-5 flex min-w-0 flex-wrap gap-2 sm:gap-3"
           >
             {isProfessional ? (
               <NavLink
@@ -208,6 +208,21 @@ export function AppShell({
                 Billing WhatsApp
               </NavLink>
             ) : null}
+            {user.role === "system-admin" && !isProfessional ? (
+              <NavLink
+                to="/app/system-admin/tenants/deposit-fee"
+                className={({ isActive }) =>
+                  cn(
+                    "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
+                    isActive
+                      ? "border-primary bg-primary text-black"
+                      : "border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] text-text-soft hover:border-[var(--theme-border-default)] hover:text-[var(--theme-text-primary)]",
+                  )
+                }
+              >
+                Sinal Online
+              </NavLink>
+            ) : null}
             {["admin", "system-admin"].includes(user.role) &&
             !isProfessional ? (
               <NavLink
@@ -250,7 +265,7 @@ export function AppShell({
         </div>
       </header>
 
-      <main className="mx-auto mt-8 max-w-7xl">
+      <main className="mx-auto mt-8 w-full max-w-7xl min-w-0">
         <Card variant="glass" padding="lg">
           {children}
         </Card>

@@ -68,18 +68,19 @@ export function DashboardHeader({
   }));
   const statusOptions = [
     { value: "CONFIRMED", label: "Confirmado" },
+    { value: "AWAITING_DEPOSIT", label: "Aguardando sinal" },
     { value: "PENDING", label: "Pendente" },
     { value: "CANCELLED", label: "Cancelado" },
     { value: "COMPLETED", label: "Concluido" },
   ];
 
   return (
-    <div className="grid gap-4">
-      <div>
+    <div className="grid gap-4 min-w-0">
+      <div className="min-w-0">
         <h2 className="text-3xl font-black tracking-tight text-[var(--theme-text-primary)]">
           Dashboard
         </h2>
-        <p className="mt-1 text-sm text-text-soft">
+        <p className="mt-1 max-w-full text-sm text-text-soft">
           {formatDashboardDate(date, tenantTimezone)} • {tenantTimezone}
         </p>
       </div>
@@ -88,20 +89,20 @@ export function DashboardHeader({
         variant="glass"
         padding="md"
         radiusSize="xxl"
-        className="grid gap-3 border-white/20 transition-all duration-200"
+        className="grid min-w-0 gap-3 border-white/20 transition-all duration-200"
       >
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="grid min-w-0 gap-2 sm:flex sm:flex-wrap sm:items-center">
           <Button
             size="sm"
             variant="secondary"
-            className="h-10 w-10 p-0 transition-all duration-200"
+            className="h-10 w-10 shrink-0 p-0 transition-all duration-200"
             onClick={onPreviousDate}
             aria-label="Ir para dia anterior"
           >
             <ChevronLeft className="h-5 w-5" aria-hidden="true" />
           </Button>
 
-          <div className="flex min-h-10 items-center gap-2 rounded-2xl border border-[var(--theme-border-default)] bg-[var(--theme-surface-glass)] px-3 py-2 transition-all duration-200">
+          <div className="flex min-h-10 min-w-0 items-center gap-2 rounded-2xl border border-[var(--theme-border-default)] bg-[var(--theme-surface-glass)] px-3 py-2 transition-all duration-200">
             <CalendarDays
               className="h-4 w-4 text-text-soft"
               aria-hidden="true"
@@ -110,7 +111,7 @@ export function DashboardHeader({
               type="date"
               value={date}
               inputSize="sm"
-              className="h-auto w-[9.25rem] border-0 bg-transparent px-0 py-0 [background-color:transparent] [box-shadow:none] focus-visible:[box-shadow:none]"
+              className="h-auto min-w-0 flex-1 border-0 bg-transparent px-0 py-0 [background-color:transparent] [box-shadow:none] focus-visible:[box-shadow:none] sm:flex-none sm:w-[9.25rem]"
               onChange={(event) => {
                 onDateChange(event.target.value);
               }}
@@ -121,23 +122,24 @@ export function DashboardHeader({
           <Button
             size="sm"
             variant="secondary"
-            className="h-10 w-10 p-0 transition-all duration-200"
+            className="h-10 w-10 shrink-0 p-0 transition-all duration-200"
             onClick={onNextDate}
             aria-label="Ir para proximo dia"
           >
             <ChevronRight className="h-5 w-5" aria-hidden="true" />
           </Button>
 
-          <Button size="sm" variant="secondary" onClick={onToday}>
+          <Button size="sm" variant="secondary" className="w-full sm:w-auto" onClick={onToday}>
             Hoje
           </Button>
-          <Button size="sm" variant="secondary" onClick={onTomorrow}>
+          <Button size="sm" variant="secondary" className="w-full sm:w-auto" onClick={onTomorrow}>
             Amanha
           </Button>
           {isToday ? <Badge variant="info">Hoje</Badge> : null}
           <Button
             size="sm"
             variant="ghost"
+            className="w-full sm:w-auto"
             onClick={onClearFilters}
             aria-label="Limpar filtros do dashboard"
           >
@@ -146,8 +148,8 @@ export function DashboardHeader({
           </Button>
         </div>
 
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-          <div className="grid gap-1.5">
+        <div className="grid min-w-0 gap-3 md:grid-cols-2 xl:grid-cols-4">
+          <div className="grid min-w-0 gap-1.5">
             <p className="text-xs text-text-soft">Profissional</p>
             <Select
               value={professionalId}
@@ -158,7 +160,7 @@ export function DashboardHeader({
             />
           </div>
 
-          <div className="grid gap-1.5">
+          <div className="grid min-w-0 gap-1.5">
             <p className="text-xs text-text-soft">Servico</p>
             <Select
               value={serviceId}
@@ -169,7 +171,7 @@ export function DashboardHeader({
             />
           </div>
 
-          <div className="grid gap-1.5">
+          <div className="grid min-w-0 gap-1.5">
             <p className="text-xs text-text-soft">Status</p>
             <Select
               value={status}
@@ -180,7 +182,7 @@ export function DashboardHeader({
             />
           </div>
 
-          <div className="grid gap-1.5">
+          <div className="grid min-w-0 gap-1.5">
             <p className="text-xs text-text-soft">Cliente</p>
             <Input
               value={customerQuery}
