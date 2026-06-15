@@ -16,6 +16,10 @@ export interface AuthTenant {
   coverImageUrl: string | null;
   publicAddress: string | null;
   description: string | null;
+  reactivationEnabled?: boolean;
+  daysAfterLastService?: number;
+  reactivationCooldownDays?: number;
+  reactivationTemplateName?: string | null;
   depositModuleEnabled: boolean;
   depositPaymentProvider: "MANUAL" | "MERCADO_PAGO";
   depositProviderConfigured: boolean;

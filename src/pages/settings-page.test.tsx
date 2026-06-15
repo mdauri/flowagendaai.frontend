@@ -17,6 +17,10 @@ vi.mock("@/hooks/use-auth", () => ({
         coverImageUrl: null,
         publicAddress: null,
         description: null,
+        reactivationEnabled: false,
+        daysAfterLastService: 30,
+        reactivationCooldownDays: 30,
+        reactivationTemplateName: null,
         depositModuleEnabled: false,
         depositPaymentProvider: "MANUAL",
         depositProviderConfigured: false,
@@ -80,6 +84,10 @@ describe("SettingsPage", () => {
       coverImageUrl: null,
       publicAddress: null,
       description: null,
+      reactivationEnabled: false,
+      daysAfterLastService: 30,
+      reactivationCooldownDays: 30,
+      reactivationTemplateName: null,
       depositModuleEnabled: false,
       depositPaymentProvider: "MANUAL",
       depositProviderConfigured: false,
@@ -125,6 +133,10 @@ describe("SettingsPage", () => {
       coverImageUrl: null,
       publicAddress: null,
       description: null,
+      reactivationEnabled: false,
+      daysAfterLastService: 30,
+      reactivationCooldownDays: 30,
+      reactivationTemplateName: null,
       depositModuleEnabled: false,
       depositPaymentProvider: "MANUAL",
       depositProviderConfigured: false,
@@ -180,6 +192,10 @@ describe("SettingsPage", () => {
                 coverImageUrl: null,
                 publicAddress: null,
                 description: null,
+                reactivationEnabled: false,
+                daysAfterLastService: 30,
+                reactivationCooldownDays: 30,
+                reactivationTemplateName: null,
                 depositModuleEnabled: false,
                 depositPaymentProvider: "MANUAL",
                 depositProviderConfigured: false,
@@ -261,6 +277,18 @@ describe("SettingsPage", () => {
     ).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: "Remover logo" })
+    ).toBeInTheDocument();
+  });
+
+  it("customer reactivation section is rendered", () => {
+    renderWithProviders(<SettingsPage />, {
+      route: "/app/settings",
+      withRouter: true,
+    });
+
+    expect(screen.getByText("Lembrete de retorno automatico")).toBeInTheDocument();
+    expect(
+      screen.getAllByRole("checkbox", { name: "Ativar lembrete de retorno automático" })[0]
     ).toBeInTheDocument();
   });
 

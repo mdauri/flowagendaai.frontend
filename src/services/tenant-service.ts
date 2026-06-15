@@ -6,6 +6,10 @@ export interface UpdateTenantInput {
   coverImageUrl?: string | null;
   publicAddress?: string | null;
   description?: string | null;
+  reactivationEnabled?: boolean;
+  daysAfterLastService?: number;
+  reactivationCooldownDays?: number;
+  reactivationTemplateName?: string | null;
 }
 
 export interface UpdateTenantResponse {
@@ -17,11 +21,25 @@ export interface UpdateTenantResponse {
   coverImageUrl: string | null;
   publicAddress: string | null;
   description: string | null;
+  reactivationEnabled?: boolean;
+  daysAfterLastService?: number;
+  reactivationCooldownDays?: number;
+  reactivationTemplateName?: string | null;
   depositModuleEnabled: boolean;
   depositPaymentProvider: "MANUAL" | "MERCADO_PAGO";
   depositProviderConfigured: boolean;
   mercadoPagoPublicKey: string | null;
   depositConvenienceFeeEnabled: boolean;
+}
+
+export interface SendCustomerReturnReminderTestInput {
+  customerName: string;
+  customerPhone: string;
+}
+
+export interface SendCustomerReturnReminderTestResponse {
+  status: "SENT";
+  metaMessageId: string;
 }
 
 export interface GeocodeInput {
@@ -56,6 +74,18 @@ export const tenantService = {
       method: "PATCH",
       body: JSON.stringify(input),
     });
+  },
+
+  async sendCustomerReturnReminderTest(
+    input: SendCustomerReturnReminderTestInput,
+  ): Promise<SendCustomerReturnReminderTestResponse> {
+    return httpClient<SendCustomerReturnReminderTestResponse>(
+      "/tenants/me/customer-return-reminders/test",
+      {
+        method: "POST",
+        body: JSON.stringify(input),
+      },
+    );
   },
 
   async geocode(input: GeocodeInput): Promise<GeocodeResponse> {
