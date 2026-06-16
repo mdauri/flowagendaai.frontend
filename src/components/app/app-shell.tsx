@@ -146,6 +146,19 @@ export function AppShell({
                 >
                   Bloqueios
                 </NavLink>
+                <NavLink
+                  to="/app/waitlist"
+                  className={({ isActive }) =>
+                    cn(
+                      "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
+                      isActive
+                        ? "border-primary bg-primary text-black"
+                        : "border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] text-text-soft hover:border-[var(--theme-border-default)] hover:text-[var(--theme-text-primary)]",
+                    )
+                  }
+                >
+                  Lista de Espera
+                </NavLink>
               </>
             )}
             {!isProfessional ? (

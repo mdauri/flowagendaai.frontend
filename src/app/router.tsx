@@ -12,6 +12,7 @@ import { PublicBookingPage } from "@/pages/public-booking-page";
 import { ManageBookingPage } from "@/pages/manage-booking-page";
 import { ResetPasswordPage } from "@/pages/reset-password-page";
 import { ServicesPage } from "@/pages/services-page";
+import { WaitlistPage } from "@/pages/waitlist-page";
 import { SlotsPage } from "@/pages/slots-page";
 import { SettingsPage } from "@/pages/settings-page";
 import { ApiTokensPage } from "@/pages/api-tokens-page";
@@ -84,6 +85,7 @@ export function AppRouter() {
           <Route path="professionals" element={<ProfessionalsPage />} />
           <Route path="professionals/:professionalId/removal" element={<ProfessionalRemovalPage />} />
           <Route path="services" element={<ServicesPage />} />
+          <Route path="waitlist" element={<WaitlistPage />} />
           <Route
             path="services/:id/professionals"
             element={
