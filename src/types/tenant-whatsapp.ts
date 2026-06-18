@@ -10,8 +10,6 @@ export interface TenantWhatsappIntegration {
   isActive: boolean;
   accessTokenMasked: string | null;
   hasAccessToken: boolean;
-  webhookUrl: string;
-  n8nWebhookUrl: string | null;
   n8nEnabled: boolean;
   createdAt: string;
   updatedAt: string;
@@ -24,7 +22,6 @@ export interface TenantWhatsappUpsertInput {
   phoneNumberId: string;
   wabaId: string;
   accessToken?: string;
-  n8nWebhookUrl?: string | null;
   n8nEnabled?: boolean;
   isActive?: boolean;
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { CheckCircle2, Copy, Info, Loader2, ShieldAlert } from "lucide-react";
+import { CheckCircle2, Info, Loader2, ShieldAlert } from "lucide-react";
 import { Badge } from "@/components/flow/badge";
 import { Button } from "@/components/flow/button";
 import { Checkbox } from "@/components/flow/checkbox";
@@ -23,7 +23,6 @@ interface FormState {
   phoneNumberId: string;
   wabaId: string;
   accessToken: string;
-  n8nWebhookUrl: string;
   n8nEnabled: boolean;
   isActive: boolean;
 }
@@ -34,7 +33,6 @@ const emptyFormState: FormState = {
   phoneNumberId: "",
   wabaId: "",
   accessToken: "",
-  n8nWebhookUrl: "",
   n8nEnabled: false,
   isActive: true,
 };
@@ -117,7 +115,6 @@ function buildFormState(value: TenantWhatsappIntegration): FormState {
     phoneNumberId: value.phoneNumberId ?? "",
     wabaId: value.wabaId ?? "",
     accessToken: "",
-    n8nWebhookUrl: value.n8nWebhookUrl ?? "",
     n8nEnabled: value.n8nEnabled,
     isActive: value.isActive,
   };
@@ -142,12 +139,6 @@ function buildPayload(
     payload.accessToken = form.accessToken.trim();
   }
 
-  if (form.n8nWebhookUrl.trim()) {
-    payload.n8nWebhookUrl = form.n8nWebhookUrl.trim();
-  } else if (!hasExistingConfig) {
-    payload.n8nWebhookUrl = null;
-  }
-
   return payload;
 }
 
@@ -162,7 +153,6 @@ export function WhatsAppIntegrationConfig({ tenantId }: WhatsAppIntegrationConfi
   const [form, setForm] = useState<FormState>(emptyFormState);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
-  const [copyState, setCopyState] = useState<"idle" | "copied">("idle");
   const whatsapp = whatsappQuery.data ?? null;
   const isEmptyState = whatsappQuery.error instanceof ApiError && whatsappQuery.error.status === 404;
   const hasExistingConfig = Boolean(whatsapp);
@@ -172,7 +162,6 @@ export function WhatsAppIntegrationConfig({ tenantId }: WhatsAppIntegrationConfi
     setForm(emptyFormState);
     setIsFormVisible(false);
     setSaveMessage(null);
-    setCopyState("idle");
 
     if (!tenantId) {
       return;
@@ -196,18 +185,6 @@ export function WhatsAppIntegrationConfig({ tenantId }: WhatsAppIntegrationConfi
     return () => window.clearTimeout(timeout);
   }, [saveMessage]);
 
-  useEffect(() => {
-    if (copyState !== "copied") {
-      return;
-    }
-
-    const timeout = window.setTimeout(() => {
-      setCopyState("idle");
-    }, 1800);
-
-    return () => window.clearTimeout(timeout);
-  }, [copyState]);
-
   function updateField<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((current) => ({
       ...current,
@@ -216,27 +193,6 @@ export function WhatsAppIntegrationConfig({ tenantId }: WhatsAppIntegrationConfi
     setSaveMessage(null);
   }
 
-  async function handleCopyWebhookUrl() {
-    if (!whatsapp?.webhookUrl) {
-      return;
-    }
-
-    try {
-      await navigator.clipboard.writeText(whatsapp.webhookUrl);
-      setCopyState("copied");
-      toast({
-        title: "Webhook copiado",
-        description: "A URL do webhook foi copiada para a area de transferencia.",
-        variant: "success",
-      });
-    } catch {
-      toast({
-        title: "Nao foi possivel copiar",
-        description: "Copie a URL manualmente.",
-        variant: "warning",
-      });
-    }
-  }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -389,18 +345,6 @@ export function WhatsAppIntegrationConfig({ tenantId }: WhatsAppIntegrationConfi
           </p>
         </div>
 
-        {whatsapp?.webhookUrl ? (
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            className="w-full sm:w-auto"
-            onClick={() => void handleCopyWebhookUrl()}
-          >
-            <Copy size={14} aria-hidden="true" />
-            {copyState === "copied" ? "Copiado" : "Copiar webhook"}
-          </Button>
-        ) : null}
       </div>
 
       {saveMessage ? (
@@ -412,30 +356,6 @@ export function WhatsAppIntegrationConfig({ tenantId }: WhatsAppIntegrationConfi
         >
           <CheckCircle2 size={16} aria-hidden="true" />
           {saveMessage}
-        </div>
-      ) : null}
-
-      {whatsapp?.webhookUrl ? (
-        <div className="space-y-2 rounded-2xl border border-[var(--theme-border-subtle)] bg-black/10 p-4">
-          <label htmlFor="webhook-url" className="block text-sm font-semibold text-[var(--theme-text-primary)]">
-            Webhook da Meta
-          </label>
-          <div className="flex flex-col gap-3 md:flex-row">
-            <Input id="webhook-url" className="min-w-0" value={whatsapp.webhookUrl} readOnly />
-            <Button
-              type="button"
-              variant="secondary"
-              size="md"
-              className="w-full md:w-auto"
-              onClick={() => void handleCopyWebhookUrl()}
-            >
-              <Copy size={14} aria-hidden="true" />
-              {copyState === "copied" ? "Copiado" : "Copiar"}
-            </Button>
-          </div>
-          <p className="text-xs leading-5 text-text-soft">
-            Configure esta URL como callback no painel da Meta. O tenant sera identificado pelo <code>phone_number_id</code> recebido no payload.
-          </p>
         </div>
       ) : null}
 
@@ -550,19 +470,6 @@ export function WhatsAppIntegrationConfig({ tenantId }: WhatsAppIntegrationConfi
             Configuracoes avancadas
           </summary>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
-            <div className="space-y-2 md:col-span-2">
-              <label htmlFor="n8n-webhook-url" className="block text-sm font-semibold text-[var(--theme-text-primary)]">
-                n8nWebhookUrl
-              </label>
-              <Input
-                id="n8n-webhook-url"
-                type="url"
-                value={form.n8nWebhookUrl}
-                onChange={(event) => updateField("n8nWebhookUrl", event.target.value)}
-                placeholder="https://n8n.agendoro.com/webhook/whatsapp"
-              />
-            </div>
-
             <label className="flex min-w-0 items-center gap-3 rounded-2xl border border-[var(--theme-border-subtle)] bg-black/10 p-4 text-sm text-[var(--theme-text-primary)]">
               <Checkbox
                 checked={form.n8nEnabled}

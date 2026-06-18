@@ -20,8 +20,6 @@ const queryState = {
         isActive: boolean;
         accessTokenMasked: string | null;
         hasAccessToken: boolean;
-        webhookUrl: string;
-        n8nWebhookUrl: string | null;
         n8nEnabled: boolean;
         createdAt: string;
         updatedAt: string;
@@ -82,8 +80,6 @@ describe("WhatsAppIntegrationConfig", () => {
       isActive: true,
       accessTokenMasked: "********1234",
       hasAccessToken: true,
-      webhookUrl: "http://localhost:3333/webhooks/meta/whatsapp",
-      n8nWebhookUrl: null,
       n8nEnabled: false,
       createdAt: "2026-06-02T00:00:00.000Z",
       updatedAt: "2026-06-02T00:00:00.000Z",
@@ -115,12 +111,10 @@ describe("WhatsAppIntegrationConfig", () => {
       accessToken: "EAAXXXXX",
       n8nEnabled: false,
       isActive: true,
-      n8nWebhookUrl: null,
     });
   });
 
-  it("exibe a configuracao existente e permite copiar o webhook", async () => {
-    const user = userEvent.setup();
+  it("exibe a configuracao existente", async () => {
     queryState.data = {
       id: "whatsapp-1",
       displayName: "Agendoro Test",
@@ -131,18 +125,10 @@ describe("WhatsAppIntegrationConfig", () => {
       isActive: true,
       accessTokenMasked: "********1234",
       hasAccessToken: true,
-      webhookUrl: "http://localhost:3333/webhooks/meta/whatsapp",
-      n8nWebhookUrl: null,
       n8nEnabled: false,
       createdAt: "2026-06-02T00:00:00.000Z",
       updatedAt: "2026-06-02T00:00:00.000Z",
     };
-
-    const clipboardWriteMock = vi.fn().mockResolvedValue(undefined);
-    Object.defineProperty(window.navigator, "clipboard", {
-      value: { writeText: clipboardWriteMock },
-      configurable: true,
-    });
 
     renderWithProviders(<WhatsAppIntegrationConfig tenantId="tenant-1" />, {
       withRouter: true,
@@ -150,11 +136,5 @@ describe("WhatsAppIntegrationConfig", () => {
 
     expect(screen.getByText("Conectado")).toBeInTheDocument();
     expect(screen.getByText("********1234")).toBeInTheDocument();
-
-    await user.click(screen.getByRole("button", { name: "Copiar webhook" }));
-
-    await waitFor(() => {
-      expect(clipboardWriteMock).toHaveBeenCalledWith("http://localhost:3333/webhooks/meta/whatsapp");
-    });
   });
 });
