@@ -116,6 +116,48 @@ const eventsResponse = {
   ],
 };
 
+const auditResponse = {
+  total: 2,
+  page: 1,
+  pageSize: 20,
+  items: [
+    {
+      id: "audit-1",
+      tenantId: "tenant-1",
+      conversationId: "conv-1",
+      phoneNumberId: "phone-1",
+      customerPhone: "5511999999999",
+      contactName: "Cliente Teste",
+      direction: "INBOUND",
+      messageType: "text",
+      metaMessageId: "wamid-in-1",
+      metaTimestamp: "2026-06-03T11:00:00.000Z",
+      textBody: "Quero agendar",
+      status: "RECEIVED",
+      statusUpdatedAt: "2026-06-03T11:00:00.000Z",
+      createdAt: "2026-06-03T11:00:00.000Z",
+      updatedAt: "2026-06-03T11:00:00.000Z",
+    },
+    {
+      id: "audit-2",
+      tenantId: "tenant-1",
+      conversationId: "conv-1",
+      phoneNumberId: "phone-1",
+      customerPhone: "5511999999999",
+      contactName: "Cliente Teste",
+      direction: "OUTBOUND",
+      messageType: "template",
+      metaMessageId: "wamid-out-1",
+      metaTimestamp: "2026-06-03T12:00:00.000Z",
+      textBody: "booking_reminder",
+      status: "SENT",
+      statusUpdatedAt: "2026-06-03T12:00:00.000Z",
+      createdAt: "2026-06-03T12:00:00.000Z",
+      updatedAt: "2026-06-03T12:00:00.000Z",
+    },
+  ],
+};
+
 const pricingRatesResponse = {
   items: [
     {
@@ -176,6 +218,15 @@ vi.mock("@/hooks/use-meta-whatsapp-billing-events-query", () => ({
   }),
 }));
 
+vi.mock("@/hooks/use-meta-whatsapp-audit-query", () => ({
+  useMetaWhatsAppAuditQuery: () => ({
+    data: auditResponse,
+    isLoading: false,
+    isError: false,
+    refetch: vi.fn(),
+  }),
+}));
+
 vi.mock("@/hooks/use-meta-whatsapp-pricing-rates-query", () => ({
   useMetaWhatsAppPricingRatesQuery: () => ({
     data: pricingRatesResponse,
@@ -209,9 +260,15 @@ describe("MetaWhatsAppBillingSystemAdminPage", () => {
     renderWithProviders(<MetaWhatsAppBillingSystemAdminPage />);
 
     expect(screen.getAllByText(/US\$\s?2,3456/).length).toBeGreaterThan(0);
-    expect(screen.getByRole("button", { name: "Eventos" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Custos" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Auditoria" })).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Eventos" }));
+    await user.click(screen.getByRole("button", { name: "Auditoria" }));
+    expect(screen.getByText("Auditoria de mensagens")).toBeInTheDocument();
+    expect(screen.getByText("INBOUND")).toBeInTheDocument();
+    expect(screen.getByText("OUTBOUND")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Custos" }));
     const eventCostMatches = screen.getAllByText(/US\$\s?1,2345/);
     expect(eventCostMatches.length).toBeGreaterThan(0);
 

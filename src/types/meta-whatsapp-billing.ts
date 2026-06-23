@@ -96,6 +96,31 @@ export interface MetaWhatsAppBillingEventsResponse {
   items: MetaWhatsAppBillingEvent[];
 }
 
+export interface MetaWhatsAppAuditMessage {
+  id: string;
+  tenantId: string;
+  conversationId: string;
+  phoneNumberId: string;
+  customerPhone: string;
+  contactName: string | null;
+  direction: "INBOUND" | "OUTBOUND" | string;
+  messageType: string;
+  metaMessageId: string;
+  metaTimestamp: string | null;
+  textBody: string | null;
+  status: string | null;
+  statusUpdatedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface MetaWhatsAppAuditMessagesResponse {
+  total: number;
+  page: number;
+  pageSize: number;
+  items: MetaWhatsAppAuditMessage[];
+}
+
 export interface MetaWhatsAppPricingRate {
   id: string;
   countryCode: string;

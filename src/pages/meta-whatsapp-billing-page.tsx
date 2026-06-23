@@ -12,12 +12,14 @@ import { SystemAdminGate } from "@/components/system-admin/system-admin-gate";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { useSystemAdminTenantsQuery } from "@/hooks/use-system-admin-tenants-query";
+import { useMetaWhatsAppAuditQuery } from "@/hooks/use-meta-whatsapp-audit-query";
 import { useMetaWhatsAppBillingSummaryQuery } from "@/hooks/use-meta-whatsapp-billing-summary-query";
 import { useMetaWhatsAppBillingEventsQuery } from "@/hooks/use-meta-whatsapp-billing-events-query";
 import { useMetaWhatsAppPricingRatesQuery } from "@/hooks/use-meta-whatsapp-pricing-rates-query";
 import { useMetaWhatsAppTenantSettingsQuery } from "@/hooks/use-meta-whatsapp-tenant-settings-query";
 import { metaWhatsAppBillingService } from "@/services/meta-whatsapp-billing-service";
 import type {
+  MetaWhatsAppAuditMessage,
   MetaWhatsAppBillingEvent,
   MetaWhatsAppBillingSummaryResponse,
   MetaWhatsAppBillingTenantSummaryResponse,
@@ -29,7 +31,7 @@ import {
 } from "@/lib/meta-whatsapp-currency";
 
 type Scope = "system-admin" | "tenant";
-type ViewTab = "overview" | "events" | "pricing" | "policy";
+type ViewTab = "costs" | "audit" | "pricing" | "policy";
 type BillingSummaryResponse =
   | MetaWhatsAppBillingSummaryResponse
   | MetaWhatsAppBillingTenantSummaryResponse;
@@ -162,7 +164,7 @@ function BillingGraph({
   );
 }
 
-function EventsTable({
+function CostEventsTable({
   currency,
   items,
 }: {
@@ -171,7 +173,7 @@ function EventsTable({
 }) {
   return (
     <Card variant="glass" padding="lg">
-      <CardTitle>Eventos detalhados</CardTitle>
+      <CardTitle>Eventos de custo</CardTitle>
       <div className="mt-5 overflow-x-auto">
         <table className="min-w-full text-sm">
           <thead className="text-left text-text-soft">
@@ -237,12 +239,80 @@ function EventsTable({
   );
 }
 
+function AuditTable({
+  items,
+}: {
+  items: MetaWhatsAppAuditMessage[];
+}) {
+  return (
+    <Card variant="glass" padding="lg">
+      <CardTitle>Auditoria de mensagens</CardTitle>
+      <CardDescription className="mt-2">
+        Inbound e outbound efetivamente persistidos na API do WhatsApp.
+      </CardDescription>
+      <div className="mt-5 overflow-x-auto">
+        <table className="min-w-full text-sm">
+          <thead className="text-left text-text-soft">
+            <tr className="border-b border-[var(--theme-border-subtle)]">
+              <th className="py-3 pr-4">Data</th>
+              <th className="py-3 pr-4">Direção</th>
+              <th className="py-3 pr-4">Tipo</th>
+              <th className="py-3 pr-4">Telefone</th>
+              <th className="py-3 pr-4">Mensagem</th>
+              <th className="py-3 pr-4">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.length === 0 ? (
+              <tr>
+                <td className="py-6 text-text-soft" colSpan={6}>
+                  Nenhuma mensagem encontrada para os filtros atuais.
+                </td>
+              </tr>
+            ) : (
+              items.map((item) => (
+                <tr
+                  key={item.id}
+                  className="border-b border-[var(--theme-border-subtle)]/60"
+                >
+                  <td className="py-3 pr-4 text-text-soft">
+                    {new Date(item.metaTimestamp ?? item.createdAt).toLocaleString("pt-BR")}
+                  </td>
+                  <td className="py-3 pr-4">
+                    <Badge
+                      variant={item.direction === "INBOUND" ? "success" : "warning"}
+                    >
+                      {item.direction}
+                    </Badge>
+                  </td>
+                  <td className="py-3 pr-4">{item.messageType}</td>
+                  <td className="py-3 pr-4">{item.customerPhone}</td>
+                  <td className="py-3 pr-4 text-text-soft">
+                    <div className="max-w-[28rem] truncate">
+                      {item.textBody ?? item.metaMessageId}
+                    </div>
+                  </td>
+                  <td className="py-3 pr-4">
+                    <Badge variant={item.status === "SENT" || item.status === "RECEIVED" ? "success" : "neutral"}>
+                      {item.status ?? "—"}
+                    </Badge>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </Card>
+  );
+}
+
 function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
   const auth = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const tenantsQuery = useSystemAdminTenantsQuery();
-  const [activeTab, setActiveTab] = useState<ViewTab>("overview");
+  const [activeTab, setActiveTab] = useState<ViewTab>("costs");
   const [selectedTenantId, setSelectedTenantId] = useState<string>("");
   const [selectedMonth, setSelectedMonth] = useState(() =>
     new Date().toISOString().slice(0, 7),
@@ -250,6 +320,10 @@ function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
   const [categoryFilter, setCategoryFilter] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("");
   const [phoneFilter, setPhoneFilter] = useState<string>("");
+  const [auditDirectionFilter, setAuditDirectionFilter] = useState<string>("");
+  const [auditMessageTypeFilter, setAuditMessageTypeFilter] = useState<string>("");
+  const [auditStatusFilter, setAuditStatusFilter] = useState<string>("");
+  const [auditPhoneFilter, setAuditPhoneFilter] = useState<string>("");
   const [pricingCountry, setPricingCountry] = useState<string>("");
   const [pricingCategory, setPricingCategory] = useState<string>("");
   const [pricingForm, setPricingForm] = useState({
@@ -277,6 +351,7 @@ function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
     scope,
     month: selectedMonth,
     tenantId: effectiveTenantId,
+    enabled: activeTab === "costs",
   });
 
   const eventsQuery = useMetaWhatsAppBillingEventsQuery({
@@ -288,6 +363,20 @@ function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
     phoneNumberId: phoneFilter || null,
     page: 1,
     pageSize: 20,
+    enabled: activeTab === "costs",
+  });
+
+  const auditQuery = useMetaWhatsAppAuditQuery({
+    scope,
+    month: selectedMonth,
+    tenantId: effectiveTenantId,
+    direction: auditDirectionFilter || null,
+    messageType: auditMessageTypeFilter || null,
+    status: auditStatusFilter || null,
+    phoneNumberId: auditPhoneFilter || null,
+    page: 1,
+    pageSize: 20,
+    enabled: activeTab === "audit",
   });
 
   const pricingRatesQuery = useMetaWhatsAppPricingRatesQuery({
@@ -346,8 +435,8 @@ function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
 
   const allowedTabs: ViewTab[] =
     scope === "system-admin"
-      ? ["overview", "events", "pricing", "policy"]
-      : ["overview", "events"];
+      ? ["costs", "audit", "pricing", "policy"]
+      : ["costs", "audit"];
 
   if (scope === "system-admin" && !isSystemAdmin) {
     return (
@@ -373,7 +462,11 @@ function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
     );
   }
 
-  if (summaryQuery.isLoading || eventsQuery.isLoading) {
+  const isLoading =
+    (activeTab === "costs" && (summaryQuery.isLoading || eventsQuery.isLoading)) ||
+    (activeTab === "audit" && auditQuery.isLoading);
+
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
         <Loader2 size={24} className="animate-spin text-text-soft" />
@@ -381,7 +474,11 @@ function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
     );
   }
 
-  if (summaryQuery.isError || eventsQuery.isError) {
+  const hasError =
+    (activeTab === "costs" && (summaryQuery.isError || eventsQuery.isError)) ||
+    (activeTab === "audit" && auditQuery.isError);
+
+  if (hasError) {
     return (
       <PageState
         title="Falha ao carregar billing"
@@ -390,16 +487,19 @@ function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
         onAction={() => {
           void summaryQuery.refetch();
           void eventsQuery.refetch();
+          void auditQuery.refetch();
         }}
       />
     );
   }
 
-  const summary: BillingSummaryResponse = summaryQuery.data!;
-  const events = eventsQuery.data?.items ?? [];
-  const topTenant = hasTopTenant(summary) ? summary.topTenant : null;
+  const summary: BillingSummaryResponse | null =
+    activeTab === "costs" ? (summaryQuery.data as BillingSummaryResponse) : null;
+  const events = activeTab === "costs" ? eventsQuery.data?.items ?? [] : [];
+  const auditMessages = activeTab === "audit" ? auditQuery.data?.items ?? [] : [];
+  const topTenant = summary && hasTopTenant(summary) ? summary.topTenant : null;
   const monthLabel = `${selectedMonth.slice(5, 7)}/${selectedMonth.slice(0, 4)}`;
-  const alertItem = summary.alerts[0] ?? null;
+  const alertItem = summary ? summary.alerts[0] ?? null : null;
   const pricingItems = pricingRatesQuery.data?.items ?? [];
   const tenantSettings = tenantSettingsQuery.data ?? null;
 
@@ -492,7 +592,7 @@ function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
             ? "Dashboard Meta API"
             : "Meu consumo WhatsApp"
         }
-        description="Controle de custos, eventos auditáveis e política de repasse por tenant."
+        description="Controle de custos, auditoria de mensagens e política de repasse por tenant."
       />
 
       <div className="mt-6 grid gap-4 lg:grid-cols-[minmax(0,1fr)_280px]">
@@ -533,10 +633,10 @@ function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
                   className="w-full sm:w-auto"
                   onClick={() => setActiveTab(tab)}
                 >
-                  {tab === "overview"
-                    ? "Visão geral"
-                    : tab === "events"
-                      ? "Eventos"
+                  {tab === "costs"
+                    ? "Custos"
+                    : tab === "audit"
+                      ? "Auditoria"
                       : tab === "pricing"
                         ? "Preços"
                         : "Política"}
@@ -547,7 +647,7 @@ function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
         </Card>
       </div>
 
-      {activeTab === "overview" ? (
+      {activeTab === "costs" ? (
         <div className="mt-6 space-y-6">
           {alertItem ? (
             <div className="flex items-center gap-3 rounded-2xl border border-[rgba(245,158,11,0.28)] bg-[rgba(245,158,11,0.10)] px-4 py-3 text-sm text-amber-100">
@@ -562,21 +662,21 @@ function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
             <SummaryMetricCard
               title="Custo do mês"
               value={formatMetaWhatsAppCurrency(
-                summary.current.repassedCost,
-                summary.currency,
+                summary!.current.repassedCost,
+                summary!.currency,
               )}
-              description={getTrendLabel(summary.current, summary.previous)}
+              description={getTrendLabel(summary!.current, summary!.previous)}
               variant="warning"
             />
             <SummaryMetricCard
               title="Mensagens entregues"
-              value={String(summary.current.deliveredCount)}
-              description={`${summary.current.totalEvents} eventos`}
+              value={String(summary!.current.deliveredCount)}
+              description={`${summary!.current.totalEvents} eventos`}
               variant="success"
             />
             <SummaryMetricCard
               title="Mensagens gratuitas"
-              value={String(summary.current.freeMessagesCount)}
+              value={String(summary!.current.freeMessagesCount)}
               description="Custo zero aplicado"
             />
             {scope === "system-admin" && (
@@ -585,7 +685,7 @@ function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
                 value={topTenant?.tenantName ?? "—"}
                 description={
                   topTenant
-                    ? formatMetaWhatsAppCurrency(topTenant.repassedCost, summary.currency)
+                    ? formatMetaWhatsAppCurrency(topTenant.repassedCost, summary!.currency)
                     : "Sem dados"
                 }
                 variant={topTenant?.isNearLimit ? "danger" : "neutral"}
@@ -594,15 +694,15 @@ function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
           </div>
 
           <div className="grid gap-6 xl:grid-cols-[1.25fr_0.75fr]">
-            <BillingGraph summary={summary} />
+            <BillingGraph summary={summary!} />
             <Card variant="glass" padding="lg" className="min-w-0">
               <CardTitle>Custo por categoria</CardTitle>
               <div className="mt-6 grid gap-4">
-                {summary.byCategory.map((item) => (
-                  <div
-                    key={item.category}
-                    className="rounded-2xl border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-4"
-                  >
+            {summary!.byCategory.map((item) => (
+              <div
+                key={item.category}
+                className="rounded-2xl border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-4"
+              >
                     <div className="flex items-center justify-between">
                       <strong className="text-[var(--theme-text-primary)]">
                         {item.category}
@@ -615,13 +715,13 @@ function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
                       <div className="flex items-center justify-between">
                         <span>Custo bruto</span>
                         <span>
-                          {formatMetaWhatsAppCurrency(item.grossCost, summary.currency)}
+                          {formatMetaWhatsAppCurrency(item.grossCost, summary!.currency)}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span>Repasse</span>
                         <span>
-                          {formatMetaWhatsAppCurrency(item.repassedCost, summary.currency)}
+                          {formatMetaWhatsAppCurrency(item.repassedCost, summary!.currency)}
                         </span>
                       </div>
                     </div>
@@ -633,19 +733,40 @@ function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
         </div>
       ) : null}
 
-      {activeTab === "events" ? (
+      {activeTab === "audit" ? (
         <div className="mt-6 space-y-6">
           <Card variant="glass" padding="lg" className="min-w-0">
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
               <div>
                 <label className="mb-2 block text-sm font-semibold text-text-soft">
-                  Categoria
+                  Direção
                 </label>
                 <Select
-                  value={categoryFilter}
-                  options={CATEGORY_OPTIONS}
-                  placeholder="Categoria"
-                  onValueChange={setCategoryFilter}
+                  value={auditDirectionFilter}
+                  options={[
+                    { value: "", label: "Todas as direções" },
+                    { value: "INBOUND", label: "Inbound" },
+                    { value: "OUTBOUND", label: "Outbound" },
+                  ]}
+                  placeholder="Direção"
+                  onValueChange={setAuditDirectionFilter}
+                />
+              </div>
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-text-soft">
+                  Tipo
+                </label>
+                <Select
+                  value={auditMessageTypeFilter}
+                  options={[
+                    { value: "", label: "Todos os tipos" },
+                    { value: "text", label: "Texto" },
+                    { value: "template", label: "Template" },
+                    { value: "audio", label: "Audio" },
+                    { value: "image", label: "Imagem" },
+                  ]}
+                  placeholder="Tipo"
+                  onValueChange={setAuditMessageTypeFilter}
                 />
               </div>
               <div>
@@ -653,10 +774,15 @@ function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
                   Status
                 </label>
                 <Select
-                  value={statusFilter}
-                  options={STATUS_OPTIONS}
+                  value={auditStatusFilter}
+                  options={[
+                    { value: "", label: "Todos os status" },
+                    { value: "RECEIVED", label: "Recebido" },
+                    { value: "SENT", label: "Enviado" },
+                    { value: "FAILED", label: "Falhou" },
+                  ]}
                   placeholder="Status"
-                  onValueChange={setStatusFilter}
+                  onValueChange={setAuditStatusFilter}
                 />
               </div>
               <div>
@@ -664,31 +790,32 @@ function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
                   Telefone
                 </label>
                 <Input
-                  value={phoneFilter}
-                  onChange={(event) => setPhoneFilter(event.target.value)}
+                  value={auditPhoneFilter}
+                  onChange={(event) => setAuditPhoneFilter(event.target.value)}
                   placeholder="+5511999999999"
                 />
               </div>
-              <div className="xl:col-span-2 flex flex-col gap-3 sm:flex-row sm:items-end">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-end xl:col-span-2">
                 <Button
                   variant="secondary"
                   className="w-full sm:w-auto"
                   onClick={() => {
-                    setCategoryFilter("");
-                    setStatusFilter("");
-                    setPhoneFilter("");
+                    setAuditDirectionFilter("");
+                    setAuditMessageTypeFilter("");
+                    setAuditStatusFilter("");
+                    setAuditPhoneFilter("");
                   }}
                 >
                   Limpar filtros
                 </Button>
-                <Button className="w-full sm:w-auto" onClick={() => void eventsQuery.refetch()}>
+                <Button className="w-full sm:w-auto" onClick={() => void auditQuery.refetch()}>
                   Atualizar
                 </Button>
               </div>
             </div>
           </Card>
 
-          <EventsTable currency={summary.currency} items={events} />
+          <AuditTable items={auditMessages} />
         </div>
       ) : null}
 

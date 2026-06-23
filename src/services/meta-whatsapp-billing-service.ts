@@ -1,5 +1,6 @@
 import { httpClient } from "@/lib/http-client";
 import type {
+  MetaWhatsAppAuditMessagesResponse,
   MetaWhatsAppBillingEventsResponse,
   MetaWhatsAppBillingSettings,
   MetaWhatsAppBillingSummaryResponse,
@@ -37,6 +38,30 @@ export const metaWhatsAppBillingService = {
     if (params.page) search.set("page", String(params.page));
     if (params.pageSize) search.set("pageSize", String(params.pageSize));
     return httpClient<MetaWhatsAppBillingEventsResponse>(`/system-admin/meta-whatsapp/events?${search.toString()}`);
+  },
+
+  async getSystemAuditMessages(params: {
+    month?: string;
+    tenantId?: string | null;
+    direction?: string | null;
+    messageType?: string | null;
+    status?: string | null;
+    phoneNumberId?: string | null;
+    recipientPhone?: string | null;
+    page?: number;
+    pageSize?: number;
+  }): Promise<MetaWhatsAppAuditMessagesResponse> {
+    const search = new URLSearchParams();
+    if (params.month) search.set("month", params.month);
+    if (params.tenantId) search.set("tenantId", params.tenantId);
+    if (params.direction) search.set("direction", params.direction);
+    if (params.messageType) search.set("messageType", params.messageType);
+    if (params.status) search.set("status", params.status);
+    if (params.phoneNumberId) search.set("phoneNumberId", params.phoneNumberId);
+    if (params.recipientPhone) search.set("recipientPhone", params.recipientPhone);
+    if (params.page) search.set("page", String(params.page));
+    if (params.pageSize) search.set("pageSize", String(params.pageSize));
+    return httpClient<MetaWhatsAppAuditMessagesResponse>(`/system-admin/meta-whatsapp/messages?${search.toString()}`);
   },
 
   async getPricingRates(params: { countryCode?: string; messageCategory?: string }): Promise<{ items: MetaWhatsAppPricingRate[] }> {
@@ -106,5 +131,27 @@ export const metaWhatsAppBillingService = {
     if (params.page) search.set("page", String(params.page));
     if (params.pageSize) search.set("pageSize", String(params.pageSize));
     return httpClient<MetaWhatsAppBillingEventsResponse>(`/api/tenant/meta-whatsapp/events?${search.toString()}`);
+  },
+
+  async getTenantAuditMessages(params: {
+    month?: string;
+    direction?: string | null;
+    messageType?: string | null;
+    status?: string | null;
+    phoneNumberId?: string | null;
+    recipientPhone?: string | null;
+    page?: number;
+    pageSize?: number;
+  }): Promise<MetaWhatsAppAuditMessagesResponse> {
+    const search = new URLSearchParams();
+    if (params.month) search.set("month", params.month);
+    if (params.direction) search.set("direction", params.direction);
+    if (params.messageType) search.set("messageType", params.messageType);
+    if (params.status) search.set("status", params.status);
+    if (params.phoneNumberId) search.set("phoneNumberId", params.phoneNumberId);
+    if (params.recipientPhone) search.set("recipientPhone", params.recipientPhone);
+    if (params.page) search.set("page", String(params.page));
+    if (params.pageSize) search.set("pageSize", String(params.pageSize));
+    return httpClient<MetaWhatsAppAuditMessagesResponse>(`/api/tenant/meta-whatsapp/messages?${search.toString()}`);
   },
 };

@@ -13,6 +13,7 @@ export function useMetaWhatsAppBillingSummaryQuery(input: {
   scope: "system-admin" | "tenant";
   month?: string;
   tenantId?: string | null;
+  enabled?: boolean;
 }) {
   return useQuery({
     queryKey: getMetaWhatsAppBillingSummaryQueryKey(input),
@@ -21,5 +22,6 @@ export function useMetaWhatsAppBillingSummaryQuery(input: {
         ? metaWhatsAppBillingService.getTenantSummary(input.month)
         : metaWhatsAppBillingService.getSystemSummary(input),
     retry: false,
+    enabled: input.enabled ?? true,
   });
 }

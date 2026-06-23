@@ -1,11 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { metaWhatsAppBillingService } from "@/services/meta-whatsapp-billing-service";
 
-export function getMetaWhatsAppBillingEventsQueryKey(input: {
+export function getMetaWhatsAppAuditQueryKey(input: {
   scope: "system-admin" | "tenant";
   month?: string;
   tenantId?: string | null;
-  category?: string | null;
+  direction?: string | null;
+  messageType?: string | null;
   status?: string | null;
   phoneNumberId?: string | null;
   recipientPhone?: string | null;
@@ -13,11 +14,12 @@ export function getMetaWhatsAppBillingEventsQueryKey(input: {
   pageSize?: number;
 }) {
   return [
-    "meta-whatsapp-billing-events",
+    "meta-whatsapp-audit",
     input.scope,
     input.month ?? null,
     input.tenantId ?? null,
-    input.category ?? null,
+    input.direction ?? null,
+    input.messageType ?? null,
     input.status ?? null,
     input.phoneNumberId ?? null,
     input.recipientPhone ?? null,
@@ -26,11 +28,12 @@ export function getMetaWhatsAppBillingEventsQueryKey(input: {
   ] as const;
 }
 
-export function useMetaWhatsAppBillingEventsQuery(input: {
+export function useMetaWhatsAppAuditQuery(input: {
   scope: "system-admin" | "tenant";
   month?: string;
   tenantId?: string | null;
-  category?: string | null;
+  direction?: string | null;
+  messageType?: string | null;
   status?: string | null;
   phoneNumberId?: string | null;
   recipientPhone?: string | null;
@@ -39,11 +42,11 @@ export function useMetaWhatsAppBillingEventsQuery(input: {
   enabled?: boolean;
 }) {
   return useQuery({
-    queryKey: getMetaWhatsAppBillingEventsQueryKey(input),
+    queryKey: getMetaWhatsAppAuditQueryKey(input),
     queryFn: () =>
       input.scope === "tenant"
-        ? metaWhatsAppBillingService.getTenantEvents(input)
-        : metaWhatsAppBillingService.getSystemEvents(input),
+        ? metaWhatsAppBillingService.getTenantAuditMessages(input)
+        : metaWhatsAppBillingService.getSystemAuditMessages(input),
     retry: false,
     enabled: input.enabled ?? true,
   });
