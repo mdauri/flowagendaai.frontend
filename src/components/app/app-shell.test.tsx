@@ -43,9 +43,8 @@ describe("AppShell", () => {
   test("exibe API Tokens e demais botoes para system-admin", () => {
     renderShell("system-admin");
 
-    expect(screen.getByRole("link", { name: "API Tokens" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "WhatsApp" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Sinal Online" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Central Tenants" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Billing WhatsApp" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Dashboard" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Profissionais" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Servicos" })).toBeInTheDocument();
@@ -59,8 +58,8 @@ describe("AppShell", () => {
   test("nao exibe API Tokens para admin", () => {
     renderShell("admin");
 
-    expect(screen.queryByRole("link", { name: "API Tokens" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: "WhatsApp" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Central Tenants" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Billing WhatsApp" })).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Meu Dia" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Dashboard" })).toBeInTheDocument();
   });

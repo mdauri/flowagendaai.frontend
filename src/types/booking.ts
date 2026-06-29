@@ -2,6 +2,11 @@ export interface CreateBookingInput {
   professionalId: string;
   serviceId: string;
   start: string;
+  paymentMode?: "NORMAL" | "DEPOSIT_REQUIRED" | "SUBSCRIPTION";
+  customerPhone?: string;
+  customerId?: string;
+  customerSubscriptionId?: string;
+  subscriptionPlanId?: string;
   idempotencyKey?: string;
 }
 
@@ -16,6 +21,10 @@ export interface CreateBookingResponse {
   depositStatus: "NOT_REQUIRED" | "PENDING";
   depositAmountCents: number | null;
   depositPaymentProvider: "MANUAL" | "MERCADO_PAGO";
+  paymentMode?: "NORMAL" | "DEPOSIT_REQUIRED" | "SUBSCRIPTION";
+  customerSubscriptionId?: string | null;
+  subscriptionPlanId?: string | null;
+  subscriptionUsageId?: string | null;
 }
 
 export type BookingStatus = "PENDING" | "AWAITING_DEPOSIT" | "CONFIRMED" | "CANCELLED" | "COMPLETED";
@@ -42,6 +51,11 @@ export interface BookingReadItem {
   depositPaidAt: string | null;
   depositMarkedPaidByUserId: string | null;
   depositNotes: string | null;
+  paymentMode?: "NORMAL" | "DEPOSIT_REQUIRED" | "SUBSCRIPTION";
+  customerId?: string | null;
+  customerSubscriptionId?: string | null;
+  subscriptionPlanId?: string | null;
+  subscriptionUsageId?: string | null;
   servicePriceSnapshot?: number | null;
   servicePrice?: number | null;
   createdAt: string;

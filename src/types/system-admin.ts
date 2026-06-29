@@ -47,3 +47,17 @@ export interface UpdateSystemAdminTenantDepositFeeInput {
   depositModuleEnabled: boolean;
   depositConvenienceFeeEnabled: boolean;
 }
+
+export interface SystemAdminTenantSubscriptionClubSettings {
+  tenant: {
+    id: string;
+    name: string;
+    slug: string | null;
+    subscriptionClubAllowed: boolean;
+    subscriptionClubEnabled: boolean;
+  };
+}
+
+export interface UpdateSystemAdminTenantSubscriptionClubInput {
+  subscriptionClubAllowed: boolean;
+}

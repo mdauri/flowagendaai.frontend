@@ -25,6 +25,8 @@ export interface AuthTenant {
   depositProviderConfigured: boolean;
   mercadoPagoPublicKey: string | null;
   depositConvenienceFeeEnabled: boolean;
+  subscriptionClubAllowed?: boolean;
+  subscriptionClubEnabled?: boolean;
 }
 
 export interface LoginRequest {

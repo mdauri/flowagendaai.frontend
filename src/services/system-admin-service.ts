@@ -4,7 +4,9 @@ import type {
   ProvisionTenantInput,
   ProvisionTenantResponse,
   SystemAdminTenantDepositFeeSettings,
+  SystemAdminTenantSubscriptionClubSettings,
   UpdateSystemAdminTenantDepositFeeInput,
+  UpdateSystemAdminTenantSubscriptionClubInput,
 } from "@/types/system-admin";
 
 export const systemAdminService = {
@@ -29,6 +31,27 @@ export const systemAdminService = {
   ): Promise<SystemAdminTenantDepositFeeSettings> {
     return httpClient<SystemAdminTenantDepositFeeSettings>(
       `/system-admin/tenants/${tenantId}/deposit-fee`,
+      {
+        method: "PUT",
+        body: JSON.stringify(input),
+      }
+    );
+  },
+
+  async getTenantSubscriptionClubSettings(
+    tenantId: string
+  ): Promise<SystemAdminTenantSubscriptionClubSettings> {
+    return httpClient<SystemAdminTenantSubscriptionClubSettings>(
+      `/system-admin/tenants/${tenantId}/subscription-club`
+    );
+  },
+
+  async updateTenantSubscriptionClubSettings(
+    tenantId: string,
+    input: UpdateSystemAdminTenantSubscriptionClubInput
+  ): Promise<SystemAdminTenantSubscriptionClubSettings> {
+    return httpClient<SystemAdminTenantSubscriptionClubSettings>(
+      `/system-admin/tenants/${tenantId}/subscription-club`,
       {
         method: "PUT",
         body: JSON.stringify(input),

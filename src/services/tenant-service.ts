@@ -10,6 +10,7 @@ export interface UpdateTenantInput {
   daysAfterLastService?: number;
   reactivationCooldownDays?: number;
   reactivationTemplateName?: string | null;
+  subscriptionClubEnabled?: boolean;
 }
 
 export interface UpdateTenantResponse {
@@ -30,6 +31,8 @@ export interface UpdateTenantResponse {
   depositProviderConfigured: boolean;
   mercadoPagoPublicKey: string | null;
   depositConvenienceFeeEnabled: boolean;
+  subscriptionClubAllowed?: boolean;
+  subscriptionClubEnabled?: boolean;
 }
 
 export interface SendCustomerReturnReminderTestInput {

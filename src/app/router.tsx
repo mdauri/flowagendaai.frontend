@@ -15,16 +15,16 @@ import { ServicesPage } from "@/pages/services-page";
 import { WaitlistPage } from "@/pages/waitlist-page";
 import { SlotsPage } from "@/pages/slots-page";
 import { SettingsPage } from "@/pages/settings-page";
-import { ApiTokensPage } from "@/pages/api-tokens-page";
 import { HolidaysPage } from "@/pages/holidays-page";
 import { MeuDiaPage } from "@/pages/meu-dia-page";
 import { SystemAdminTenantProvisionPage } from "@/pages/system-admin-tenant-provision-page";
-import { SystemAdminTenantDepositFeePage } from "@/pages/system-admin-tenant-deposit-fee-page";
-import { SystemAdminTenantWhatsAppPage } from "@/pages/system-admin-tenant-whatsapp-page";
+import { SubscriptionPlansPage } from "@/pages/subscription-plans-page";
+import { CustomerSubscriptionsPage } from "@/pages/customer-subscriptions-page";
 import {
   MetaWhatsAppBillingSystemAdminPage,
   MetaWhatsAppBillingTenantPage,
 } from "@/pages/meta-whatsapp-billing-page";
+import { SystemAdminTenantControlCenterPage } from "@/pages/system-admin-tenant-control-center-page";
 import { TermsPage } from "@/pages/terms-page";
 import { ProfessionalServiceManager } from "@/components/professional-service-manager";
 import { ProtectedRoute } from "@/components/app/protected-route";
@@ -105,12 +105,16 @@ export function AppRouter() {
               </BlockProfessionalRoute>
             }
           />
-          <Route path="api-tokens" element={<ApiTokensPage />} />
-          <Route path="system-admin/tenants/deposit-fee" element={<SystemAdminTenantDepositFeePage />} />
+          <Route path="system-admin/tenants/central" element={<SystemAdminTenantControlCenterPage />} />
+          <Route path="api-tokens" element={<Navigate to="/app/system-admin/tenants/central?tab=api-tokens" replace />} />
+          <Route path="system-admin/tenants/deposit-fee" element={<Navigate to="/app/system-admin/tenants/central?tab=deposit-fee" replace />} />
+          <Route path="system-admin/tenants/subscription-club" element={<Navigate to="/app/system-admin/tenants/central?tab=subscription-club" replace />} />
           <Route path="system-admin/tenants/provision" element={<SystemAdminTenantProvisionPage />} />
-          <Route path="system-admin/tenants/whatsapp" element={<SystemAdminTenantWhatsAppPage />} />
+          <Route path="system-admin/tenants/whatsapp" element={<Navigate to="/app/system-admin/tenants/central?tab=whatsapp" replace />} />
           <Route path="system-admin/meta-whatsapp" element={<MetaWhatsAppBillingSystemAdminPage />} />
           <Route path="meta-whatsapp" element={<MetaWhatsAppBillingTenantPage />} />
+          <Route path="subscription-club/plans" element={<SubscriptionPlansPage />} />
+          <Route path="subscription-club/subscribers" element={<CustomerSubscriptionsPage />} />
           <Route path="*" element={<AppIndexRedirect />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />

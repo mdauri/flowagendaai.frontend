@@ -21,6 +21,9 @@ export function AppShell({
   children,
 }: AppShellProps) {
   const isProfessional = user.role === "professional";
+  const canUseSubscriptionClub = Boolean(
+    tenant.subscriptionClubAllowed && tenant.subscriptionClubEnabled
+  );
 
   return (
     <div className="min-h-screen px-4 py-4 sm:px-6 md:px-10 lg:px-16">
@@ -159,6 +162,36 @@ export function AppShell({
                 >
                   Lista de Espera
                 </NavLink>
+                {canUseSubscriptionClub ? (
+                  <>
+                    <NavLink
+                      to="/app/subscription-club/plans"
+                      className={({ isActive }) =>
+                        cn(
+                          "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
+                          isActive
+                            ? "border-primary bg-primary text-black"
+                            : "border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] text-text-soft hover:border-[var(--theme-border-default)] hover:text-[var(--theme-text-primary)]",
+                        )
+                      }
+                    >
+                      Planos
+                    </NavLink>
+                    <NavLink
+                      to="/app/subscription-club/subscribers"
+                      className={({ isActive }) =>
+                        cn(
+                          "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
+                          isActive
+                            ? "border-primary bg-primary text-black"
+                            : "border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] text-text-soft hover:border-[var(--theme-border-default)] hover:text-[var(--theme-text-primary)]",
+                        )
+                      }
+                    >
+                      Assinantes
+                    </NavLink>
+                  </>
+                ) : null}
               </>
             )}
             {!isProfessional ? (
@@ -178,7 +211,7 @@ export function AppShell({
             ) : null}
             {user.role === "system-admin" && !isProfessional ? (
               <NavLink
-                to="/app/api-tokens"
+                to="/app/system-admin/tenants/central"
                 className={({ isActive }) =>
                   cn(
                     "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
@@ -188,22 +221,7 @@ export function AppShell({
                   )
                 }
               >
-                API Tokens
-              </NavLink>
-            ) : null}
-            {user.role === "system-admin" && !isProfessional ? (
-              <NavLink
-                to="/app/system-admin/tenants/whatsapp"
-                className={({ isActive }) =>
-                  cn(
-                    "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
-                    isActive
-                      ? "border-primary bg-primary text-black"
-                      : "border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] text-text-soft hover:border-[var(--theme-border-default)] hover:text-[var(--theme-text-primary)]",
-                  )
-                }
-              >
-                WhatsApp
+                Central Tenants
               </NavLink>
             ) : null}
             {user.role === "system-admin" && !isProfessional ? (
@@ -219,21 +237,6 @@ export function AppShell({
                 }
               >
                 Billing WhatsApp
-              </NavLink>
-            ) : null}
-            {user.role === "system-admin" && !isProfessional ? (
-              <NavLink
-                to="/app/system-admin/tenants/deposit-fee"
-                className={({ isActive }) =>
-                  cn(
-                    "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
-                    isActive
-                      ? "border-primary bg-primary text-black"
-                      : "border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] text-text-soft hover:border-[var(--theme-border-default)] hover:text-[var(--theme-text-primary)]",
-                  )
-                }
-              >
-                Sinal Online
               </NavLink>
             ) : null}
             {["admin", "system-admin"].includes(user.role) &&

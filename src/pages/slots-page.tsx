@@ -11,6 +11,10 @@ import { SlotSearchFilters } from "@/components/slots/slot-search-filters";
 import { SlotsEmptyState } from "@/components/slots/slots-empty-state";
 import { SlotsErrorState } from "@/components/slots/slots-error-state";
 import { PageState } from "@/components/shared/page-state";
+import {
+  BookingSubscriptionOption,
+  type BookingSubscriptionSelection,
+} from "@/components/bookings/booking-subscription-option";
 import { useAuth } from "@/hooks/use-auth";
 import { useAvailableDatesQuery } from "@/hooks/use-available-dates-query";
 import {
@@ -95,6 +99,11 @@ export function SlotsPage() {
   const [submittedFilters, setSubmittedFilters] = useState<ListAvailableSlotsInput | null>(null);
   const [selectedSlotStart, setSelectedSlotStart] = useState<string | null>(null);
   const [confirmedBooking, setConfirmedBooking] = useState<CreateBookingResponse | null>(null);
+  const [subscriptionSelection, setSubscriptionSelection] =
+    useState<BookingSubscriptionSelection>({
+      useSubscription: false,
+      customerPhone: "",
+    });
   const availableSlotsQuery = useAvailableSlotsQuery(submittedFilters);
 
   const professionals = professionalsQuery.data?.professionals ?? [];
@@ -183,6 +192,7 @@ export function SlotsPage() {
 
     setSelectedSlotStart(null);
     setConfirmedBooking(null);
+    setSubscriptionSelection({ useSubscription: false, customerPhone: "" });
     createBookingMutation.reset();
 
     if (isSameSearch(submittedFilters, filters)) {
@@ -218,6 +228,7 @@ export function SlotsPage() {
       setSubmittedFilters(null);
       setSelectedSlotStart(null);
       setConfirmedBooking(null);
+      setSubscriptionSelection({ useSubscription: false, customerPhone: "" });
       createBookingMutation.reset();
     }
   }
@@ -233,6 +244,12 @@ export function SlotsPage() {
     }
 
     setSelectedSlotStart(slot.start);
+    setSubscriptionSelection((current) => ({
+      ...current,
+      useSubscription: false,
+      customerSubscriptionId: undefined,
+      subscriptionPlanId: undefined,
+    }));
   }
 
   function handleConfirmBooking() {
@@ -245,6 +262,14 @@ export function SlotsPage() {
       professionalId: submittedFilters.professionalId,
       serviceId: submittedFilters.serviceId,
       start: selectedSlot.start,
+      ...(subscriptionSelection.useSubscription
+        ? {
+            paymentMode: "SUBSCRIPTION" as const,
+            customerPhone: subscriptionSelection.customerPhone,
+            customerSubscriptionId: subscriptionSelection.customerSubscriptionId,
+            subscriptionPlanId: subscriptionSelection.subscriptionPlanId,
+          }
+        : {}),
     });
   }
 
@@ -258,6 +283,7 @@ export function SlotsPage() {
     }
 
     setSelectedSlotStart(null);
+    setSubscriptionSelection({ useSubscription: false, customerPhone: "" });
     createBookingMutation.reset();
     void availableSlotsQuery.refetch();
   }
@@ -301,6 +327,14 @@ export function SlotsPage() {
     !availableSlotsQuery.isFetching &&
     !availableSlotsQuery.isError &&
     (slots.length > 0 || confirmedBooking !== null || createBookingMutation.isError);
+  const canUseSubscriptionClub = Boolean(
+    auth.tenant?.subscriptionClubAllowed && auth.tenant?.subscriptionClubEnabled
+  );
+  const canConfirmBooking =
+    Boolean(selectedSlot) &&
+    !isBookingPending &&
+    (!subscriptionSelection.useSubscription ||
+      Boolean(subscriptionSelection.customerSubscriptionId));
 
   return (
     <>
@@ -390,20 +424,30 @@ export function SlotsPage() {
               onSelect={handleSelectSlot}
             />
 
-            <BookingConfirmationPanel
-              state={bookingPanelState}
-              selectedSlot={selectedSlot}
-              confirmedBooking={confirmedBooking}
-              tenantTimezone={activeTenantTimezone}
-              professionalName={selectedProfessionalName}
-              serviceName={selectedServiceName}
-              canConfirm={Boolean(selectedSlot) && !isBookingPending}
-              onConfirm={handleConfirmBooking}
-              onRetry={handleRetryBooking}
-              onRefreshSlots={handleRefreshSlots}
-              onResetSuccess={handleResetBookingSuccess}
-              errorDescription={bookingErrorDescription}
-            />
+            <div className="grid gap-4">
+              <BookingSubscriptionOption
+                enabled={canUseSubscriptionClub}
+                serviceId={submittedFilters.serviceId}
+                startDateTime={selectedSlot?.start ?? null}
+                value={subscriptionSelection}
+                onChange={setSubscriptionSelection}
+              />
+
+              <BookingConfirmationPanel
+                state={bookingPanelState}
+                selectedSlot={selectedSlot}
+                confirmedBooking={confirmedBooking}
+                tenantTimezone={activeTenantTimezone}
+                professionalName={selectedProfessionalName}
+                serviceName={selectedServiceName}
+                canConfirm={canConfirmBooking}
+                onConfirm={handleConfirmBooking}
+                onRetry={handleRetryBooking}
+                onRefreshSlots={handleRefreshSlots}
+                onResetSuccess={handleResetBookingSuccess}
+                errorDescription={bookingErrorDescription}
+              />
+            </div>
           </div>
         ) : null}
       </div>

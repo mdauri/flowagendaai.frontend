@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CheckCircle2, Info, Loader2, ShieldAlert } from "lucide-react";
 import { Badge } from "@/components/flow/badge";
 import { Button } from "@/components/flow/button";
@@ -144,9 +144,10 @@ function buildPayload(
 
 interface WhatsAppIntegrationConfigProps {
   tenantId: string | null;
+  onDirtyChange?: (dirty: boolean) => void;
 }
 
-export function WhatsAppIntegrationConfig({ tenantId }: WhatsAppIntegrationConfigProps) {
+export function WhatsAppIntegrationConfig({ tenantId, onDirtyChange }: WhatsAppIntegrationConfigProps) {
   const { toast } = useToast();
   const whatsappQuery = useTenantWhatsappQuery(tenantId);
   const saveMutation = useSaveTenantWhatsappMutation();
@@ -157,6 +158,37 @@ export function WhatsAppIntegrationConfig({ tenantId }: WhatsAppIntegrationConfi
   const isEmptyState = whatsappQuery.error instanceof ApiError && whatsappQuery.error.status === 404;
   const hasExistingConfig = Boolean(whatsapp);
   const status = mapStatusLabel(whatsapp?.status ?? "pending");
+  const baselineForm = useMemo(
+    () => (whatsapp ? buildFormState(whatsapp) : emptyFormState),
+    [whatsapp],
+  );
+  const isDirty = useMemo(() => {
+    if (!tenantId) {
+      return false;
+    }
+
+    if (isFormVisible && !hasExistingConfig) {
+      return (
+        form.displayName !== emptyFormState.displayName ||
+        form.displayPhone !== emptyFormState.displayPhone ||
+        form.phoneNumberId !== emptyFormState.phoneNumberId ||
+        form.wabaId !== emptyFormState.wabaId ||
+        form.accessToken !== emptyFormState.accessToken ||
+        form.n8nEnabled !== emptyFormState.n8nEnabled ||
+        form.isActive !== emptyFormState.isActive
+      );
+    }
+
+    return (
+      form.displayName !== baselineForm.displayName ||
+      form.displayPhone !== baselineForm.displayPhone ||
+      form.phoneNumberId !== baselineForm.phoneNumberId ||
+      form.wabaId !== baselineForm.wabaId ||
+      form.accessToken.trim().length > 0 ||
+      form.n8nEnabled !== baselineForm.n8nEnabled ||
+      form.isActive !== baselineForm.isActive
+    );
+  }, [baselineForm, form, hasExistingConfig, isFormVisible, tenantId]);
 
   useEffect(() => {
     setForm(emptyFormState);
@@ -184,6 +216,10 @@ export function WhatsAppIntegrationConfig({ tenantId }: WhatsAppIntegrationConfi
 
     return () => window.clearTimeout(timeout);
   }, [saveMessage]);
+
+  useEffect(() => {
+    onDirtyChange?.(isDirty);
+  }, [isDirty, onDirtyChange]);
 
   function updateField<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((current) => ({

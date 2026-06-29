@@ -7,6 +7,7 @@ import { CoverImageUpload } from "@/components/settings/cover-image-upload";
 import { LogoUpload } from "@/components/settings/logo-upload";
 import { BusinessHoursConfig } from "@/components/settings/business-hours-config";
 import { CustomerReactivationConfig } from "@/components/settings/customer-reactivation-config";
+import { SubscriptionClubConfig } from "@/components/settings/subscription-club-config";
 import { tenantService } from "@/services/tenant-service";
 import { tenantCoverImageService } from "@/services/tenant-cover-image-service";
 import { tenantLogoImageService } from "@/services/tenant-logo-image-service";
@@ -202,6 +203,9 @@ export function SettingsPage() {
 
       {/* Customer Reactivation Section */}
       <CustomerReactivationConfig />
+
+      {/* Subscription Club Section */}
+      <SubscriptionClubConfig />
 
       {/* Save Button and Feedback */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">

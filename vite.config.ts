@@ -14,6 +14,16 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: "./src/test/setup.ts",
     clearMocks: true,
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "html", "json-summary"],
+      reportsDirectory: "./coverage",
+      exclude: [
+        "src/test/**",
+        "**/*.test.ts",
+        "**/*.test.tsx",
+      ],
+    },
     exclude: [
       ...configDefaults.exclude,
       "e2e/**",
