@@ -24,8 +24,15 @@ vi.mock("@/hooks/use-order-module", () => ({
 
 describe("ProductionPage", () => {
   test("exibe a data selecionada em formato brasileiro", () => {
-    renderWithProviders(<ProductionPage />);
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-06-29T12:00:00Z"));
 
-    expect(screen.getByText("Data selecionada: 30/06/2026")).toBeInTheDocument();
+    try {
+      renderWithProviders(<ProductionPage />);
+
+      expect(screen.getByText("Data selecionada: 30/06/2026")).toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
