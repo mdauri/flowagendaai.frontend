@@ -61,3 +61,42 @@ export interface SystemAdminTenantSubscriptionClubSettings {
 export interface UpdateSystemAdminTenantSubscriptionClubInput {
   subscriptionClubAllowed: boolean;
 }
+
+export type SystemAdminTenantMetaWhatsappStatus =
+  | "not_configured"
+  | "connecting"
+  | "active"
+  | "error"
+  | "disconnected";
+
+export interface SystemAdminTenantMetaWhatsappStatusResponse {
+  configured: boolean;
+  status: SystemAdminTenantMetaWhatsappStatus;
+  tenantId: string;
+  provider: string | null;
+  businessId: string | null;
+  businessName: string | null;
+  wabaId: string | null;
+  phoneNumberId: string | null;
+  displayPhoneNumber: string | null;
+  verifiedName: string | null;
+  hasAccessToken: boolean;
+  tokenExpiresAt: string | null;
+  webhookSubscribed: boolean;
+  messagingEnabled: boolean;
+  lastSyncAt: string | null;
+  lastError: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+
+export interface ConnectSystemAdminTenantMetaWhatsappInput {
+  code: string;
+  phoneNumberId?: string;
+  wabaId?: string;
+  businessId?: string;
+}
+
+export interface SendSystemAdminTenantMetaWhatsappTestMessageInput {
+  toPhone: string;
+}

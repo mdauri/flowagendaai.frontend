@@ -1,8 +1,11 @@
 import { httpClient } from "@/lib/http-client";
 import type {
+  ConnectSystemAdminTenantMetaWhatsappInput,
   ListSystemAdminTenantsResponse,
   ProvisionTenantInput,
   ProvisionTenantResponse,
+  SendSystemAdminTenantMetaWhatsappTestMessageInput,
+  SystemAdminTenantMetaWhatsappStatusResponse,
   SystemAdminTenantDepositFeeSettings,
   SystemAdminTenantSubscriptionClubSettings,
   UpdateSystemAdminTenantDepositFeeInput,
@@ -56,6 +59,62 @@ export const systemAdminService = {
         method: "PUT",
         body: JSON.stringify(input),
       }
+    );
+  },
+
+  async getTenantMetaWhatsappStatus(
+    tenantId: string,
+  ): Promise<SystemAdminTenantMetaWhatsappStatusResponse> {
+    return httpClient<SystemAdminTenantMetaWhatsappStatusResponse>(
+      `/system-admin/tenants/${tenantId}/whatsapp/meta/status`,
+    );
+  },
+
+  async connectTenantMetaWhatsapp(
+    tenantId: string,
+    input: ConnectSystemAdminTenantMetaWhatsappInput,
+  ): Promise<SystemAdminTenantMetaWhatsappStatusResponse> {
+    return httpClient<SystemAdminTenantMetaWhatsappStatusResponse>(
+      `/system-admin/tenants/${tenantId}/whatsapp/meta/embedded-signup/callback`,
+      {
+        method: "POST",
+        body: JSON.stringify(input),
+      },
+    );
+  },
+
+  async syncTenantMetaWhatsapp(
+    tenantId: string,
+  ): Promise<SystemAdminTenantMetaWhatsappStatusResponse> {
+    return httpClient<SystemAdminTenantMetaWhatsappStatusResponse>(
+      `/system-admin/tenants/${tenantId}/whatsapp/meta/sync`,
+      {
+        method: "POST",
+      },
+    );
+  },
+
+  async sendTenantMetaWhatsappTestMessage(
+    tenantId: string,
+    input: SendSystemAdminTenantMetaWhatsappTestMessageInput,
+  ): Promise<{ ok: true }> {
+    return httpClient<{ ok: true }>(
+      `/system-admin/tenants/${tenantId}/whatsapp/meta/test-message`,
+      {
+        method: "POST",
+        body: JSON.stringify(input),
+      },
+    );
+  },
+
+  async disconnectTenantMetaWhatsapp(
+    tenantId: string,
+  ): Promise<SystemAdminTenantMetaWhatsappStatusResponse> {
+    return httpClient<SystemAdminTenantMetaWhatsappStatusResponse>(
+      `/system-admin/tenants/${tenantId}/whatsapp/meta`,
+      {
+        method: "DELETE",
+      },
     );
   },
 };

@@ -3,47 +3,67 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { WhatsAppIntegrationConfig } from "@/components/settings/whatsapp-integration-config";
 import { renderWithProviders } from "@/test/render";
-import { ApiError } from "@/types/api";
+import type { SystemAdminTenantMetaWhatsappStatusResponse } from "@/types/system-admin";
 
 const toastMock = vi.fn();
-const mutateAsyncMock = vi.fn();
+const connectMutateAsyncMock = vi.fn();
+const syncMutateAsyncMock = vi.fn();
+const testMessageMutateAsyncMock = vi.fn();
+const disconnectMutateAsyncMock = vi.fn();
+
+function createStatusResponse(
+  overrides: Partial<SystemAdminTenantMetaWhatsappStatusResponse> = {},
+): SystemAdminTenantMetaWhatsappStatusResponse {
+  return {
+    configured: false,
+    status: "not_configured",
+    tenantId: "tenant-1",
+    provider: null,
+    businessId: null,
+    businessName: null,
+    wabaId: null,
+    phoneNumberId: null,
+    displayPhoneNumber: null,
+    verifiedName: null,
+    hasAccessToken: false,
+    tokenExpiresAt: null,
+    webhookSubscribed: false,
+    messagingEnabled: false,
+    lastSyncAt: null,
+    lastError: null,
+    createdAt: null,
+    updatedAt: null,
+    ...overrides,
+  };
+}
 
 const queryState = {
-  data: undefined as
-    | {
-        id: string;
-        displayName: string | null;
-        displayPhone: string | null;
-        phoneNumberId: string;
-        wabaId: string | null;
-        status: string;
-        isActive: boolean;
-        accessTokenMasked: string | null;
-        hasAccessToken: boolean;
-        n8nEnabled: boolean;
-        createdAt: string;
-        updatedAt: string;
-      }
-    | undefined,
-  error: null as ApiError | null,
+  data: createStatusResponse(),
   isLoading: false,
   isError: false,
+  error: null,
 };
 
 vi.mock("@/hooks/use-toast", () => ({
   useToast: () => ({ toast: toastMock }),
 }));
 
-vi.mock("@/hooks/use-tenant-whatsapp-query", () => ({
-  useTenantWhatsappQuery: (tenantId: string | null) => ({
-    ...queryState,
-    enabledTenantId: tenantId,
+vi.mock("@/hooks/use-system-admin-meta-whatsapp", () => ({
+  useSystemAdminMetaWhatsappStatusQuery: () => queryState,
+  useConnectSystemAdminMetaWhatsappMutation: () => ({
+    mutateAsync: connectMutateAsyncMock,
+    isPending: false,
   }),
-}));
-
-vi.mock("@/hooks/use-save-tenant-whatsapp-mutation", () => ({
-  useSaveTenantWhatsappMutation: () => ({
-    mutateAsync: mutateAsyncMock,
+  useSyncSystemAdminMetaWhatsappMutation: () => ({
+    mutateAsync: syncMutateAsyncMock,
+    isPending: false,
+  }),
+  useSendSystemAdminMetaWhatsappTestMessageMutation: () => ({
+    mutateAsync: testMessageMutateAsyncMock,
+    isPending: false,
+  }),
+  useDisconnectSystemAdminMetaWhatsappMutation: () => ({
+    mutateAsync: disconnectMutateAsyncMock,
     isPending: false,
   }),
 }));
@@ -51,11 +71,22 @@ vi.mock("@/hooks/use-save-tenant-whatsapp-mutation", () => ({
 describe("WhatsAppIntegrationConfig", () => {
   beforeEach(() => {
     toastMock.mockReset();
-    mutateAsyncMock.mockReset();
-    queryState.data = undefined;
-    queryState.error = null;
-    queryState.isLoading = false;
-    queryState.isError = false;
+    connectMutateAsyncMock.mockReset();
+    syncMutateAsyncMock.mockReset();
+    testMessageMutateAsyncMock.mockReset();
+    disconnectMutateAsyncMock.mockReset();
+    queryState.data = createStatusResponse();
+    import.meta.env.VITE_META_APP_ID = "meta-app-id";
+    import.meta.env.VITE_META_WHATSAPP_CONFIGURATION_ID = "config-123";
+    window.FB = {
+      login: (callback) =>
+        callback({
+          authResponse: { code: "code-123" },
+          phone_number_id: "123456789",
+          waba_id: "987654321",
+          business_id: "55555555",
+        }),
+    };
   });
 
   it("mostra prompt para selecionar tenant", () => {
@@ -66,75 +97,70 @@ describe("WhatsAppIntegrationConfig", () => {
     expect(screen.getByText("Selecione um tenant")).toBeInTheDocument();
   });
 
-  it("submete a criacao com os campos obrigatorios", async () => {
+  it("inicia o Embedded Signup e envia o callback ao backend", async () => {
     const user = userEvent.setup();
-    queryState.error = new ApiError(404, "NOT_FOUND", "Configuracao nao encontrada.", "req-1");
-    queryState.isError = true;
-    mutateAsyncMock.mockResolvedValue({
-      id: "whatsapp-1",
-      displayName: "Agendoro Test",
-      displayPhone: "+55 12 99999-9999",
-      phoneNumberId: "123456789",
-      wabaId: "987654321",
-      status: "connected",
-      isActive: true,
-      accessTokenMasked: "********1234",
-      hasAccessToken: true,
-      n8nEnabled: false,
-      createdAt: "2026-06-02T00:00:00.000Z",
-      updatedAt: "2026-06-02T00:00:00.000Z",
-    });
+    connectMutateAsyncMock.mockResolvedValue(undefined);
 
     renderWithProviders(<WhatsAppIntegrationConfig tenantId="tenant-1" />, {
       withRouter: true,
     });
 
-    await user.click(screen.getByRole("button", { name: "Configurar WhatsApp" }));
-    await user.type(screen.getByLabelText("Nome de exibicao"), "Agendoro Test");
-    await user.type(screen.getByLabelText("Numero WhatsApp"), "+55 12 99999-9999");
-    await user.type(screen.getByLabelText("Phone Number ID"), "123456789");
-    await user.type(screen.getByLabelText("WABA ID"), "987654321");
-    await user.type(screen.getByLabelText("Token de acesso da Meta"), "EAAXXXXX");
-
-    await user.click(screen.getByRole("button", { name: "Configurar WhatsApp" }));
+    await user.click(screen.getByRole("button", { name: /Conectar WhatsApp Business/i }));
 
     await waitFor(() => {
-      expect(mutateAsyncMock).toHaveBeenCalledTimes(1);
-    });
-
-    expect(mutateAsyncMock).toHaveBeenCalledWith({
-      tenantId: "tenant-1",
-      displayName: "Agendoro Test",
-      displayPhone: "+55 12 99999-9999",
-      phoneNumberId: "123456789",
-      wabaId: "987654321",
-      accessToken: "EAAXXXXX",
-      n8nEnabled: false,
-      isActive: true,
+      expect(connectMutateAsyncMock).toHaveBeenCalledWith({
+        code: "code-123",
+        phoneNumberId: "123456789",
+        wabaId: "987654321",
+        businessId: "55555555",
+      });
     });
   });
 
-  it("exibe a configuracao existente", async () => {
-    queryState.data = {
-      id: "whatsapp-1",
-      displayName: "Agendoro Test",
-      displayPhone: "+55 12 99999-9999",
-      phoneNumberId: "123456789",
+  it("mostra a integracao ativa e permite enviar teste e desconectar", async () => {
+    const user = userEvent.setup();
+    queryState.data = createStatusResponse({
+      configured: true,
+      status: "active",
+      provider: "meta",
+      businessId: "55555555",
+      businessName: "Clinica Demo",
       wabaId: "987654321",
-      status: "connected",
-      isActive: true,
-      accessTokenMasked: "********1234",
+      phoneNumberId: "123456789",
+      displayPhoneNumber: "+55 11 99999-9999",
+      verifiedName: "Clinica Demo",
       hasAccessToken: true,
-      n8nEnabled: false,
-      createdAt: "2026-06-02T00:00:00.000Z",
-      updatedAt: "2026-06-02T00:00:00.000Z",
-    };
+      webhookSubscribed: true,
+      messagingEnabled: true,
+      lastSyncAt: "2026-07-01T15:00:00.000Z",
+      createdAt: "2026-07-01T14:00:00.000Z",
+      updatedAt: "2026-07-01T15:00:00.000Z",
+    });
+    testMessageMutateAsyncMock.mockResolvedValue({ ok: true });
+    disconnectMutateAsyncMock.mockResolvedValue(undefined);
 
     renderWithProviders(<WhatsAppIntegrationConfig tenantId="tenant-1" />, {
       withRouter: true,
     });
 
-    expect(screen.getByText("Conectado")).toBeInTheDocument();
-    expect(screen.getByText("********1234")).toBeInTheDocument();
+    expect(screen.getByText("Ativo")).toBeInTheDocument();
+    expect(screen.getByText("Clinica Demo")).toBeInTheDocument();
+
+    await user.type(screen.getByPlaceholderText("+55 11 99999-9999"), "+55 11 98888-7777");
+    await user.click(screen.getByRole("button", { name: /Enviar teste/i }));
+
+    await waitFor(() => {
+      expect(testMessageMutateAsyncMock).toHaveBeenCalledWith({
+        toPhone: "+55 11 98888-7777",
+      });
+    });
+
+    await user.click(screen.getByRole("button", { name: "Desconectar" }));
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Confirmar desconexao" }));
+
+    await waitFor(() => {
+      expect(disconnectMutateAsyncMock).toHaveBeenCalledTimes(1);
+    });
   });
 });
