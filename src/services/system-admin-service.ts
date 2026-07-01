@@ -1,9 +1,12 @@
 import { httpClient } from "@/lib/http-client";
 import type { OrderStoreSettings } from "@/types/order-module";
 import type {
+  ConnectSystemAdminTenantMetaWhatsappInput,
   ListSystemAdminTenantsResponse,
   ProvisionTenantInput,
   ProvisionTenantResponse,
+  SendSystemAdminTenantMetaWhatsappTestMessageInput,
+  SystemAdminTenantMetaWhatsappStatusResponse,
   SystemAdminTenantDepositFeeSettings,
   SystemAdminTenantSubscriptionClubSettings,
   UpdateSystemAdminTenantDepositFeeInput,
@@ -15,67 +18,131 @@ export const systemAdminService = {
     return httpClient<ListSystemAdminTenantsResponse>("/system-admin/tenants");
   },
 
-  async provisionTenant(input: ProvisionTenantInput): Promise<ProvisionTenantResponse> {
-    return httpClient<ProvisionTenantResponse>("/system-admin/tenants/provision", {
-      method: "POST",
-      body: JSON.stringify(input),
-    });
+  async provisionTenant(
+    input: ProvisionTenantInput,
+  ): Promise<ProvisionTenantResponse> {
+    return httpClient<ProvisionTenantResponse>(
+      "/system-admin/tenants/provision",
+      {
+        method: "POST",
+        body: JSON.stringify(input),
+      },
+    );
   },
 
-  async getTenantDepositFeeSettings(tenantId: string): Promise<SystemAdminTenantDepositFeeSettings> {
-    return httpClient<SystemAdminTenantDepositFeeSettings>(`/system-admin/tenants/${tenantId}/deposit-fee`);
+  async getTenantDepositFeeSettings(
+    tenantId: string,
+  ): Promise<SystemAdminTenantDepositFeeSettings> {
+    return httpClient<SystemAdminTenantDepositFeeSettings>(
+      `/system-admin/tenants/${tenantId}/deposit-fee`,
+    );
   },
 
   async updateTenantDepositFeeSettings(
     tenantId: string,
-    input: UpdateSystemAdminTenantDepositFeeInput
+    input: UpdateSystemAdminTenantDepositFeeInput,
   ): Promise<SystemAdminTenantDepositFeeSettings> {
     return httpClient<SystemAdminTenantDepositFeeSettings>(
       `/system-admin/tenants/${tenantId}/deposit-fee`,
       {
         method: "PUT",
         body: JSON.stringify(input),
-      }
+      },
     );
   },
 
   async getTenantSubscriptionClubSettings(
-    tenantId: string
+    tenantId: string,
   ): Promise<SystemAdminTenantSubscriptionClubSettings> {
     return httpClient<SystemAdminTenantSubscriptionClubSettings>(
-      `/system-admin/tenants/${tenantId}/subscription-club`
+      `/system-admin/tenants/${tenantId}/subscription-club`,
     );
   },
 
   async updateTenantSubscriptionClubSettings(
     tenantId: string,
-    input: UpdateSystemAdminTenantSubscriptionClubInput
+    input: UpdateSystemAdminTenantSubscriptionClubInput,
   ): Promise<SystemAdminTenantSubscriptionClubSettings> {
     return httpClient<SystemAdminTenantSubscriptionClubSettings>(
       `/system-admin/tenants/${tenantId}/subscription-club`,
       {
         method: "PUT",
         body: JSON.stringify(input),
-      }
+      },
     );
   },
 
   async getTenantOrderSettings(tenantId: string): Promise<OrderStoreSettings> {
     return httpClient<OrderStoreSettings>(
-      `/system-admin/tenants/${tenantId}/order-settings`
+      `/system-admin/tenants/${tenantId}/order-settings`,
     );
   },
 
   async updateTenantOrderSettings(
     tenantId: string,
-    input: Partial<OrderStoreSettings>
+    input: Partial<OrderStoreSettings>,
   ): Promise<OrderStoreSettings> {
     return httpClient<OrderStoreSettings>(
       `/system-admin/tenants/${tenantId}/order-settings`,
       {
         method: "PATCH",
         body: JSON.stringify(input),
-      }
+      },
+    );
+  },
+  async getTenantMetaWhatsappStatus(
+    tenantId: string,
+  ): Promise<SystemAdminTenantMetaWhatsappStatusResponse> {
+    return httpClient<SystemAdminTenantMetaWhatsappStatusResponse>(
+      `/system-admin/tenants/${tenantId}/whatsapp/meta/status`,
+    );
+  },
+
+  async connectTenantMetaWhatsapp(
+    tenantId: string,
+    input: ConnectSystemAdminTenantMetaWhatsappInput,
+  ): Promise<SystemAdminTenantMetaWhatsappStatusResponse> {
+    return httpClient<SystemAdminTenantMetaWhatsappStatusResponse>(
+      `/system-admin/tenants/${tenantId}/whatsapp/meta/embedded-signup/callback`,
+      {
+        method: "POST",
+        body: JSON.stringify(input),
+      },
+    );
+  },
+
+  async syncTenantMetaWhatsapp(
+    tenantId: string,
+  ): Promise<SystemAdminTenantMetaWhatsappStatusResponse> {
+    return httpClient<SystemAdminTenantMetaWhatsappStatusResponse>(
+      `/system-admin/tenants/${tenantId}/whatsapp/meta/sync`,
+      {
+        method: "POST",
+      },
+    );
+  },
+
+  async sendTenantMetaWhatsappTestMessage(
+    tenantId: string,
+    input: SendSystemAdminTenantMetaWhatsappTestMessageInput,
+  ): Promise<{ ok: true }> {
+    return httpClient<{ ok: true }>(
+      `/system-admin/tenants/${tenantId}/whatsapp/meta/test-message`,
+      {
+        method: "POST",
+        body: JSON.stringify(input),
+      },
+    );
+  },
+
+  async disconnectTenantMetaWhatsapp(
+    tenantId: string,
+  ): Promise<SystemAdminTenantMetaWhatsappStatusResponse> {
+    return httpClient<SystemAdminTenantMetaWhatsappStatusResponse>(
+      `/system-admin/tenants/${tenantId}/whatsapp/meta`,
+      {
+        method: "DELETE",
+      },
     );
   },
 };

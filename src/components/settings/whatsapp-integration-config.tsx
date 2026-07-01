@@ -1,73 +1,127 @@
 import { useEffect, useMemo, useState } from "react";
-import { CheckCircle2, Info, Loader2, ShieldAlert } from "lucide-react";
+import { CheckCircle2, Loader2, RefreshCcw, ShieldAlert, Unplug, Waypoints } from "lucide-react";
 import { Badge } from "@/components/flow/badge";
 import { Button } from "@/components/flow/button";
-import { Checkbox } from "@/components/flow/checkbox";
+import { Card, CardDescription, CardTitle } from "@/components/flow/card";
 import { Input } from "@/components/flow/input";
 import { FeedbackBanner } from "@/components/shared/feedback-banner";
 import { PageState } from "@/components/shared/page-state";
+import {
+  useConnectSystemAdminMetaWhatsappMutation,
+  useDisconnectSystemAdminMetaWhatsappMutation,
+  useSendSystemAdminMetaWhatsappTestMessageMutation,
+  useSyncSystemAdminMetaWhatsappMutation,
+  useSystemAdminMetaWhatsappStatusQuery,
+} from "@/hooks/use-system-admin-meta-whatsapp";
 import { useToast } from "@/hooks/use-toast";
-import { useSaveTenantWhatsappMutation } from "@/hooks/use-save-tenant-whatsapp-mutation";
-import { useTenantWhatsappQuery } from "@/hooks/use-tenant-whatsapp-query";
 import { ApiError } from "@/types/api";
 import type {
-  TenantWhatsappIntegration,
-  TenantWhatsappStatus,
-  TenantWhatsappUpsertInput,
-} from "@/types/tenant-whatsapp";
-import { cn } from "@/lib/cn";
+  ConnectSystemAdminTenantMetaWhatsappInput,
+  SystemAdminTenantMetaWhatsappStatus,
+} from "@/types/system-admin";
 
-interface FormState {
-  displayName: string;
-  displayPhone: string;
-  phoneNumberId: string;
-  wabaId: string;
-  accessToken: string;
-  n8nEnabled: boolean;
-  isActive: boolean;
+declare global {
+  interface Window {
+    FB?: {
+      init?: (options: Record<string, unknown>) => void;
+      login: (
+        callback: (response: Record<string, unknown>) => void,
+        options: Record<string, unknown>,
+      ) => void;
+    };
+    fbAsyncInit?: () => void;
+  }
 }
 
-const emptyFormState: FormState = {
-  displayName: "",
-  displayPhone: "",
-  phoneNumberId: "",
-  wabaId: "",
-  accessToken: "",
-  n8nEnabled: false,
-  isActive: true,
-};
+interface EmbeddedSignupContext {
+  phoneNumberId?: string;
+  wabaId?: string;
+  businessId?: string;
+}
 
-const statusLabelMap: Record<TenantWhatsappStatus, string> = {
-  connected: "Conectado",
-  pending: "Pendente",
-  inactive: "Inativo",
+interface WhatsAppIntegrationConfigProps {
+  tenantId: string | null;
+  onDirtyChange?: (dirty: boolean) => void;
+}
+
+const statusLabelMap: Record<SystemAdminTenantMetaWhatsappStatus, string> = {
+  not_configured: "Nao configurado",
+  connecting: "Conectando",
+  active: "Ativo",
   error: "Erro",
+  disconnected: "Desconectado",
 };
 
-const statusVariantMap: Record<TenantWhatsappStatus, "success" | "warning" | "neutral" | "danger"> = {
-  connected: "success",
-  pending: "warning",
-  inactive: "neutral",
+const statusVariantMap: Record<SystemAdminTenantMetaWhatsappStatus, "warning" | "success" | "danger" | "neutral"> = {
+  not_configured: "warning",
+  connecting: "warning",
+  active: "success",
   error: "danger",
+  disconnected: "neutral",
 };
 
-function normalizePhoneCandidate(value: string): string {
-  return value.trim();
+let metaSdkPromise: Promise<void> | null = null;
+
+function getMetaAppId(): string {
+  return (
+    import.meta.env.VITE_META_APP_ID ??
+    import.meta.env.NEXT_PUBLIC_META_APP_ID ??
+    ""
+  );
 }
 
-function isInternationalPhone(value: string): boolean {
-  const normalized = normalizePhoneCandidate(value);
+function getMetaConfigurationId(): string {
+  return (
+    import.meta.env.VITE_META_WHATSAPP_CONFIGURATION_ID ??
+    import.meta.env.NEXT_PUBLIC_META_WHATSAPP_CONFIGURATION_ID ??
+    ""
+  );
+}
 
-  if (!/^\+\d[\d\s()-]*$/.test(normalized)) {
-    return false;
+function extractStringRecord(data: unknown): Record<string, unknown> | null {
+  if (typeof data !== "object" || data === null) {
+    return null;
   }
 
-  const digits = normalized.replace(/\D/g, "");
-  return digits.length >= 8 && digits.length <= 15;
+  return data as Record<string, unknown>;
 }
 
-function isNumericIdentifier(value: string): boolean {
-  return /^\d{5,30}$/.test(value.trim());
+function resolveEmbeddedSignupContext(data: unknown): EmbeddedSignupContext | null {
+  const root = extractStringRecord(data);
+  if (!root) {
+    return null;
+  }
+
+  const candidates = [root, extractStringRecord(root.data), extractStringRecord(root.payload)].filter(
+    Boolean,
+  ) as Array<Record<string, unknown>>;
+
+  for (const candidate of candidates) {
+    const phoneNumberId =
+      typeof candidate.phoneNumberId === "string"
+        ? candidate.phoneNumberId
+        : typeof candidate.phone_number_id === "string"
+          ? candidate.phone_number_id
+          : undefined;
+    const wabaId =
+      typeof candidate.wabaId === "string"
+        ? candidate.wabaId
+        : typeof candidate.waba_id === "string"
+          ? candidate.waba_id
+          : undefined;
+    const businessId =
+      typeof candidate.businessId === "string"
+        ? candidate.businessId
+        : typeof candidate.business_id === "string"
+          ? candidate.business_id
+          : undefined;
+
+    if (phoneNumberId || wabaId || businessId) {
+      return { phoneNumberId, wabaId, businessId };
+    }
+  }
+
+  return null;
 }
 
 function mapApiError(error: ApiError): string {
@@ -76,223 +130,258 @@ function mapApiError(error: ApiError): string {
   }
 
   if (error.status === 403) {
-    return "Apenas system-admin pode configurar o WhatsApp.";
+    return "Apenas system-admin pode operar a integracao WhatsApp.";
   }
 
   if (error.status === 404) {
-    return "Ainda nao existe configuracao de WhatsApp para este tenant.";
+    return "A integracao WhatsApp deste tenant ainda nao foi configurada.";
   }
 
   if (error.status === 409) {
-    return "Este phoneNumberId ja esta em uso em outro tenant.";
+    return "Este numero ja esta vinculado a outro tenant.";
   }
 
   if (error.status === 400) {
-    return "Dados invalidos. Revise os campos informados.";
+    return error.message;
   }
 
   return "Nao foi possivel concluir a operacao agora.";
 }
 
-function mapStatusLabel(status: string): TenantWhatsappStatus {
-  const normalized = status.trim().toLowerCase() as TenantWhatsappStatus | string;
-
-  if (normalized === "connected" || normalized === "pending" || normalized === "inactive" || normalized === "error") {
-    return normalized;
+function ensureMetaSdkLoaded(): Promise<void> {
+  if (typeof window === "undefined") {
+    return Promise.reject(new Error("SDK indisponivel fora do navegador."));
   }
 
-  if (normalized === "active") {
-    return "connected";
+  if (window.FB?.login) {
+    return Promise.resolve();
   }
 
-  return "pending";
+  if (metaSdkPromise) {
+    return metaSdkPromise;
+  }
+
+  metaSdkPromise = new Promise<void>((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = "https://connect.facebook.net/en_US/sdk.js";
+    script.async = true;
+    script.defer = true;
+    script.onerror = () => reject(new Error("Nao foi possivel carregar o Facebook SDK."));
+    window.fbAsyncInit = () => {
+      window.FB?.init?.({
+        appId: getMetaAppId(),
+        xfbml: false,
+        version: "v24.0",
+      });
+      resolve();
+    };
+    document.body.appendChild(script);
+  });
+
+  return metaSdkPromise;
 }
 
-function buildFormState(value: TenantWhatsappIntegration): FormState {
+function buildConnectPayload(
+  code: string,
+  embeddedSignupContext: EmbeddedSignupContext | null,
+  loginResponse: Record<string, unknown>,
+): ConnectSystemAdminTenantMetaWhatsappInput {
+  const loginContext = resolveEmbeddedSignupContext(loginResponse);
+
   return {
-    displayName: value.displayName ?? "",
-    displayPhone: value.displayPhone ?? "",
-    phoneNumberId: value.phoneNumberId ?? "",
-    wabaId: value.wabaId ?? "",
-    accessToken: "",
-    n8nEnabled: value.n8nEnabled,
-    isActive: value.isActive,
+    code,
+    phoneNumberId: embeddedSignupContext?.phoneNumberId ?? loginContext?.phoneNumberId,
+    wabaId: embeddedSignupContext?.wabaId ?? loginContext?.wabaId,
+    businessId: embeddedSignupContext?.businessId ?? loginContext?.businessId,
   };
 }
 
-function buildPayload(
-  form: FormState,
-  hasExistingConfig: boolean,
-  tenantId: string,
-): TenantWhatsappUpsertInput {
-  const payload: TenantWhatsappUpsertInput = {
-    tenantId,
-    displayName: form.displayName.trim(),
-    displayPhone: form.displayPhone.trim(),
-    phoneNumberId: form.phoneNumberId.trim(),
-    wabaId: form.wabaId.trim(),
-    n8nEnabled: form.n8nEnabled,
-    isActive: form.isActive,
-  };
+async function requestEmbeddedSignupCode(): Promise<Record<string, unknown>> {
+  await ensureMetaSdkLoaded();
 
-  if (form.accessToken.trim()) {
-    payload.accessToken = form.accessToken.trim();
+  return new Promise((resolve, reject) => {
+    if (!window.FB?.login) {
+      reject(new Error("Facebook SDK nao esta disponivel."));
+      return;
+    }
+
+    window.FB.login(
+      (response) => {
+        const objectResponse = extractStringRecord(response);
+        if (!objectResponse) {
+          reject(new Error("Resposta invalida do Embedded Signup."));
+          return;
+        }
+
+        resolve(objectResponse);
+      },
+      {
+        config_id: getMetaConfigurationId(),
+        response_type: "code",
+        override_default_response_type: true,
+      },
+    );
+  });
+}
+
+function extractCodeFromLoginResponse(response: Record<string, unknown>): string | null {
+  const directCode = typeof response.code === "string" ? response.code : null;
+  if (directCode?.trim()) {
+    return directCode.trim();
   }
 
-  return payload;
-}
-
-interface WhatsAppIntegrationConfigProps {
-  tenantId: string | null;
-  onDirtyChange?: (dirty: boolean) => void;
+  const authResponse = extractStringRecord(response.authResponse);
+  const authCode = typeof authResponse?.code === "string" ? authResponse.code : null;
+  return authCode?.trim() ? authCode.trim() : null;
 }
 
 export function WhatsAppIntegrationConfig({ tenantId, onDirtyChange }: WhatsAppIntegrationConfigProps) {
   const { toast } = useToast();
-  const whatsappQuery = useTenantWhatsappQuery(tenantId);
-  const saveMutation = useSaveTenantWhatsappMutation();
-  const [form, setForm] = useState<FormState>(emptyFormState);
-  const [isFormVisible, setIsFormVisible] = useState(false);
-  const [saveMessage, setSaveMessage] = useState<string | null>(null);
-  const whatsapp = whatsappQuery.data ?? null;
-  const isEmptyState = whatsappQuery.error instanceof ApiError && whatsappQuery.error.status === 404;
-  const hasExistingConfig = Boolean(whatsapp);
-  const status = mapStatusLabel(whatsapp?.status ?? "pending");
-  const baselineForm = useMemo(
-    () => (whatsapp ? buildFormState(whatsapp) : emptyFormState),
-    [whatsapp],
+  const statusQuery = useSystemAdminMetaWhatsappStatusQuery(tenantId);
+  const connectMutation = useConnectSystemAdminMetaWhatsappMutation(tenantId);
+  const syncMutation = useSyncSystemAdminMetaWhatsappMutation(tenantId);
+  const testMessageMutation = useSendSystemAdminMetaWhatsappTestMessageMutation(tenantId);
+  const disconnectMutation = useDisconnectSystemAdminMetaWhatsappMutation(tenantId);
+  const [testPhone, setTestPhone] = useState("");
+  const [embeddedSignupContext, setEmbeddedSignupContext] = useState<EmbeddedSignupContext | null>(null);
+  const [showDisconnectConfirm, setShowDisconnectConfirm] = useState(false);
+
+  const status = statusQuery.data?.status ?? "not_configured";
+  const isBusy =
+    connectMutation.isPending ||
+    syncMutation.isPending ||
+    testMessageMutation.isPending ||
+    disconnectMutation.isPending;
+
+  const missingMetaPublicConfig = !getMetaAppId().trim() || !getMetaConfigurationId().trim();
+
+  useEffect(() => {
+    onDirtyChange?.(false);
+  }, [onDirtyChange]);
+
+  useEffect(() => {
+    function handleMessage(event: MessageEvent) {
+      const nextContext = resolveEmbeddedSignupContext(event.data);
+      if (nextContext) {
+        setEmbeddedSignupContext(nextContext);
+      }
+    }
+
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, []);
+
+  const summaryRows = useMemo(
+    () => [
+      { label: "Nome verificado", value: statusQuery.data?.verifiedName ?? "Aguardando conexao" },
+      { label: "Numero exibido", value: statusQuery.data?.displayPhoneNumber ?? "Aguardando conexao" },
+      { label: "WABA ID", value: statusQuery.data?.wabaId ?? "Nao informado" },
+      { label: "Phone Number ID", value: statusQuery.data?.phoneNumberId ?? "Nao informado" },
+      { label: "Business ID", value: statusQuery.data?.businessId ?? "Nao informado" },
+    ],
+    [statusQuery.data],
   );
-  const isDirty = useMemo(() => {
-    if (!tenantId) {
-      return false;
-    }
 
-    if (isFormVisible && !hasExistingConfig) {
-      return (
-        form.displayName !== emptyFormState.displayName ||
-        form.displayPhone !== emptyFormState.displayPhone ||
-        form.phoneNumberId !== emptyFormState.phoneNumberId ||
-        form.wabaId !== emptyFormState.wabaId ||
-        form.accessToken !== emptyFormState.accessToken ||
-        form.n8nEnabled !== emptyFormState.n8nEnabled ||
-        form.isActive !== emptyFormState.isActive
-      );
-    }
-
-    return (
-      form.displayName !== baselineForm.displayName ||
-      form.displayPhone !== baselineForm.displayPhone ||
-      form.phoneNumberId !== baselineForm.phoneNumberId ||
-      form.wabaId !== baselineForm.wabaId ||
-      form.accessToken.trim().length > 0 ||
-      form.n8nEnabled !== baselineForm.n8nEnabled ||
-      form.isActive !== baselineForm.isActive
-    );
-  }, [baselineForm, form, hasExistingConfig, isFormVisible, tenantId]);
-
-  useEffect(() => {
-    setForm(emptyFormState);
-    setIsFormVisible(false);
-    setSaveMessage(null);
-
+  async function handleConnect() {
     if (!tenantId) {
       return;
     }
 
-    if (whatsapp) {
-      setForm(buildFormState(whatsapp));
-      setIsFormVisible(true);
-    }
-  }, [tenantId, whatsapp]);
-
-  useEffect(() => {
-    if (!saveMessage) {
-      return;
-    }
-
-    const timeout = window.setTimeout(() => {
-      setSaveMessage(null);
-    }, 3000);
-
-    return () => window.clearTimeout(timeout);
-  }, [saveMessage]);
-
-  useEffect(() => {
-    onDirtyChange?.(isDirty);
-  }, [isDirty, onDirtyChange]);
-
-  function updateField<K extends keyof FormState>(key: K, value: FormState[K]) {
-    setForm((current) => ({
-      ...current,
-      [key]: value,
-    }));
-    setSaveMessage(null);
-  }
-
-
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setSaveMessage(null);
-
-    const validationErrors: string[] = [];
-
-    if (form.displayName.trim().length < 2) {
-      validationErrors.push("Informe um nome de exibicao valido.");
-    }
-
-    if (!isInternationalPhone(form.displayPhone)) {
-      validationErrors.push("Informe o numero WhatsApp em formato internacional.");
-    }
-
-    if (!isNumericIdentifier(form.phoneNumberId)) {
-      validationErrors.push("Phone Number ID invalido.");
-    }
-
-    if (!isNumericIdentifier(form.wabaId)) {
-      validationErrors.push("WABA ID invalido.");
-    }
-
-    if (!hasExistingConfig && !form.accessToken.trim()) {
-      validationErrors.push("Informe o token da Meta para criar a integracao.");
-    }
-
-    if (validationErrors.length > 0) {
+    if (missingMetaPublicConfig) {
       toast({
-        title: "Revise os campos",
-        description: validationErrors[0],
+        title: "Configuracao incompleta",
+        description: "Defina as variaveis publicas da Meta no frontend para iniciar o Embedded Signup.",
         variant: "warning",
       });
       return;
     }
 
     try {
-      if (!tenantId) {
-        return;
+      const loginResponse = await requestEmbeddedSignupCode();
+      const code = extractCodeFromLoginResponse(loginResponse);
+
+      if (!code) {
+        throw new Error("A Meta nao retornou o code da autorizacao.");
       }
 
-      const payload = buildPayload(form, hasExistingConfig, tenantId);
-      const response = await saveMutation.mutateAsync(payload);
-      setForm(buildFormState(response));
-      setIsFormVisible(true);
-      setSaveMessage("Configuracao do WhatsApp salva com sucesso.");
+      await connectMutation.mutateAsync(buildConnectPayload(code, embeddedSignupContext, loginResponse));
       toast({
-        title: "WhatsApp salvo",
-        description: "A configuracao do tenant foi atualizada.",
+        title: "WhatsApp conectado",
+        description: "A integracao Meta do tenant foi vinculada com sucesso.",
         variant: "success",
       });
-    } catch (error: unknown) {
-      if (error instanceof ApiError) {
-        toast({
-          title: "Falha ao salvar",
-          description: mapApiError(error),
-          variant: "danger",
-        });
-        return;
-      }
-
+    } catch (error) {
+      const description =
+        error instanceof ApiError
+          ? mapApiError(error)
+          : error instanceof Error
+            ? error.message
+            : "Falha ao iniciar a conexao com a Meta.";
       toast({
-        title: "Falha ao salvar",
-        description: "Erro inesperado.",
+        title: "Falha ao conectar",
+        description,
+        variant: "danger",
+      });
+    }
+  }
+
+  async function handleSync() {
+    try {
+      await syncMutation.mutateAsync();
+      toast({
+        title: "Integracao sincronizada",
+        description: "Os dados do numero foram atualizados com a Meta.",
+        variant: "success",
+      });
+    } catch (error) {
+      toast({
+        title: "Falha ao sincronizar",
+        description: error instanceof ApiError ? mapApiError(error) : "Erro inesperado.",
+        variant: "danger",
+      });
+    }
+  }
+
+  async function handleSendTestMessage() {
+    if (!testPhone.trim()) {
+      toast({
+        title: "Numero obrigatorio",
+        description: "Informe um telefone em formato internacional para enviar o teste.",
+        variant: "warning",
+      });
+      return;
+    }
+
+    try {
+      await testMessageMutation.mutateAsync({ toPhone: testPhone.trim() });
+      toast({
+        title: "Teste enviado",
+        description: "A mensagem de teste foi enviada pela integracao do tenant.",
+        variant: "success",
+      });
+    } catch (error) {
+      toast({
+        title: "Falha ao enviar teste",
+        description: error instanceof ApiError ? mapApiError(error) : "Erro inesperado.",
+        variant: "danger",
+      });
+    }
+  }
+
+  async function handleDisconnect() {
+    try {
+      await disconnectMutation.mutateAsync();
+      setShowDisconnectConfirm(false);
+      setTestPhone("");
+      toast({
+        title: "Integracao desconectada",
+        description: "O token salvo foi removido e o tenant ficou desconectado da Meta.",
+        variant: "success",
+      });
+    } catch (error) {
+      toast({
+        title: "Falha ao desconectar",
+        description: error instanceof ApiError ? mapApiError(error) : "Erro inesperado.",
         variant: "danger",
       });
     }
@@ -302,252 +391,220 @@ export function WhatsAppIntegrationConfig({ tenantId, onDirtyChange }: WhatsAppI
     return (
       <PageState
         title="Selecione um tenant"
-        description="Escolha um tenant acima para carregar e configurar o WhatsApp."
+        description="Escolha um tenant acima para carregar e operar a integracao WhatsApp."
       />
     );
   }
 
-  if (whatsappQuery.isLoading) {
+  if (statusQuery.isLoading) {
     return (
-      <div className="space-y-4 rounded-2xl border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-4 backdrop-blur-sm">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-secondary">WhatsApp</p>
-            <h2 className="mt-2 text-2xl font-black text-[var(--theme-text-primary)]">Integração WhatsApp</h2>
-          </div>
-          <Loader2 size={20} className="animate-spin text-text-soft" />
-        </div>
-        <p className="text-sm text-text-soft">Carregando configuracao do tenant...</p>
+      <div className="flex items-center gap-3 text-text-soft">
+        <Loader2 size={18} className="animate-spin" />
+        Carregando integracao WhatsApp...
       </div>
     );
   }
 
-  if (whatsappQuery.isError && !isEmptyState) {
+  if (statusQuery.isError) {
     return (
       <FeedbackBanner
         tone="danger"
-        title="Nao foi possivel carregar a configuracao do WhatsApp"
+        title="Nao foi possivel carregar a integracao"
         description={
-          whatsappQuery.error instanceof ApiError
-            ? mapApiError(whatsappQuery.error)
-            : "Erro inesperado ao carregar a configuracao."
+          statusQuery.error instanceof ApiError
+            ? mapApiError(statusQuery.error)
+            : "Erro inesperado ao carregar a integracao WhatsApp."
         }
       />
     );
   }
 
-  if (isEmptyState && !isFormVisible) {
-    return (
-      <div className="space-y-4 rounded-2xl border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-4 backdrop-blur-sm">
-        <div className="flex items-start justify-between gap-4">
-          <div className="space-y-2">
-            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-secondary">WhatsApp</p>
-            <h2 className="text-2xl font-black text-[var(--theme-text-primary)]">Integração WhatsApp</h2>
-            <p className="max-w-2xl text-sm leading-6 text-text-soft">
-              Nenhuma configuracao foi criada ainda. Cadastre o numero do tenant para preparar o webhook unico da Meta Cloud API.
-            </p>
-          </div>
-          <Badge variant="warning">Pendente</Badge>
-        </div>
-
-        <div className="rounded-2xl border border-[var(--theme-border-subtle)] bg-black/10 p-4">
-          <div className="flex items-start gap-3">
-            <Info size={18} className="mt-0.5 text-secondary" aria-hidden="true" />
-            <div className="space-y-2 text-sm leading-6 text-text-soft">
-              <p>Voce vai precisar do Phone Number ID, do WABA ID e do token de acesso da Meta.</p>
-              <p>O webhook unico do tenant sera disponibilizado apos a criacao da integracao.</p>
-            </div>
-          </div>
-        </div>
-
-        <Button onClick={() => setIsFormVisible(true)} size="md">
-          Configurar WhatsApp
-        </Button>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-w-0 space-y-4 rounded-2xl border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-4 backdrop-blur-sm">
-      <div className="grid gap-4 sm:flex sm:items-start sm:justify-between">
-        <div className="min-w-0 space-y-2">
-          <p className="text-sm font-semibold uppercase tracking-[0.22em] text-secondary">WhatsApp</p>
-          <div className="flex min-w-0 flex-wrap items-center gap-3">
-            <h2 className="text-2xl font-black text-[var(--theme-text-primary)]">Integração WhatsApp</h2>
+    <div className="space-y-6">
+      {missingMetaPublicConfig ? (
+        <FeedbackBanner
+          tone="warning"
+          title="Variaveis publicas da Meta ausentes"
+          description="Configure VITE_META_APP_ID e VITE_META_WHATSAPP_CONFIGURATION_ID para habilitar o Embedded Signup nesta tela."
+        />
+      ) : null}
+
+      {statusQuery.data?.lastError ? (
+        <FeedbackBanner
+          tone="danger"
+          title="Ultimo erro registrado"
+          description={statusQuery.data.lastError}
+        />
+      ) : null}
+
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.5fr)_minmax(320px,1fr)]">
+        <Card variant="glass" padding="lg" className="space-y-4">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-secondary">
+                WhatsApp Business
+              </p>
+              <CardTitle className="mt-2">Embedded Signup da Meta</CardTitle>
+              <CardDescription className="mt-2">
+                Conecte a conta WhatsApp Business do tenant sem expor token no frontend.
+              </CardDescription>
+            </div>
             <Badge variant={statusVariantMap[status]}>{statusLabelMap[status]}</Badge>
           </div>
-          <p className="max-w-3xl text-sm leading-6 text-text-soft">
-            Cadastre e mantenha os dados da conta WhatsApp do tenant para preparar o webhook unico da Meta e o faturamento futuro por mensagem.
-          </p>
-        </div>
 
-      </div>
-
-      {saveMessage ? (
-        <div
-          className="flex items-center gap-2 rounded-lg border border-[rgba(34,197,94,0.28)] bg-[rgba(34,197,94,0.10)] px-3 py-2 text-sm"
-          style={{ color: "#4ADE80" }}
-          role="status"
-          aria-live="polite"
-        >
-          <CheckCircle2 size={16} aria-hidden="true" />
-          {saveMessage}
-        </div>
-      ) : null}
-
-      {whatsapp?.accessTokenMasked ? (
-        <div className="rounded-2xl border border-[var(--theme-border-subtle)] bg-black/10 p-4">
-          <p className="text-sm font-semibold text-[var(--theme-text-primary)]">Token salvo</p>
-          <p className="mt-2 text-sm text-text-soft">
-            {whatsapp.accessTokenMasked}{" "}
-            <span className="text-xs text-text-soft">O valor completo nunca e exibido novamente.</span>
-          </p>
-        </div>
-      ) : null}
-
-      <form className="space-y-5" onSubmit={(event) => void handleSubmit(event)}>
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2 md:col-span-2">
-            <label htmlFor="display-name" className="block text-sm font-semibold text-[var(--theme-text-primary)]">
-              Nome de exibicao
-            </label>
-            <Input
-              id="display-name"
-              value={form.displayName}
-              onChange={(event) => updateField("displayName", event.target.value)}
-              placeholder="Agendoro Test"
-            />
+          <div className="grid gap-3 sm:grid-cols-2">
+            {summaryRows.map((row) => (
+              <div
+                key={row.label}
+                className="rounded-2xl border border-[var(--theme-border-subtle)] bg-black/10 p-4"
+              >
+                <p className="text-xs uppercase tracking-[0.18em] text-text-soft">{row.label}</p>
+                <p className="mt-2 break-all text-sm font-semibold text-[var(--theme-text-primary)]">
+                  {row.value}
+                </p>
+              </div>
+            ))}
           </div>
 
-          <div className="space-y-2">
-            <label htmlFor="display-phone" className="block text-sm font-semibold text-[var(--theme-text-primary)]">
-              Numero WhatsApp
-            </label>
-            <Input
-              id="display-phone"
-              value={form.displayPhone}
-              onChange={(event) => updateField("displayPhone", event.target.value)}
-              placeholder="+55 12 99999-9999"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label htmlFor="phone-number-id" className="block text-sm font-semibold text-[var(--theme-text-primary)]">
-              Phone Number ID
-            </label>
-            <Input
-              id="phone-number-id"
-              value={form.phoneNumberId}
-              onChange={(event) => updateField("phoneNumberId", event.target.value)}
-              placeholder="123456789"
-            />
-          </div>
-
-          <div className="space-y-2 md:col-span-2">
-            <label htmlFor="waba-id" className="block text-sm font-semibold text-[var(--theme-text-primary)]">
-              WABA ID
-            </label>
-            <Input
-              id="waba-id"
-              value={form.wabaId}
-              onChange={(event) => updateField("wabaId", event.target.value)}
-              placeholder="987654321"
-            />
-          </div>
-        </div>
-
-        <div className="rounded-2xl border border-[var(--theme-border-subtle)] bg-black/10 p-4">
-          <div className="flex items-start gap-3">
-            <ShieldAlert size={18} className="mt-0.5 text-secondary" aria-hidden="true" />
-            <div className="space-y-2 text-sm leading-6 text-text-soft">
-              <p>O token da Meta e sensivel. Nao compartilhe este valor.</p>
-              <p>Se houver um token salvo, ele sera mantido enquanto este campo permanecer vazio.</p>
+          <div className="rounded-2xl border border-[var(--theme-border-subtle)] bg-black/10 p-4">
+            <div className="flex items-start gap-3">
+              <ShieldAlert size={18} className="mt-0.5 text-secondary" />
+              <div className="space-y-1 text-sm leading-6 text-text-soft">
+                <p>O token Meta e trocado e armazenado apenas no backend do Agendoro.</p>
+                <p>O webhook unico continua ativo e a resolucao do tenant segue pelo Phone Number ID.</p>
+              </div>
             </div>
           </div>
-        </div>
+        </Card>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2">
-            <label htmlFor="access-token" className="block text-sm font-semibold text-[var(--theme-text-primary)]">
-              Token de acesso da Meta
-            </label>
-            <Input
-              id="access-token"
-              type="password"
-              value={form.accessToken}
-              onChange={(event) => updateField("accessToken", event.target.value)}
-              placeholder={hasExistingConfig ? "Deixe em branco para manter o token salvo" : "EAAXXXXX"}
-              autoComplete="off"
-            />
-            <p className="text-xs leading-5 text-text-soft">
-              {hasExistingConfig
-                ? "Preencha apenas se quiser substituir o token salvo."
-                : "Obrigatorio para criar a integracao."}
-            </p>
-          </div>
+        <Card variant="premium" padding="lg" className="space-y-4">
+          <CardTitle>Acoes</CardTitle>
+          <CardDescription>
+            Conecte, sincronize, envie um teste e desconecte a integracao do tenant.
+          </CardDescription>
 
-          <div className="space-y-2">
-            <label htmlFor="webhook-verify-token" className="block text-sm font-semibold text-[var(--theme-text-primary)]">
-              Webhook verify token
-            </label>
-            <Input
-              id="webhook-verify-token"
-              value="Global no webhook da aplicacao"
-              readOnly
-            />
-            <p className="text-xs leading-5 text-text-soft">
-              O verify token e global e configurado no ambiente da aplicacao para `GET /webhooks/meta/whatsapp`.
-            </p>
-          </div>
-        </div>
-
-        <details className="rounded-2xl border border-[var(--theme-border-subtle)] bg-black/10 p-4">
-          <summary className="cursor-pointer list-none text-sm font-semibold text-[var(--theme-text-primary)]">
-            Configuracoes avancadas
-          </summary>
-          <div className="mt-4 grid gap-4 md:grid-cols-2">
-            <label className="flex min-w-0 items-center gap-3 rounded-2xl border border-[var(--theme-border-subtle)] bg-black/10 p-4 text-sm text-[var(--theme-text-primary)]">
-              <Checkbox
-                checked={form.n8nEnabled}
-                onCheckedChange={(checked) => updateField("n8nEnabled", checked)}
-              />
-              Habilitar n8n
-            </label>
-          </div>
-        </details>
-
-        <label className={cn("flex min-w-0 items-center gap-3 rounded-2xl border border-[var(--theme-border-subtle)] bg-black/10 p-4 text-sm text-[var(--theme-text-primary)]")}>
-          <Checkbox
-            checked={form.isActive}
-            onCheckedChange={(checked) => updateField("isActive", checked)}
-          />
-          Integracao ativa
-        </label>
-
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <Button
-            type="submit"
-            disabled={saveMutation.isPending}
+            type="button"
             size="md"
-            className="w-full sm:w-auto"
+            onClick={() => void handleConnect()}
+            disabled={isBusy}
+            className="w-full"
           >
-            {saveMutation.isPending ? (
+            {connectMutation.isPending ? (
               <>
-                <Loader2 size={16} className="animate-spin" aria-hidden="true" />
-                Salvando...
+                <Loader2 size={16} className="animate-spin" />
+                Conectando...
               </>
-            ) : hasExistingConfig ? (
-              "Salvar integração"
             ) : (
-              "Configurar WhatsApp"
+              <>
+                <Waypoints size={16} />
+                {status === "active" ? "Conectar novamente" : "Conectar WhatsApp Business"}
+              </>
             )}
           </Button>
 
-          <p className="text-xs leading-5 text-text-soft">
-            Phone Number ID e WABA ID ficam visiveis na Meta Developer Console. O webhook e identificado pelo phoneNumberId.
-          </p>
-        </div>
-      </form>
+          <Button
+            type="button"
+            variant="secondary"
+            size="md"
+            onClick={() => void handleSync()}
+            disabled={isBusy || !statusQuery.data?.configured}
+            className="w-full"
+          >
+            {syncMutation.isPending ? (
+              <>
+                <Loader2 size={16} className="animate-spin" />
+                Sincronizando...
+              </>
+            ) : (
+              <>
+                <RefreshCcw size={16} />
+                Sincronizar
+              </>
+            )}
+          </Button>
+
+          <div className="space-y-3 rounded-2xl border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-4">
+            <label className="grid gap-2 text-sm font-semibold text-[var(--theme-text-primary)]">
+              Telefone para teste
+              <Input
+                value={testPhone}
+                onChange={(event) => setTestPhone(event.target.value)}
+                placeholder="+55 11 99999-9999"
+                disabled={isBusy || !statusQuery.data?.configured}
+              />
+            </label>
+            <Button
+              type="button"
+              variant="secondary"
+              size="md"
+              onClick={() => void handleSendTestMessage()}
+              disabled={isBusy || !statusQuery.data?.configured}
+              className="w-full"
+            >
+              {testMessageMutation.isPending ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" />
+                  Enviando teste...
+                </>
+              ) : (
+                <>
+                  <CheckCircle2 size={16} />
+                  Enviar teste
+                </>
+              )}
+            </Button>
+          </div>
+
+          <Button
+            type="button"
+            variant="danger"
+            size="md"
+            onClick={() => setShowDisconnectConfirm(true)}
+            disabled={isBusy || !statusQuery.data?.configured}
+            className="w-full"
+          >
+            <Unplug size={16} />
+            Desconectar
+          </Button>
+        </Card>
+      </div>
+
+      {showDisconnectConfirm ? (
+        <Card
+          variant="glass"
+          padding="lg"
+          radiusSize="lg"
+          role="dialog"
+          aria-modal="true"
+          className="space-y-4 border border-[var(--theme-border-default)]"
+        >
+          <CardTitle>Desconectar integracao?</CardTitle>
+          <CardDescription>
+            Essa acao remove o token salvo e desativa o envio do WhatsApp para este tenant ate uma nova conexao.
+          </CardDescription>
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+            <Button
+              type="button"
+              variant="secondary"
+              size="md"
+              onClick={() => setShowDisconnectConfirm(false)}
+              disabled={disconnectMutation.isPending}
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="button"
+              variant="danger"
+              size="md"
+              onClick={() => void handleDisconnect()}
+              disabled={disconnectMutation.isPending}
+            >
+              {disconnectMutation.isPending ? "Desconectando..." : "Confirmar desconexao"}
+            </Button>
+          </div>
+        </Card>
+      ) : null}
     </div>
   );
 }
