@@ -69,6 +69,12 @@ vi.mock("@/components/system-admin/subscription-club-panel", () => ({
   ),
 }));
 
+vi.mock("@/components/system-admin/tenant-order-settings-panel", () => ({
+  TenantOrderSettingsPanel: ({ tenantId }: { tenantId: string | null }) => (
+    <div data-testid="tenant-order-settings-panel">{tenantId ?? "no-tenant"}</div>
+  ),
+}));
+
 vi.mock("@/components/system-admin/tenant-deposit-fee-panel", () => ({
   TenantDepositFeePanel: ({ tenantId }: { tenantId: string | null }) => (
     <div data-testid="deposit-fee-panel">{tenantId ?? "no-tenant"}</div>
@@ -144,6 +150,9 @@ describe("SystemAdminTenantControlCenterPage", () => {
 
     await user.click(screen.getByRole("tab", { name: "Sinal Online" }));
     expect(screen.getByTestId("deposit-fee-panel")).toHaveTextContent("tenant-2");
+
+    await user.click(screen.getByRole("tab", { name: "Pedidos" }));
+    expect(screen.getByTestId("tenant-order-settings-panel")).toHaveTextContent("tenant-2");
   });
 
   test("pede confirmacao antes de trocar de modulo com alteracoes nao salvas", async () => {

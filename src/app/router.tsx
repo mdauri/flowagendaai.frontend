@@ -5,10 +5,20 @@ import { CatalogPage } from "@/pages/catalog-page";
 import { DashboardPage } from "@/pages/dashboard-page";
 import { LoginPage } from "@/pages/login-page";
 import { LandingPage } from "@/pages/landing-page";
+import { OrderHostEntryPage } from "@/pages/order-host-entry-page";
+import { OrderSettingsPage } from "@/pages/order-settings-page";
 import { ProfessionalsPage } from "@/pages/professionals-page";
+import { ProductCategoriesPage } from "@/pages/product-categories-page";
+import { ProductOrdersPage } from "@/pages/product-orders-page";
+import { ProductsPage } from "@/pages/products-page";
+import { ProductionPage } from "@/pages/production-page";
 import { ProfessionalRemovalPage } from "@/pages/professional-removal-page";
 import { PrivacyPolicyPage } from "@/pages/privacy-policy-page";
 import { PublicBookingPage } from "@/pages/public-booking-page";
+import { PublicOrderCheckoutPage } from "@/pages/public-order-checkout-page";
+import { PublicOrderConfirmationPage } from "@/pages/public-order-confirmation-page";
+import { PublicOrderMenuPage } from "@/pages/public-order-menu-page";
+import { PublicOrderStorePage } from "@/pages/public-order-store-page";
 import { ManageBookingPage } from "@/pages/manage-booking-page";
 import { ResetPasswordPage } from "@/pages/reset-password-page";
 import { ServicesPage } from "@/pages/services-page";
@@ -55,19 +65,42 @@ function BlockProfessionalRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function isOrderHost() {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  return ["pedido.dauri.com.br", "localhost", "127.0.0.1"].includes(
+    window.location.hostname,
+  );
+}
+
 export function AppRouter() {
+  const orderHost = isOrderHost();
+
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<LandingPage />} />
+        <Route path="/" element={orderHost ? <OrderHostEntryPage /> : <LandingPage />} />
         <Route path="/termos-de-uso" element={<TermsPage />} />
         <Route path="/politica-de-privacidade" element={<PrivacyPolicyPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
-        <Route path="/p/:slug" element={<PublicBookingPage />} />
-        <Route path="/manage/:token" element={<ManageBookingPage />} />
-        <Route path="/c/:slug/catalog" element={<CatalogPage />} />
+        {orderHost ? (
+          <>
+            <Route path="/:slug" element={<PublicOrderStorePage />} />
+            <Route path="/:slug/cardapio" element={<PublicOrderMenuPage />} />
+            <Route path="/:slug/pedido" element={<PublicOrderCheckoutPage />} />
+            <Route path="/:slug/confirmacao/:orderNumber" element={<PublicOrderConfirmationPage />} />
+          </>
+        ) : (
+          <>
+            <Route path="/p/:slug" element={<PublicBookingPage />} />
+            <Route path="/manage/:token" element={<ManageBookingPage />} />
+            <Route path="/c/:slug/catalog" element={<CatalogPage />} />
+          </>
+        )}
 
         <Route
           path="/app/*"
@@ -97,6 +130,11 @@ export function AppRouter() {
           <Route path="availability" element={<AvailabilityPage />} />
           <Route path="slots" element={<SlotsPage />} />
           <Route path="holidays" element={<HolidaysPage />} />
+          <Route path="orders/settings" element={<OrderSettingsPage />} />
+          <Route path="orders/categories" element={<ProductCategoriesPage />} />
+          <Route path="orders/products" element={<ProductsPage />} />
+          <Route path="orders/list" element={<ProductOrdersPage />} />
+          <Route path="orders/production" element={<ProductionPage />} />
           <Route
             path="settings"
             element={

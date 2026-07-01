@@ -1,4 +1,5 @@
 import { httpClient } from "@/lib/http-client";
+import type { OrderStoreSettings } from "@/types/order-module";
 import type {
   ListSystemAdminTenantsResponse,
   ProvisionTenantInput,
@@ -54,6 +55,25 @@ export const systemAdminService = {
       `/system-admin/tenants/${tenantId}/subscription-club`,
       {
         method: "PUT",
+        body: JSON.stringify(input),
+      }
+    );
+  },
+
+  async getTenantOrderSettings(tenantId: string): Promise<OrderStoreSettings> {
+    return httpClient<OrderStoreSettings>(
+      `/system-admin/tenants/${tenantId}/order-settings`
+    );
+  },
+
+  async updateTenantOrderSettings(
+    tenantId: string,
+    input: Partial<OrderStoreSettings>
+  ): Promise<OrderStoreSettings> {
+    return httpClient<OrderStoreSettings>(
+      `/system-admin/tenants/${tenantId}/order-settings`,
+      {
+        method: "PATCH",
         body: JSON.stringify(input),
       }
     );
