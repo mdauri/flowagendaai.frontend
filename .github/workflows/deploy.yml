@@ -59,6 +59,8 @@ jobs:
           VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
           VITE_FRONTEND_URL: ${{ secrets.VITE_FRONTEND_URL}}
           VITE_WHATSAPP_LINK: ${{ secrets.VITE_WHATSAPP_LINK }}
+          VITE_META_APP_ID: $${{ secrets.VITE_META_APP_ID }}
+          VITE_META_WHATSAPP_CONFIGURATION_ID: $${{ secrets.VITE_META_WHATSAPP_CONFIGURATION_ID }}
 
       - name: Metadata da imagem Frontend
         id: meta-frontend
@@ -80,7 +82,8 @@ jobs:
           build-args: |
             VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}
             VITE_FRONTEND_URL=${{ secrets.VITE_FRONTEND_URL}}
-            VITE_WHATSAPP_LINK=${{ secrets.VITE_WHATSAPP_LINK }}
+            VITE_META_APP_ID=${{ secrets.VITE_META_APP_ID }}
+            VITE_META_WHATSAPP_CONFIGURATION_ID=${{ secrets.VITE_META_WHATSAPP_CONFIGURATION_ID }}
 
   deploy:
     runs-on: ubuntu-latest
