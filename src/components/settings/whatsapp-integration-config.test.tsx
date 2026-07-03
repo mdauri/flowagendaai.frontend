@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { WhatsAppIntegrationConfig } from "@/components/settings/whatsapp-integration-config";
 import { renderWithProviders } from "@/test/render";
+import { ApiError } from "@/types/api";
 import type { SystemAdminTenantMetaWhatsappStatusResponse } from "@/types/system-admin";
 
 const toastMock = vi.fn();
@@ -114,6 +115,40 @@ describe("WhatsAppIntegrationConfig", () => {
         wabaId: "987654321",
         businessId: "55555555",
       });
+    });
+  });
+
+  it("mostra orientacao detalhada quando a Meta falha na conexao", async () => {
+    const user = userEvent.setup();
+    connectMutateAsyncMock.mockRejectedValue(
+      new ApiError(
+        400,
+        "INVALID_INPUT",
+        "Invalid verification code format",
+        "req-123",
+        {
+          stage: "exchange_code",
+          operatorHint:
+            "Refaca o fluxo no Embedded Signup da Meta e confirme se o code nao expirou.",
+        },
+      ),
+    );
+
+    renderWithProviders(<WhatsAppIntegrationConfig tenantId="tenant-1" />, {
+      withRouter: true,
+    });
+
+    await user.click(screen.getByRole("button", { name: /Conectar WhatsApp Business/i }));
+
+    await waitFor(() => {
+      expect(toastMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: "Falha ao conectar",
+          description:
+            "Falha na etapa exchange_code. Invalid verification code format Refaca o fluxo no Embedded Signup da Meta e confirme se o code nao expirou. RequestId: req-123.",
+          variant: "danger",
+        }),
+      );
     });
   });
 

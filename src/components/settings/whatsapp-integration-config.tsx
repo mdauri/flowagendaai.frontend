@@ -39,6 +39,11 @@ interface EmbeddedSignupContext {
   businessId?: string;
 }
 
+interface MetaWhatsappErrorDetails {
+  stage?: string;
+  operatorHint?: string;
+}
+
 interface WhatsAppIntegrationConfigProps {
   tenantId: string | null;
   onDirtyChange?: (dirty: boolean) => void;
@@ -125,6 +130,20 @@ function resolveEmbeddedSignupContext(data: unknown): EmbeddedSignupContext | nu
 }
 
 function mapApiError(error: ApiError): string {
+  const details =
+    typeof error.details === "object" && error.details !== null
+      ? (error.details as MetaWhatsappErrorDetails)
+      : null;
+  const requestIdSuffix =
+    error.requestId && error.requestId !== "unknown"
+      ? ` RequestId: ${error.requestId}.`
+      : "";
+
+  if (details?.operatorHint) {
+    const stagePrefix = details.stage ? `Falha na etapa ${details.stage}. ` : "";
+    return `${stagePrefix}${error.message} ${details.operatorHint}${requestIdSuffix}`;
+  }
+
   if (error.status === 401) {
     return "Sessao invalida. Faca login novamente.";
   }
@@ -142,7 +161,7 @@ function mapApiError(error: ApiError): string {
   }
 
   if (error.status === 400) {
-    return error.message;
+    return `${error.message}${requestIdSuffix}`;
   }
 
   return "Nao foi possivel concluir a operacao agora.";
