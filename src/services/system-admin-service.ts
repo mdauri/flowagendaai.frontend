@@ -6,9 +6,11 @@ import type {
   ProvisionTenantInput,
   ProvisionTenantResponse,
   SendSystemAdminTenantMetaWhatsappTestMessageInput,
+  SystemAdminTenantMetaWhatsappAccessResponse,
   SystemAdminTenantMetaWhatsappStatusResponse,
   SystemAdminTenantDepositFeeSettings,
   SystemAdminTenantSubscriptionClubSettings,
+  UpdateSystemAdminTenantMetaWhatsappAccessInput,
   UpdateSystemAdminTenantDepositFeeInput,
   UpdateSystemAdminTenantSubscriptionClubInput,
 } from "@/types/system-admin";
@@ -95,6 +97,19 @@ export const systemAdminService = {
   ): Promise<SystemAdminTenantMetaWhatsappStatusResponse> {
     return httpClient<SystemAdminTenantMetaWhatsappStatusResponse>(
       `/system-admin/tenants/${tenantId}/whatsapp/meta/status`,
+    );
+  },
+
+  async updateTenantMetaWhatsappAccess(
+    tenantId: string,
+    input: UpdateSystemAdminTenantMetaWhatsappAccessInput,
+  ): Promise<SystemAdminTenantMetaWhatsappAccessResponse> {
+    return httpClient<SystemAdminTenantMetaWhatsappAccessResponse>(
+      `/system-admin/tenants/${tenantId}/whatsapp/meta/access`,
+      {
+        method: "PUT",
+        body: JSON.stringify(input),
+      },
     );
   },
 

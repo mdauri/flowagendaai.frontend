@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   MetaWhatsAppBillingSystemAdminPage,
+  MetaWhatsAppBillingTenantPage,
 } from "@/pages/meta-whatsapp-billing-page";
 import { renderWithProviders } from "@/test/render";
 
@@ -249,6 +250,10 @@ vi.mock("@/components/system-admin/system-admin-gate", () => ({
   SystemAdminGate: ({ children }: { children: ReactNode }) => <>{children}</>,
 }));
 
+vi.mock("@/components/settings/whatsapp-integration-config", () => ({
+  WhatsAppIntegrationConfig: () => <div>whatsapp-config-panel</div>,
+}));
+
 describe("MetaWhatsAppBillingSystemAdminPage", () => {
   beforeEach(() => {
     authState.user.role = "system-admin";
@@ -274,5 +279,13 @@ describe("MetaWhatsAppBillingSystemAdminPage", () => {
 
     await user.click(screen.getByRole("button", { name: "Preços" }));
     expect(screen.getAllByText(/US\$\s?1,2345/).length).toBeGreaterThan(0);
+  });
+
+  it("mostra o bloco operacional no topo da visao tenant", () => {
+    authState.user.role = "admin";
+
+    renderWithProviders(<MetaWhatsAppBillingTenantPage />);
+
+    expect(screen.getByText("whatsapp-config-panel")).toBeInTheDocument();
   });
 });

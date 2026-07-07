@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useMemo, useSyncExternalStore } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   clearStoredToken,
@@ -6,6 +6,7 @@ import {
   subscribeToStoredToken,
 } from "@/session/session-storage";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import { ApiError } from "@/types/api";
 
 export function useAuth() {
   const queryClient = useQueryClient();
@@ -16,6 +17,15 @@ export function useAuth() {
     clearStoredToken();
     queryClient.clear();
   }, [queryClient]);
+
+  useEffect(() => {
+    if (!(currentUserQuery.error instanceof ApiError) || currentUserQuery.error.status !== 401 || !token) {
+      return;
+    }
+
+    clearStoredToken();
+    queryClient.clear();
+  }, [currentUserQuery.error, queryClient, token]);
 
   return useMemo(
     () => ({

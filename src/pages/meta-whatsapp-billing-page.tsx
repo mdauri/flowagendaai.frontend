@@ -7,6 +7,7 @@ import { Card, CardDescription, CardTitle } from "@/components/flow/card";
 import { Input } from "@/components/flow/input";
 import { PageState } from "@/components/shared/page-state";
 import { SectionHeading } from "@/components/flow/section-heading";
+import { WhatsAppIntegrationConfig } from "@/components/settings/whatsapp-integration-config";
 import { Select, type SelectOption } from "@/components/flow/select";
 import { SystemAdminGate } from "@/components/system-admin/system-admin-gate";
 import { useAuth } from "@/hooks/use-auth";
@@ -594,6 +595,15 @@ function MetaWhatsAppBillingWorkspace({ scope }: { scope: Scope }) {
         }
         description="Controle de custos, auditoria de mensagens e política de repasse por tenant."
       />
+
+      {scope === "tenant" ? (
+        <div className="mt-6">
+          <WhatsAppIntegrationConfig
+            scope="tenant"
+            tenantId={auth.tenant?.id ?? null}
+          />
+        </div>
+      ) : null}
 
       <div className="mt-6 grid gap-4 lg:grid-cols-[minmax(0,1fr)_280px]">
         <Card variant="premium" padding="lg" className="min-w-0">

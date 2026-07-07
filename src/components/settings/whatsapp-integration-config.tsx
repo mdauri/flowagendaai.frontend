@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { CheckCircle2, Loader2, RefreshCcw, ShieldAlert, Unplug, Waypoints } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Loader2, RefreshCcw, ShieldAlert, Unplug, Waypoints } from "lucide-react";
 import { Badge } from "@/components/flow/badge";
 import { Button } from "@/components/flow/button";
 import { Card, CardDescription, CardTitle } from "@/components/flow/card";
@@ -7,11 +7,19 @@ import { Input } from "@/components/flow/input";
 import { FeedbackBanner } from "@/components/shared/feedback-banner";
 import { PageState } from "@/components/shared/page-state";
 import {
+  useConnectTenantMetaWhatsappMutation,
+  useDisconnectTenantMetaWhatsappMutation,
+  useSendTenantMetaWhatsappTestMessageMutation,
+  useSyncTenantMetaWhatsappMutation,
+  useTenantMetaWhatsappStatusQuery,
+} from "@/hooks/use-tenant-meta-whatsapp";
+import {
   useConnectSystemAdminMetaWhatsappMutation,
   useDisconnectSystemAdminMetaWhatsappMutation,
   useSendSystemAdminMetaWhatsappTestMessageMutation,
   useSyncSystemAdminMetaWhatsappMutation,
   useSystemAdminMetaWhatsappStatusQuery,
+  useUpdateSystemAdminMetaWhatsappAccessMutation,
 } from "@/hooks/use-system-admin-meta-whatsapp";
 import { useToast } from "@/hooks/use-toast";
 import { ApiError } from "@/types/api";
@@ -45,6 +53,7 @@ interface MetaWhatsappErrorDetails {
 }
 
 interface WhatsAppIntegrationConfigProps {
+  scope?: "system-admin" | "tenant";
   tenantId: string | null;
   onDirtyChange?: (dirty: boolean) => void;
 }
@@ -149,7 +158,7 @@ function mapApiError(error: ApiError): string {
   }
 
   if (error.status === 403) {
-    return "Apenas system-admin pode operar a integracao WhatsApp.";
+    return `${error.message}${requestIdSuffix}`;
   }
 
   if (error.status === 404) {
@@ -254,23 +263,52 @@ function extractCodeFromLoginResponse(response: Record<string, unknown>): string
   return authCode?.trim() ? authCode.trim() : null;
 }
 
-export function WhatsAppIntegrationConfig({ tenantId, onDirtyChange }: WhatsAppIntegrationConfigProps) {
+export function WhatsAppIntegrationConfig({
+  scope = "system-admin",
+  tenantId,
+  onDirtyChange,
+}: WhatsAppIntegrationConfigProps) {
   const { toast } = useToast();
-  const statusQuery = useSystemAdminMetaWhatsappStatusQuery(tenantId);
-  const connectMutation = useConnectSystemAdminMetaWhatsappMutation(tenantId);
-  const syncMutation = useSyncSystemAdminMetaWhatsappMutation(tenantId);
-  const testMessageMutation = useSendSystemAdminMetaWhatsappTestMessageMutation(tenantId);
-  const disconnectMutation = useDisconnectSystemAdminMetaWhatsappMutation(tenantId);
+  const systemStatusQuery = useSystemAdminMetaWhatsappStatusQuery(
+    scope === "system-admin" ? tenantId : null,
+  );
+  const tenantStatusQuery = useTenantMetaWhatsappStatusQuery(scope === "tenant");
+  const systemConnectMutation =
+    useConnectSystemAdminMetaWhatsappMutation(tenantId);
+  const tenantConnectMutation = useConnectTenantMetaWhatsappMutation();
+  const systemSyncMutation = useSyncSystemAdminMetaWhatsappMutation(tenantId);
+  const tenantSyncMutation = useSyncTenantMetaWhatsappMutation();
+  const systemTestMessageMutation =
+    useSendSystemAdminMetaWhatsappTestMessageMutation(tenantId);
+  const tenantTestMessageMutation =
+    useSendTenantMetaWhatsappTestMessageMutation();
+  const systemDisconnectMutation =
+    useDisconnectSystemAdminMetaWhatsappMutation(tenantId);
+  const tenantDisconnectMutation = useDisconnectTenantMetaWhatsappMutation();
+  const accessMutation =
+    useUpdateSystemAdminMetaWhatsappAccessMutation(tenantId);
   const [testPhone, setTestPhone] = useState("");
   const [embeddedSignupContext, setEmbeddedSignupContext] = useState<EmbeddedSignupContext | null>(null);
   const [showDisconnectConfirm, setShowDisconnectConfirm] = useState(false);
+  const statusQuery = scope === "system-admin" ? systemStatusQuery : tenantStatusQuery;
+  const connectMutation = scope === "system-admin" ? systemConnectMutation : tenantConnectMutation;
+  const syncMutation = scope === "system-admin" ? systemSyncMutation : tenantSyncMutation;
+  const testMessageMutation =
+    scope === "system-admin" ? systemTestMessageMutation : tenantTestMessageMutation;
+  const disconnectMutation =
+    scope === "system-admin" ? systemDisconnectMutation : tenantDisconnectMutation;
 
   const status = statusQuery.data?.status ?? "not_configured";
+  const enabled = statusQuery.data?.enabled ?? false;
+  const isTenantScope = scope === "tenant";
+  const isSystemAdminScope = scope === "system-admin";
+  const isBlocked = isTenantScope && !enabled;
   const isBusy =
     connectMutation.isPending ||
     syncMutation.isPending ||
     testMessageMutation.isPending ||
-    disconnectMutation.isPending;
+    disconnectMutation.isPending ||
+    accessMutation.isPending;
 
   const missingMetaPublicConfig = !getMetaAppId().trim() || !getMetaConfigurationId().trim();
 
@@ -292,8 +330,14 @@ export function WhatsAppIntegrationConfig({ tenantId, onDirtyChange }: WhatsAppI
 
   const summaryRows = useMemo(
     () => [
-      { label: "Nome verificado", value: statusQuery.data?.verifiedName ?? "Aguardando conexao" },
-      { label: "Numero exibido", value: statusQuery.data?.displayPhoneNumber ?? "Aguardando conexao" },
+      {
+        label: "Nome verificado",
+        value: statusQuery.data?.verifiedName ?? "Aguardando conexao",
+      },
+      {
+        label: "Numero exibido",
+        value: statusQuery.data?.displayPhoneNumber ?? "Aguardando conexao",
+      },
       { label: "WABA ID", value: statusQuery.data?.wabaId ?? "Nao informado" },
       { label: "Phone Number ID", value: statusQuery.data?.phoneNumberId ?? "Nao informado" },
       { label: "Business ID", value: statusQuery.data?.businessId ?? "Nao informado" },
@@ -302,7 +346,7 @@ export function WhatsAppIntegrationConfig({ tenantId, onDirtyChange }: WhatsAppI
   );
 
   async function handleConnect() {
-    if (!tenantId) {
+    if (isSystemAdminScope && !tenantId) {
       return;
     }
 
@@ -323,10 +367,14 @@ export function WhatsAppIntegrationConfig({ tenantId, onDirtyChange }: WhatsAppI
         throw new Error("A Meta nao retornou o code da autorizacao.");
       }
 
-      await connectMutation.mutateAsync(buildConnectPayload(code, embeddedSignupContext, loginResponse));
+      await connectMutation.mutateAsync(
+        buildConnectPayload(code, embeddedSignupContext, loginResponse),
+      );
       toast({
         title: "WhatsApp conectado",
-        description: "A integracao Meta do tenant foi vinculada com sucesso.",
+        description: isTenantScope
+          ? "Seu WhatsApp foi conectado com sucesso."
+          : "A integracao Meta do tenant foi vinculada com sucesso.",
         variant: "success",
       });
     } catch (error) {
@@ -349,7 +397,9 @@ export function WhatsAppIntegrationConfig({ tenantId, onDirtyChange }: WhatsAppI
       await syncMutation.mutateAsync();
       toast({
         title: "Integracao sincronizada",
-        description: "Os dados do numero foram atualizados com a Meta.",
+        description: isTenantScope
+          ? "Os dados do numero foram atualizados."
+          : "Os dados do numero foram atualizados com a Meta.",
         variant: "success",
       });
     } catch (error) {
@@ -375,7 +425,9 @@ export function WhatsAppIntegrationConfig({ tenantId, onDirtyChange }: WhatsAppI
       await testMessageMutation.mutateAsync({ toPhone: testPhone.trim() });
       toast({
         title: "Teste enviado",
-        description: "A mensagem de teste foi enviada pela integracao do tenant.",
+        description: isTenantScope
+          ? "A mensagem de teste foi enviada."
+          : "A mensagem de teste foi enviada pela integracao do tenant.",
         variant: "success",
       });
     } catch (error) {
@@ -394,7 +446,9 @@ export function WhatsAppIntegrationConfig({ tenantId, onDirtyChange }: WhatsAppI
       setTestPhone("");
       toast({
         title: "Integracao desconectada",
-        description: "O token salvo foi removido e o tenant ficou desconectado da Meta.",
+        description: isTenantScope
+          ? "Seu WhatsApp foi desconectado."
+          : "O token salvo foi removido e o tenant ficou desconectado da Meta.",
         variant: "success",
       });
     } catch (error) {
@@ -406,7 +460,27 @@ export function WhatsAppIntegrationConfig({ tenantId, onDirtyChange }: WhatsAppI
     }
   }
 
-  if (!tenantId) {
+  async function handleToggleAccess(nextEnabled: boolean) {
+    try {
+      await accessMutation.mutateAsync({ enabled: nextEnabled });
+      toast({
+        title: nextEnabled ? "WhatsApp liberado" : "WhatsApp bloqueado",
+        description: nextEnabled
+          ? "O tenant agora pode configurar o proprio WhatsApp."
+          : "O tenant nao podera operar o WhatsApp ate nova liberacao.",
+        variant: "success",
+      });
+    } catch (error) {
+      toast({
+        title: "Falha ao atualizar acesso",
+        description:
+          error instanceof ApiError ? mapApiError(error) : "Erro inesperado.",
+        variant: "danger",
+      });
+    }
+  }
+
+  if (isSystemAdminScope && !tenantId) {
     return (
       <PageState
         title="Selecione um tenant"
@@ -456,6 +530,20 @@ export function WhatsAppIntegrationConfig({ tenantId, onDirtyChange }: WhatsAppI
         />
       ) : null}
 
+      {isBlocked ? (
+        <Card variant="premium" padding="lg" className="space-y-3">
+          <div className="flex items-start gap-3">
+            <AlertTriangle size={18} className="mt-0.5 text-secondary" />
+            <div className="space-y-1">
+              <CardTitle>WhatsApp indisponivel</CardTitle>
+              <CardDescription>
+                Esse recurso ainda nao foi liberado para este tenant.
+              </CardDescription>
+            </div>
+          </div>
+        </Card>
+      ) : null}
+
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1.5fr)_minmax(320px,1fr)]">
         <Card variant="glass" padding="lg" className="space-y-4">
           <div className="flex flex-wrap items-start justify-between gap-3">
@@ -463,9 +551,15 @@ export function WhatsAppIntegrationConfig({ tenantId, onDirtyChange }: WhatsAppI
               <p className="text-sm font-semibold uppercase tracking-[0.22em] text-secondary">
                 WhatsApp Business
               </p>
-              <CardTitle className="mt-2">Embedded Signup da Meta</CardTitle>
+              <CardTitle className="mt-2">
+                {isTenantScope ? "Meu WhatsApp" : "Embedded Signup da Meta"}
+              </CardTitle>
               <CardDescription className="mt-2">
-                Conecte a conta WhatsApp Business do tenant sem expor token no frontend.
+                {isTenantScope
+                  ? enabled
+                    ? "Conecte e acompanhe sua conta WhatsApp Business."
+                    : "A liberacao desta integracao e feita pelo system-admin."
+                  : "Acompanhe o estado da conta e controle a liberacao do tenant."}
               </CardDescription>
             </div>
             <Badge variant={statusVariantMap[status]}>{statusLabelMap[status]}</Badge>
@@ -496,100 +590,167 @@ export function WhatsAppIntegrationConfig({ tenantId, onDirtyChange }: WhatsAppI
           </div>
         </Card>
 
-        <Card variant="premium" padding="lg" className="space-y-4">
-          <CardTitle>Acoes</CardTitle>
-          <CardDescription>
-            Conecte, sincronize, envie um teste e desconecte a integracao do tenant.
-          </CardDescription>
+        {isSystemAdminScope ? (
+          <Card variant="premium" padding="lg" className="space-y-4">
+            <CardTitle>Liberacao do tenant</CardTitle>
+            <CardDescription>
+              O admin do tenant faz a configuracao em Meu WhatsApp. Aqui voce so libera ou bloqueia o uso.
+            </CardDescription>
 
-          <Button
-            type="button"
-            size="md"
-            onClick={() => void handleConnect()}
-            disabled={isBusy}
-            className="w-full"
-          >
-            {connectMutation.isPending ? (
-              <>
-                <Loader2 size={16} className="animate-spin" />
-                Conectando...
-              </>
-            ) : (
-              <>
-                <Waypoints size={16} />
-                {status === "active" ? "Conectar novamente" : "Conectar WhatsApp Business"}
-              </>
-            )}
-          </Button>
+            <div className="space-y-3 rounded-2xl border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-sm font-semibold text-[var(--theme-text-primary)]">
+                    {enabled ? "WhatsApp liberado" : "WhatsApp bloqueado"}
+                  </p>
+                  <p className="mt-1 text-sm text-text-soft">
+                    {enabled
+                      ? "O tenant pode conectar e operar o proprio WhatsApp."
+                      : "O tenant nao pode conectar nem operar o WhatsApp."}
+                  </p>
+                </div>
+                <Badge variant={enabled ? "success" : "warning"}>
+                  {enabled ? "Liberado" : "Bloqueado"}
+                </Badge>
+              </div>
 
-          <Button
-            type="button"
-            variant="secondary"
-            size="md"
-            onClick={() => void handleSync()}
-            disabled={isBusy || !statusQuery.data?.configured}
-            className="w-full"
-          >
-            {syncMutation.isPending ? (
-              <>
-                <Loader2 size={16} className="animate-spin" />
-                Sincronizando...
-              </>
-            ) : (
-              <>
-                <RefreshCcw size={16} />
-                Sincronizar
-              </>
-            )}
-          </Button>
+              <div className="grid gap-3">
+                <Button
+                  type="button"
+                  size="md"
+                  onClick={() => void handleToggleAccess(true)}
+                  disabled={isBusy || enabled}
+                  className="w-full"
+                >
+                  {accessMutation.isPending && !enabled ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      Liberando...
+                    </>
+                  ) : (
+                    "Liberar WhatsApp"
+                  )}
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="md"
+                  onClick={() => void handleToggleAccess(false)}
+                  disabled={isBusy || !enabled}
+                  className="w-full"
+                >
+                  {accessMutation.isPending && enabled ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      Bloqueando...
+                    </>
+                  ) : (
+                    "Bloquear WhatsApp"
+                  )}
+                </Button>
+              </div>
+            </div>
+          </Card>
+        ) : (
+          <Card variant="premium" padding="lg" className="space-y-4">
+            <CardTitle>{enabled ? "Acoes" : "Aguardando liberacao"}</CardTitle>
+            <CardDescription>
+              {enabled
+                ? "Conecte, atualize, envie um teste e desconecte sua integracao."
+                : "Quando o system-admin liberar este recurso, voce podera configurar seu WhatsApp aqui."}
+            </CardDescription>
 
-          <div className="space-y-3 rounded-2xl border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-4">
-            <label className="grid gap-2 text-sm font-semibold text-[var(--theme-text-primary)]">
-              Telefone para teste
-              <Input
-                value={testPhone}
-                onChange={(event) => setTestPhone(event.target.value)}
-                placeholder="+55 11 99999-9999"
-                disabled={isBusy || !statusQuery.data?.configured}
-              />
-            </label>
+            <Button
+              type="button"
+              size="md"
+              onClick={() => void handleConnect()}
+              disabled={isBusy || isBlocked}
+              className="w-full"
+            >
+              {connectMutation.isPending ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" />
+                  Conectando...
+                </>
+              ) : (
+                <>
+                  <Waypoints size={16} />
+                  {status === "active"
+                    ? "Conectar novamente"
+                    : "Conectar WhatsApp Business"}
+                </>
+              )}
+            </Button>
+
             <Button
               type="button"
               variant="secondary"
               size="md"
-              onClick={() => void handleSendTestMessage()}
-              disabled={isBusy || !statusQuery.data?.configured}
+              onClick={() => void handleSync()}
+              disabled={isBusy || !statusQuery.data?.configured || isBlocked}
               className="w-full"
             >
-              {testMessageMutation.isPending ? (
+              {syncMutation.isPending ? (
                 <>
                   <Loader2 size={16} className="animate-spin" />
-                  Enviando teste...
+                  Atualizando...
                 </>
               ) : (
                 <>
-                  <CheckCircle2 size={16} />
-                  Enviar teste
+                  <RefreshCcw size={16} />
+                  Atualizar dados
                 </>
               )}
             </Button>
-          </div>
 
-          <Button
-            type="button"
-            variant="danger"
-            size="md"
-            onClick={() => setShowDisconnectConfirm(true)}
-            disabled={isBusy || !statusQuery.data?.configured}
-            className="w-full"
-          >
-            <Unplug size={16} />
-            Desconectar
-          </Button>
-        </Card>
+            <div className="space-y-3 rounded-2xl border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-4">
+              <label className="grid gap-2 text-sm font-semibold text-[var(--theme-text-primary)]">
+                Telefone para teste
+                <Input
+                  value={testPhone}
+                  onChange={(event) => setTestPhone(event.target.value)}
+                  placeholder="+55 11 99999-9999"
+                  disabled={isBusy || !statusQuery.data?.configured || isBlocked}
+                />
+              </label>
+              <Button
+                type="button"
+                variant="secondary"
+                size="md"
+                onClick={() => void handleSendTestMessage()}
+                disabled={isBusy || !statusQuery.data?.configured || isBlocked}
+                className="w-full"
+              >
+                {testMessageMutation.isPending ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin" />
+                    Enviando teste...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 size={16} />
+                    Enviar teste
+                  </>
+                )}
+              </Button>
+            </div>
+
+            <Button
+              type="button"
+              variant="danger"
+              size="md"
+              onClick={() => setShowDisconnectConfirm(true)}
+              disabled={isBusy || !statusQuery.data?.configured || isBlocked}
+              className="w-full"
+            >
+              <Unplug size={16} />
+              Desconectar
+            </Button>
+          </Card>
+        )}
       </div>
 
-      {showDisconnectConfirm ? (
+      {showDisconnectConfirm && isTenantScope ? (
         <Card
           variant="glass"
           padding="lg"

@@ -7,15 +7,17 @@ import { ApiError } from "@/types/api";
 import type { SystemAdminTenantMetaWhatsappStatusResponse } from "@/types/system-admin";
 
 const toastMock = vi.fn();
-const connectMutateAsyncMock = vi.fn();
-const syncMutateAsyncMock = vi.fn();
-const testMessageMutateAsyncMock = vi.fn();
-const disconnectMutateAsyncMock = vi.fn();
+const systemConnectMutateAsyncMock = vi.fn();
+const tenantConnectMutateAsyncMock = vi.fn();
+const tenantTestMessageMutateAsyncMock = vi.fn();
+const tenantDisconnectMutateAsyncMock = vi.fn();
+const updateAccessMutateAsyncMock = vi.fn();
 
 function createStatusResponse(
   overrides: Partial<SystemAdminTenantMetaWhatsappStatusResponse> = {},
 ): SystemAdminTenantMetaWhatsappStatusResponse {
   return {
+    enabled: false,
     configured: false,
     status: "not_configured",
     tenantId: "tenant-1",
@@ -38,7 +40,14 @@ function createStatusResponse(
   };
 }
 
-const queryState = {
+const systemQueryState = {
+  data: createStatusResponse(),
+  isLoading: false,
+  isError: false,
+  error: null,
+};
+
+const tenantQueryState = {
   data: createStatusResponse(),
   isLoading: false,
   isError: false,
@@ -50,21 +59,45 @@ vi.mock("@/hooks/use-toast", () => ({
 }));
 
 vi.mock("@/hooks/use-system-admin-meta-whatsapp", () => ({
-  useSystemAdminMetaWhatsappStatusQuery: () => queryState,
+  useSystemAdminMetaWhatsappStatusQuery: () => systemQueryState,
   useConnectSystemAdminMetaWhatsappMutation: () => ({
-    mutateAsync: connectMutateAsyncMock,
+    mutateAsync: systemConnectMutateAsyncMock,
     isPending: false,
   }),
   useSyncSystemAdminMetaWhatsappMutation: () => ({
-    mutateAsync: syncMutateAsyncMock,
+    mutateAsync: vi.fn(),
     isPending: false,
   }),
   useSendSystemAdminMetaWhatsappTestMessageMutation: () => ({
-    mutateAsync: testMessageMutateAsyncMock,
+    mutateAsync: vi.fn(),
     isPending: false,
   }),
   useDisconnectSystemAdminMetaWhatsappMutation: () => ({
-    mutateAsync: disconnectMutateAsyncMock,
+    mutateAsync: vi.fn(),
+    isPending: false,
+  }),
+  useUpdateSystemAdminMetaWhatsappAccessMutation: () => ({
+    mutateAsync: updateAccessMutateAsyncMock,
+    isPending: false,
+  }),
+}));
+
+vi.mock("@/hooks/use-tenant-meta-whatsapp", () => ({
+  useTenantMetaWhatsappStatusQuery: () => tenantQueryState,
+  useConnectTenantMetaWhatsappMutation: () => ({
+    mutateAsync: tenantConnectMutateAsyncMock,
+    isPending: false,
+  }),
+  useSyncTenantMetaWhatsappMutation: () => ({
+    mutateAsync: vi.fn(),
+    isPending: false,
+  }),
+  useSendTenantMetaWhatsappTestMessageMutation: () => ({
+    mutateAsync: tenantTestMessageMutateAsyncMock,
+    isPending: false,
+  }),
+  useDisconnectTenantMetaWhatsappMutation: () => ({
+    mutateAsync: tenantDisconnectMutateAsyncMock,
     isPending: false,
   }),
 }));
@@ -72,11 +105,13 @@ vi.mock("@/hooks/use-system-admin-meta-whatsapp", () => ({
 describe("WhatsAppIntegrationConfig", () => {
   beforeEach(() => {
     toastMock.mockReset();
-    connectMutateAsyncMock.mockReset();
-    syncMutateAsyncMock.mockReset();
-    testMessageMutateAsyncMock.mockReset();
-    disconnectMutateAsyncMock.mockReset();
-    queryState.data = createStatusResponse();
+    systemConnectMutateAsyncMock.mockReset();
+    tenantConnectMutateAsyncMock.mockReset();
+    tenantTestMessageMutateAsyncMock.mockReset();
+    tenantDisconnectMutateAsyncMock.mockReset();
+    updateAccessMutateAsyncMock.mockReset();
+    systemQueryState.data = createStatusResponse();
+    tenantQueryState.data = createStatusResponse();
     import.meta.env.VITE_META_APP_ID = "meta-app-id";
     import.meta.env.VITE_META_WHATSAPP_CONFIGURATION_ID = "config-123";
     window.FB = {
@@ -90,7 +125,7 @@ describe("WhatsAppIntegrationConfig", () => {
     };
   });
 
-  it("mostra prompt para selecionar tenant", () => {
+  it("mostra prompt para selecionar tenant no system-admin", () => {
     renderWithProviders(<WhatsAppIntegrationConfig tenantId={null} />, {
       withRouter: true,
     });
@@ -98,18 +133,69 @@ describe("WhatsAppIntegrationConfig", () => {
     expect(screen.getByText("Selecione um tenant")).toBeInTheDocument();
   });
 
-  it("inicia o Embedded Signup e envia o callback ao backend", async () => {
+  it("permite liberar o tenant no system-admin", async () => {
     const user = userEvent.setup();
-    connectMutateAsyncMock.mockResolvedValue(undefined);
+    updateAccessMutateAsyncMock.mockResolvedValue({
+      tenantId: "tenant-1",
+      enabled: true,
+      updatedAt: "2026-07-06T10:00:00.000Z",
+    });
 
     renderWithProviders(<WhatsAppIntegrationConfig tenantId="tenant-1" />, {
       withRouter: true,
     });
 
-    await user.click(screen.getByRole("button", { name: /Conectar WhatsApp Business/i }));
+    await user.click(screen.getByRole("button", { name: /Liberar WhatsApp/i }));
 
     await waitFor(() => {
-      expect(connectMutateAsyncMock).toHaveBeenCalledWith({
+      expect(updateAccessMutateAsyncMock).toHaveBeenCalledWith({
+        enabled: true,
+      });
+    });
+  });
+
+  it("mostra estado bloqueado no tenant", () => {
+    tenantQueryState.data = createStatusResponse({
+      enabled: false,
+      configured: false,
+      status: "not_configured",
+    });
+
+    renderWithProviders(
+      <WhatsAppIntegrationConfig scope="tenant" tenantId="tenant-1" />,
+      {
+        withRouter: true,
+      },
+    );
+
+    expect(screen.getByText("WhatsApp indisponivel")).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /Conectar WhatsApp Business/i }),
+    ).toBeDisabled();
+  });
+
+  it("inicia o Embedded Signup no tenant", async () => {
+    const user = userEvent.setup();
+    tenantQueryState.data = createStatusResponse({
+      enabled: true,
+      configured: false,
+      status: "not_configured",
+    });
+    tenantConnectMutateAsyncMock.mockResolvedValue(undefined);
+
+    renderWithProviders(
+      <WhatsAppIntegrationConfig scope="tenant" tenantId="tenant-1" />,
+      {
+        withRouter: true,
+      },
+    );
+
+    await user.click(
+      screen.getByRole("button", { name: /Conectar WhatsApp Business/i }),
+    );
+
+    await waitFor(() => {
+      expect(tenantConnectMutateAsyncMock).toHaveBeenCalledWith({
         code: "code-123",
         phoneNumberId: "123456789",
         wabaId: "987654321",
@@ -118,9 +204,14 @@ describe("WhatsAppIntegrationConfig", () => {
     });
   });
 
-  it("mostra orientacao detalhada quando a Meta falha na conexao", async () => {
+  it("mostra orientacao detalhada quando a Meta falha na conexao do tenant", async () => {
     const user = userEvent.setup();
-    connectMutateAsyncMock.mockRejectedValue(
+    tenantQueryState.data = createStatusResponse({
+      enabled: true,
+      configured: false,
+      status: "not_configured",
+    });
+    tenantConnectMutateAsyncMock.mockRejectedValue(
       new ApiError(
         400,
         "INVALID_INPUT",
@@ -134,11 +225,16 @@ describe("WhatsAppIntegrationConfig", () => {
       ),
     );
 
-    renderWithProviders(<WhatsAppIntegrationConfig tenantId="tenant-1" />, {
-      withRouter: true,
-    });
+    renderWithProviders(
+      <WhatsAppIntegrationConfig scope="tenant" tenantId="tenant-1" />,
+      {
+        withRouter: true,
+      },
+    );
 
-    await user.click(screen.getByRole("button", { name: /Conectar WhatsApp Business/i }));
+    await user.click(
+      screen.getByRole("button", { name: /Conectar WhatsApp Business/i }),
+    );
 
     await waitFor(() => {
       expect(toastMock).toHaveBeenCalledWith(
@@ -152,9 +248,10 @@ describe("WhatsAppIntegrationConfig", () => {
     });
   });
 
-  it("mostra a integracao ativa e permite enviar teste e desconectar", async () => {
+  it("mostra a integracao ativa no tenant e permite enviar teste e desconectar", async () => {
     const user = userEvent.setup();
-    queryState.data = createStatusResponse({
+    tenantQueryState.data = createStatusResponse({
+      enabled: true,
       configured: true,
       status: "active",
       provider: "meta",
@@ -171,21 +268,28 @@ describe("WhatsAppIntegrationConfig", () => {
       createdAt: "2026-07-01T14:00:00.000Z",
       updatedAt: "2026-07-01T15:00:00.000Z",
     });
-    testMessageMutateAsyncMock.mockResolvedValue({ ok: true });
-    disconnectMutateAsyncMock.mockResolvedValue(undefined);
+    tenantTestMessageMutateAsyncMock.mockResolvedValue({ ok: true });
+    tenantDisconnectMutateAsyncMock.mockResolvedValue(undefined);
 
-    renderWithProviders(<WhatsAppIntegrationConfig tenantId="tenant-1" />, {
-      withRouter: true,
-    });
+    renderWithProviders(
+      <WhatsAppIntegrationConfig scope="tenant" tenantId="tenant-1" />,
+      {
+        withRouter: true,
+      },
+    );
 
     expect(screen.getByText("Ativo")).toBeInTheDocument();
     expect(screen.getByText("Clinica Demo")).toBeInTheDocument();
+    expect(screen.getByText("Atualizar dados")).toBeInTheDocument();
 
-    await user.type(screen.getByPlaceholderText("+55 11 99999-9999"), "+55 11 98888-7777");
+    await user.type(
+      screen.getByPlaceholderText("+55 11 99999-9999"),
+      "+55 11 98888-7777",
+    );
     await user.click(screen.getByRole("button", { name: /Enviar teste/i }));
 
     await waitFor(() => {
-      expect(testMessageMutateAsyncMock).toHaveBeenCalledWith({
+      expect(tenantTestMessageMutateAsyncMock).toHaveBeenCalledWith({
         toPhone: "+55 11 98888-7777",
       });
     });
@@ -195,7 +299,7 @@ describe("WhatsAppIntegrationConfig", () => {
     await user.click(screen.getByRole("button", { name: "Confirmar desconexao" }));
 
     await waitFor(() => {
-      expect(disconnectMutateAsyncMock).toHaveBeenCalledTimes(1);
+      expect(tenantDisconnectMutateAsyncMock).toHaveBeenCalledTimes(1);
     });
   });
 });

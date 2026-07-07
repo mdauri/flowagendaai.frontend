@@ -3,6 +3,7 @@ import { systemAdminService } from "@/services/system-admin-service";
 import type {
   ConnectSystemAdminTenantMetaWhatsappInput,
   SendSystemAdminTenantMetaWhatsappTestMessageInput,
+  UpdateSystemAdminTenantMetaWhatsappAccessInput,
 } from "@/types/system-admin";
 
 export const SYSTEM_ADMIN_META_WHATSAPP_QUERY_KEY = ["system-admin", "meta-whatsapp"] as const;
@@ -27,6 +28,20 @@ export function useConnectSystemAdminMetaWhatsappMutation(tenantId: string | nul
   return useMutation({
     mutationFn: (input: ConnectSystemAdminTenantMetaWhatsappInput) =>
       systemAdminService.connectTenantMetaWhatsapp(tenantId as string, input),
+    onSuccess: async () => {
+      await invalidateMetaWhatsappStatus(queryClient);
+    },
+  });
+}
+
+export function useUpdateSystemAdminMetaWhatsappAccessMutation(
+  tenantId: string | null,
+) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: UpdateSystemAdminTenantMetaWhatsappAccessInput) =>
+      systemAdminService.updateTenantMetaWhatsappAccess(tenantId as string, input),
     onSuccess: async () => {
       await invalidateMetaWhatsappStatus(queryClient);
     },

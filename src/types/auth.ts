@@ -25,6 +25,7 @@ export interface AuthTenant {
   depositProviderConfigured: boolean;
   mercadoPagoPublicKey: string | null;
   depositConvenienceFeeEnabled: boolean;
+  metaWhatsappEnabled?: boolean;
   subscriptionClubAllowed?: boolean;
   subscriptionClubEnabled?: boolean;
   orderModuleEnabled?: boolean;

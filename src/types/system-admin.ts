@@ -70,6 +70,7 @@ export type SystemAdminTenantMetaWhatsappStatus =
   | "disconnected";
 
 export interface SystemAdminTenantMetaWhatsappStatusResponse {
+  enabled: boolean;
   configured: boolean;
   status: SystemAdminTenantMetaWhatsappStatus;
   tenantId: string;
@@ -88,6 +89,16 @@ export interface SystemAdminTenantMetaWhatsappStatusResponse {
   lastError: string | null;
   createdAt: string | null;
   updatedAt: string | null;
+}
+
+export interface UpdateSystemAdminTenantMetaWhatsappAccessInput {
+  enabled: boolean;
+}
+
+export interface SystemAdminTenantMetaWhatsappAccessResponse {
+  tenantId: string;
+  enabled: boolean;
+  updatedAt: string;
 }
 
 export interface ConnectSystemAdminTenantMetaWhatsappInput {
