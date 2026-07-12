@@ -5,37 +5,76 @@ import { SettingsPage } from "@/pages/settings-page";
 import { renderWithProviders } from "@/test/render";
 
 const mockRefetchCurrentUser = vi.fn();
+type MockAuthState = {
+  user:
+    | { id: string; name: string; email: string; role: string; professionalId: null }
+    | null;
+  tenant:
+    | {
+        id: string;
+        name: string;
+        timezone: string;
+        logoUrl: string;
+        coverImageUrl: null;
+        publicAddress: null;
+        description: null;
+        reactivationEnabled: boolean;
+        daysAfterLastService: number;
+        reactivationCooldownDays: number;
+        reactivationTemplateName: null;
+        bookingReminderEnabled: boolean;
+        bookingReminderWhatsappEnabled: boolean;
+        bookingReminderEmailEnabled: boolean;
+        bookingReminderOffsets: number[];
+        depositModuleEnabled: boolean;
+        depositPaymentProvider: string;
+        depositProviderConfigured: boolean;
+        mercadoPagoPublicKey: null;
+        depositConvenienceFeeEnabled: boolean;
+      }
+    | null;
+  isBootstrapping: boolean;
+  refetchCurrentUser: typeof mockRefetchCurrentUser;
+};
+
+const mockAuthState: MockAuthState = {
+  user: { id: "user-1", name: "Admin", email: "admin@test.com", role: "admin", professionalId: null },
+  tenant: {
+    id: "tenant-1",
+    name: "Test Studio",
+    timezone: "America/Sao_Paulo",
+    logoUrl: "https://example.com/logo.png",
+    coverImageUrl: null,
+    publicAddress: null,
+    description: null,
+    reactivationEnabled: false,
+    daysAfterLastService: 30,
+    reactivationCooldownDays: 30,
+    reactivationTemplateName: null,
+    bookingReminderEnabled: true,
+    bookingReminderWhatsappEnabled: true,
+    bookingReminderEmailEnabled: false,
+    bookingReminderOffsets: [24],
+    depositModuleEnabled: false,
+    depositPaymentProvider: "MANUAL",
+    depositProviderConfigured: false,
+    mercadoPagoPublicKey: null,
+    depositConvenienceFeeEnabled: false,
+  },
+  isBootstrapping: false,
+  refetchCurrentUser: mockRefetchCurrentUser,
+};
 
 vi.mock("@/hooks/use-auth", () => ({
-  useAuth: () => ({
-    user: { id: "user-1", name: "Admin", email: "admin@test.com", role: "admin", professionalId: null },
-      tenant: {
-        id: "tenant-1",
-        name: "Test Studio",
-        timezone: "America/Sao_Paulo",
-        logoUrl: "https://example.com/logo.png",
-        coverImageUrl: null,
-        publicAddress: null,
-        description: null,
-        reactivationEnabled: false,
-        daysAfterLastService: 30,
-        reactivationCooldownDays: 30,
-        reactivationTemplateName: null,
-        depositModuleEnabled: false,
-        depositPaymentProvider: "MANUAL",
-        depositProviderConfigured: false,
-        mercadoPagoPublicKey: null,
-        depositConvenienceFeeEnabled: false,
-      },
-    isBootstrapping: false,
-    refetchCurrentUser: mockRefetchCurrentUser,
-  }),
+  useAuth: () => mockAuthState,
 }));
 
 vi.mock("@/services/tenant-service", () => ({
   tenantService: {
     updateTenant: vi.fn(),
     geocode: vi.fn(),
+    getBookingReminderSettings: vi.fn(),
+    updateBookingReminderSettings: vi.fn(),
   },
 }));
 
@@ -61,6 +100,43 @@ import { tenantLogoImageService } from "@/services/tenant-logo-image-service";
 describe("SettingsPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockAuthState.user = {
+      id: "user-1",
+      name: "Admin",
+      email: "admin@test.com",
+      role: "admin",
+      professionalId: null,
+    };
+    mockAuthState.tenant = {
+      id: "tenant-1",
+      name: "Test Studio",
+      timezone: "America/Sao_Paulo",
+      logoUrl: "https://example.com/logo.png",
+      coverImageUrl: null,
+      publicAddress: null,
+      description: null,
+      reactivationEnabled: false,
+      daysAfterLastService: 30,
+      reactivationCooldownDays: 30,
+      reactivationTemplateName: null,
+      bookingReminderEnabled: true,
+      bookingReminderWhatsappEnabled: true,
+      bookingReminderEmailEnabled: false,
+      bookingReminderOffsets: [24],
+      depositModuleEnabled: false,
+      depositPaymentProvider: "MANUAL",
+      depositProviderConfigured: false,
+      mercadoPagoPublicKey: null,
+      depositConvenienceFeeEnabled: false,
+    };
+    mockAuthState.isBootstrapping = false;
+    mockAuthState.refetchCurrentUser = mockRefetchCurrentUser;
+    vi.mocked(tenantService.getBookingReminderSettings).mockResolvedValue({
+      enabled: true,
+      whatsappEnabled: true,
+      emailEnabled: false,
+      offsets: [24],
+    });
   });
 
   it("renders tenant profile section with current data", () => {
@@ -72,6 +148,16 @@ describe("SettingsPage", () => {
     expect(screen.getByText("Configuracoes")).toBeInTheDocument();
     expect(screen.getByDisplayValue("Test Studio")).toBeInTheDocument();
     expect(screen.getByText("Perfil Publico")).toBeInTheDocument();
+  });
+
+  it("renders booking reminder settings section", async () => {
+    renderWithProviders(<SettingsPage />, {
+      route: "/app/settings",
+      withRouter: true,
+    });
+
+    expect(await screen.findByText("Lembretes de compromisso")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Salvar lembretes" })).toBeInTheDocument();
   });
 
   it("save button calls PATCH /tenants/me with updated values", async () => {
@@ -222,25 +308,17 @@ describe("SettingsPage", () => {
   });
 
   it("shows loading state when bootstrapping", () => {
-    // Re-mock useAuth to return bootstrapping state
-    vi.doMock("@/hooks/use-auth", () => ({
-      useAuth: () => ({
-        user: null,
-        tenant: null,
-        isBootstrapping: true,
-        refetchCurrentUser: vi.fn(),
-      }),
-    }));
+    mockAuthState.user = null;
+    mockAuthState.tenant = null;
+    mockAuthState.isBootstrapping = true;
 
-    // Since we can't easily re-import after doMock, we test the existing render
     renderWithProviders(<SettingsPage />, {
       route: "/app/settings",
       withRouter: true,
     });
 
-    // The page should render normally with the mocked data above
-    // (bootstrapping test would need a separate mock setup)
-    expect(screen.getByText("Configuracoes")).toBeInTheDocument();
+    expect(document.querySelector(".animate-spin")).toBeInTheDocument();
+    expect(screen.queryByText("Configuracoes")).not.toBeInTheDocument();
   });
 
   it("public address input is rendered", () => {

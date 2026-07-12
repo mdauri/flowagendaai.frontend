@@ -35,6 +35,20 @@ export interface UpdateTenantResponse {
   subscriptionClubEnabled?: boolean;
 }
 
+export interface BookingReminderSettings {
+  enabled: boolean;
+  whatsappEnabled: boolean;
+  emailEnabled: boolean;
+  offsets: number[];
+}
+
+export interface UpdateBookingReminderSettingsInput {
+  enabled: boolean;
+  whatsappEnabled: boolean;
+  emailEnabled: boolean;
+  offsets: number[];
+}
+
 export interface SendCustomerReturnReminderTestInput {
   customerName: string;
   customerPhone: string;
@@ -104,6 +118,19 @@ export const tenantService = {
 
   async updateBusinessHours(input: UpdateBusinessHoursInput): Promise<void> {
     await httpClient("/tenants/me/business-hours", {
+      method: "PUT",
+      body: JSON.stringify(input),
+    });
+  },
+
+  async getBookingReminderSettings(): Promise<BookingReminderSettings> {
+    return httpClient<BookingReminderSettings>("/tenants/me/booking-reminder-settings");
+  },
+
+  async updateBookingReminderSettings(
+    input: UpdateBookingReminderSettingsInput,
+  ): Promise<BookingReminderSettings> {
+    return httpClient<BookingReminderSettings>("/tenants/me/booking-reminder-settings", {
       method: "PUT",
       body: JSON.stringify(input),
     });
