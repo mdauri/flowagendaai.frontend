@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 import { Button } from "@/components/flow/button";
 import { Checkbox } from "@/components/flow/checkbox";
+import { Input } from "@/components/flow/input";
 import { useAuth } from "@/hooks/use-auth";
 import { useBookingReminderSettingsQuery } from "@/hooks/use-booking-reminder-settings-query";
 import { useSaveBookingReminderSettingsMutation } from "@/hooks/use-save-booking-reminder-settings-mutation";
+import { tenantService } from "@/services/tenant-service";
 
 type SaveState = "idle" | "saving" | "success" | "error";
 
@@ -38,6 +40,9 @@ export function BookingReminderConfig() {
   const [offsets, setOffsets] = useState<number[]>([24]);
   const [saveState, setSaveState] = useState<SaveState>("idle");
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [testRecipientEmail, setTestRecipientEmail] = useState("");
+  const [testState, setTestState] = useState<SaveState>("idle");
+  const [testError, setTestError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!settingsQuery.data) {
@@ -50,6 +55,8 @@ export function BookingReminderConfig() {
     setOffsets(sortOffsets(settingsQuery.data.offsets));
     setSaveState("idle");
     setSaveError(null);
+    setTestState("idle");
+    setTestError(null);
   }, [settingsQuery.data]);
 
   if (!tenantId) {
@@ -90,6 +97,33 @@ export function BookingReminderConfig() {
         error instanceof Error
           ? error.message
           : "Nao foi possivel salvar os lembretes agora.",
+      );
+    }
+  }
+
+  async function handleSendTestEmail() {
+    if (!testRecipientEmail.trim()) {
+      setTestState("error");
+      setTestError("Informe o e-mail de destino para o teste.");
+      return;
+    }
+
+    setTestState("saving");
+    setTestError(null);
+
+    try {
+      await tenantService.sendBookingReminderTestEmail({
+        recipientEmail: testRecipientEmail.trim(),
+      });
+
+      setTestState("success");
+      setTimeout(() => setTestState("idle"), 3000);
+    } catch (error) {
+      setTestState("error");
+      setTestError(
+        error instanceof Error
+          ? error.message
+          : "Nao foi possivel enviar o teste agora.",
       );
     }
   }
@@ -180,6 +214,76 @@ export function BookingReminderConfig() {
                 O lembrete por e-mail sera enviado apenas quando o cliente tiver e-mail cadastrado.
               </p>
             </div>
+          </div>
+        </div>
+
+        <div className="space-y-4 rounded-xl border border-[var(--theme-border-subtle)] bg-[rgba(255,255,255,0.02)] p-4">
+          <div className="space-y-1">
+            <h4 className="text-sm font-semibold text-[var(--theme-text-primary)]">
+              Teste de recebimento
+            </h4>
+            <p className="text-xs text-text-soft">
+              Envia um e-mail real de teste usando o template atual do lembrete de agendamento.
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <label
+              htmlFor="booking-reminder-test-email"
+              className="block text-sm font-medium text-text-soft"
+            >
+              E-mail para teste
+            </label>
+            <Input
+              id="booking-reminder-test-email"
+              type="email"
+              value={testRecipientEmail}
+              onChange={(event) => setTestRecipientEmail(event.target.value)}
+              placeholder="cliente@exemplo.com"
+              disabled={controlsDisabled || !emailEnabled || testState === "saving"}
+              maxLength={320}
+            />
+          </div>
+
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <Button
+              onClick={handleSendTestEmail}
+              disabled={controlsDisabled || !emailEnabled || testState === "saving"}
+              size="md"
+              className="w-full sm:w-auto"
+            >
+              {testState === "saving" ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" aria-hidden="true" />
+                  Enviando teste...
+                </>
+              ) : (
+                "Enviar teste"
+              )}
+            </Button>
+
+            {testState === "success" ? (
+              <div
+                className="flex items-center gap-2 rounded-lg border border-[rgba(34,197,94,0.28)] bg-[rgba(34,197,94,0.10)] px-3 py-2 text-sm text-[#4ADE80]"
+                role="status"
+                aria-live="polite"
+              >
+                <CheckCircle2 size={16} aria-hidden="true" />
+                E-mail de teste enviado com sucesso.
+              </div>
+            ) : null}
+
+            {testState === "error" && testError ? (
+              <div
+                className="flex items-center gap-2 rounded-lg border border-[rgba(248,113,113,0.28)] bg-[rgba(239,68,68,0.10)] px-3 py-2 text-sm"
+                style={{ color: "#F87171" }}
+                role="alert"
+                aria-live="assertive"
+              >
+                <AlertCircle size={16} aria-hidden="true" />
+                {testError}
+              </div>
+            ) : null}
           </div>
         </div>
       </div>

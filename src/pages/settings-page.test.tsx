@@ -75,6 +75,7 @@ vi.mock("@/services/tenant-service", () => ({
     geocode: vi.fn(),
     getBookingReminderSettings: vi.fn(),
     updateBookingReminderSettings: vi.fn(),
+    sendBookingReminderTestEmail: vi.fn(),
   },
 }));
 

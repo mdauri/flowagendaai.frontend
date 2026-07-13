@@ -14,6 +14,7 @@ vi.mock("@/services/tenant-service", () => ({
   tenantService: {
     getBookingReminderSettings: vi.fn(),
     updateBookingReminderSettings: vi.fn(),
+    sendBookingReminderTestEmail: vi.fn(),
   },
 }));
 
@@ -102,5 +103,66 @@ describe("BookingReminderConfig", () => {
         offsets: [24, 12],
       });
     });
+  });
+
+  it("keeps the test email action disabled while email channel is inactive", async () => {
+    renderWithProviders(<BookingReminderConfig />);
+
+    await screen.findByText("Lembretes de compromisso");
+
+    expect(screen.getByLabelText("E-mail para teste")).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Enviar teste" })).toBeDisabled();
+  });
+
+  it("validates recipient email before sending the test", async () => {
+    vi.mocked(tenantService.getBookingReminderSettings).mockResolvedValue({
+      enabled: true,
+      whatsappEnabled: true,
+      emailEnabled: true,
+      offsets: [24],
+    });
+
+    const user = userEvent.setup();
+    renderWithProviders(<BookingReminderConfig />);
+
+    await screen.findByText("Lembretes de compromisso");
+    await user.click(screen.getByRole("button", { name: "Enviar teste" }));
+
+    expect(
+      screen.getByText("Informe o e-mail de destino para o teste."),
+    ).toBeInTheDocument();
+  });
+
+  it("sends a test email when email channel is active", async () => {
+    vi.mocked(tenantService.getBookingReminderSettings).mockResolvedValue({
+      enabled: true,
+      whatsappEnabled: true,
+      emailEnabled: true,
+      offsets: [24],
+    });
+    vi.mocked(tenantService.sendBookingReminderTestEmail).mockResolvedValue({
+      status: "SENT",
+    });
+
+    const user = userEvent.setup();
+    renderWithProviders(<BookingReminderConfig />);
+
+    await screen.findByText("Lembretes de compromisso");
+    await waitFor(() => {
+      expect(screen.getByLabelText("E-mail para teste")).not.toBeDisabled();
+      expect(screen.getByRole("button", { name: "Enviar teste" })).not.toBeDisabled();
+    });
+    await user.type(screen.getByLabelText("E-mail para teste"), "teste@agendoro.com");
+    await user.click(screen.getByRole("button", { name: "Enviar teste" }));
+
+    await waitFor(() => {
+      expect(tenantService.sendBookingReminderTestEmail).toHaveBeenCalledWith({
+        recipientEmail: "teste@agendoro.com",
+      });
+    });
+
+    expect(
+      await screen.findByText("E-mail de teste enviado com sucesso."),
+    ).toBeInTheDocument();
   });
 });

@@ -49,6 +49,14 @@ export interface UpdateBookingReminderSettingsInput {
   offsets: number[];
 }
 
+export interface SendBookingReminderTestEmailInput {
+  recipientEmail: string;
+}
+
+export interface SendBookingReminderTestEmailResponse {
+  status: "SENT";
+}
+
 export interface SendCustomerReturnReminderTestInput {
   customerName: string;
   customerPhone: string;
@@ -134,5 +142,17 @@ export const tenantService = {
       method: "PUT",
       body: JSON.stringify(input),
     });
+  },
+
+  async sendBookingReminderTestEmail(
+    input: SendBookingReminderTestEmailInput,
+  ): Promise<SendBookingReminderTestEmailResponse> {
+    return httpClient<SendBookingReminderTestEmailResponse>(
+      "/tenants/me/booking-reminder-settings/test-email",
+      {
+        method: "POST",
+        body: JSON.stringify(input),
+      },
+    );
   },
 };
