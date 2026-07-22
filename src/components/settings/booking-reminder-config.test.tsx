@@ -31,6 +31,7 @@ describe("BookingReminderConfig", () => {
     vi.clearAllMocks();
     vi.mocked(tenantService.getBookingReminderSettings).mockResolvedValue({
       enabled: false,
+      pushEnabled: false,
       whatsappEnabled: true,
       emailEnabled: false,
       offsets: [24],
@@ -74,6 +75,7 @@ describe("BookingReminderConfig", () => {
   it("saves the selected settings", async () => {
     vi.mocked(tenantService.updateBookingReminderSettings).mockResolvedValue({
       enabled: true,
+      pushEnabled: false,
       whatsappEnabled: true,
       emailEnabled: true,
       offsets: [24, 12],
@@ -98,9 +100,46 @@ describe("BookingReminderConfig", () => {
     await waitFor(() => {
       expect(tenantService.updateBookingReminderSettings).toHaveBeenCalledWith({
         enabled: true,
+        pushEnabled: false,
         whatsappEnabled: true,
         emailEnabled: true,
         offsets: [24, 12],
+      });
+    });
+  });
+
+  it("accepts saving reminders enabled only with push", async () => {
+    vi.mocked(tenantService.updateBookingReminderSettings).mockResolvedValue({
+      enabled: true,
+      pushEnabled: true,
+      whatsappEnabled: false,
+      emailEnabled: false,
+      offsets: [24],
+    });
+
+    const user = userEvent.setup();
+    renderWithProviders(<BookingReminderConfig />);
+
+    await screen.findByText("Lembretes de compromisso");
+    await waitFor(() => {
+      expect(getCheckboxButton("Ativar lembretes de compromisso")).toHaveAttribute(
+        "aria-disabled",
+        "false",
+      );
+    });
+
+    await user.click(getCheckboxButton("Ativar lembretes de compromisso"));
+    await user.click(getCheckboxButton("WhatsApp"));
+    await user.click(getCheckboxButton("Push"));
+    await user.click(screen.getByRole("button", { name: "Salvar lembretes" }));
+
+    await waitFor(() => {
+      expect(tenantService.updateBookingReminderSettings).toHaveBeenCalledWith({
+        enabled: true,
+        pushEnabled: true,
+        whatsappEnabled: false,
+        emailEnabled: false,
+        offsets: [24],
       });
     });
   });
@@ -117,6 +156,7 @@ describe("BookingReminderConfig", () => {
   it("validates recipient email before sending the test", async () => {
     vi.mocked(tenantService.getBookingReminderSettings).mockResolvedValue({
       enabled: true,
+      pushEnabled: false,
       whatsappEnabled: true,
       emailEnabled: true,
       offsets: [24],
@@ -136,6 +176,7 @@ describe("BookingReminderConfig", () => {
   it("sends a test email when email channel is active", async () => {
     vi.mocked(tenantService.getBookingReminderSettings).mockResolvedValue({
       enabled: true,
+      pushEnabled: false,
       whatsappEnabled: true,
       emailEnabled: true,
       offsets: [24],

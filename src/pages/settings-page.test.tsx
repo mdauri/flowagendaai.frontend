@@ -73,6 +73,7 @@ vi.mock("@/services/tenant-service", () => ({
   tenantService: {
     updateTenant: vi.fn(),
     geocode: vi.fn(),
+    getCustomerAppSettings: vi.fn(),
     getBookingReminderSettings: vi.fn(),
     updateBookingReminderSettings: vi.fn(),
     sendBookingReminderTestEmail: vi.fn(),
@@ -134,9 +135,16 @@ describe("SettingsPage", () => {
     mockAuthState.refetchCurrentUser = mockRefetchCurrentUser;
     vi.mocked(tenantService.getBookingReminderSettings).mockResolvedValue({
       enabled: true,
+      pushEnabled: false,
       whatsappEnabled: true,
       emailEnabled: false,
       offsets: [24],
+    });
+    vi.mocked(tenantService.getCustomerAppSettings).mockResolvedValue({
+      tenantSlug: "test-studio",
+      customerAppUrl: "http://localhost:5173/c/test-studio",
+      whatsappMessageTemplate: "Mensagem de teste",
+      whatsappBusinessHint: "Cole no WhatsApp Business.",
     });
   });
 
@@ -159,6 +167,18 @@ describe("SettingsPage", () => {
 
     expect(await screen.findByText("Lembretes de compromisso")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Salvar lembretes" })).toBeInTheDocument();
+  });
+
+  it("renders customer app settings section", async () => {
+    renderWithProviders(<SettingsPage />, {
+      route: "/app/settings",
+      withRouter: true,
+    });
+
+    expect(await screen.findByText("App do cliente")).toBeInTheDocument();
+    expect(await screen.findByDisplayValue("http://localhost:5173/c/test-studio")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Copiar link" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Copiar mensagem" })).toBeInTheDocument();
   });
 
   it("save button calls PATCH /tenants/me with updated values", async () => {

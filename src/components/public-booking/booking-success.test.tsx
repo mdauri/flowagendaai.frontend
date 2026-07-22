@@ -19,6 +19,7 @@ const singleDayBooking = {
   customerEmail: null,
   professionalName: "Ana Silva",
   serviceName: "Consultoria",
+  customerAppBootstrapToken: "bootstrap-token-1",
 };
 
 const multiDayBooking = {

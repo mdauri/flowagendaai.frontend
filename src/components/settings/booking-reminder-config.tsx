@@ -35,6 +35,7 @@ export function BookingReminderConfig() {
   const saveMutation = useSaveBookingReminderSettingsMutation();
 
   const [enabled, setEnabled] = useState(false);
+  const [pushEnabled, setPushEnabled] = useState(false);
   const [whatsappEnabled, setWhatsappEnabled] = useState(false);
   const [emailEnabled, setEmailEnabled] = useState(false);
   const [offsets, setOffsets] = useState<number[]>([24]);
@@ -50,6 +51,7 @@ export function BookingReminderConfig() {
     }
 
     setEnabled(settingsQuery.data.enabled);
+    setPushEnabled(settingsQuery.data.pushEnabled);
     setWhatsappEnabled(settingsQuery.data.whatsappEnabled);
     setEmailEnabled(settingsQuery.data.emailEnabled);
     setOffsets(sortOffsets(settingsQuery.data.offsets));
@@ -72,7 +74,7 @@ export function BookingReminderConfig() {
       return;
     }
 
-    if (enabled && !whatsappEnabled && !emailEnabled) {
+    if (enabled && !pushEnabled && !whatsappEnabled && !emailEnabled) {
       setSaveState("error");
       setSaveError("Selecione pelo menos um canal para ativar os lembretes.");
       return;
@@ -84,6 +86,7 @@ export function BookingReminderConfig() {
     try {
       await saveMutation.mutateAsync({
         enabled,
+        pushEnabled,
         whatsappEnabled,
         emailEnabled,
         offsets: sortOffsets(offsets),
@@ -187,6 +190,23 @@ export function BookingReminderConfig() {
         </div>
 
         <div className="space-y-3">
+          <div className="flex items-start gap-3">
+            <Checkbox
+              checked={pushEnabled}
+              onCheckedChange={setPushEnabled}
+              disabled={controlsDisabled}
+              aria-label="Push"
+            />
+            <div className="space-y-1">
+              <label className="block text-sm text-[var(--theme-text-primary)]">
+                Push
+              </label>
+              <p className="text-xs text-text-soft">
+                O cliente so recebe push quando instalar o app, permitir notificacoes e manter uma assinatura ativa no dispositivo.
+              </p>
+            </div>
+          </div>
+
           <div className="flex items-start gap-3">
             <Checkbox
               checked={whatsappEnabled}
