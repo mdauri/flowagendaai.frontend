@@ -7,6 +7,7 @@ import { CoverImageUpload } from "@/components/settings/cover-image-upload";
 import { LogoUpload } from "@/components/settings/logo-upload";
 import { BusinessHoursConfig } from "@/components/settings/business-hours-config";
 import { BookingReminderConfig } from "@/components/settings/booking-reminder-config";
+import { CustomerAppSettingsCard } from "@/components/settings/customer-app-settings-card";
 import { CustomerReactivationConfig } from "@/components/settings/customer-reactivation-config";
 import { SubscriptionClubConfig } from "@/components/settings/subscription-club-config";
 import { tenantService } from "@/services/tenant-service";
@@ -204,6 +205,9 @@ export function SettingsPage() {
 
       {/* Booking Reminder Section */}
       <BookingReminderConfig />
+
+      {/* Customer App Section */}
+      <CustomerAppSettingsCard />
 
       {/* Customer Reactivation Section */}
       <CustomerReactivationConfig />

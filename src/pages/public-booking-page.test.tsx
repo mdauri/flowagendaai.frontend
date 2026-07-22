@@ -52,6 +52,7 @@ const mockBooking: CreatePublicBookingResponse = {
   customerEmail: null,
   professionalName: mockProfessional.name,
   serviceName: mockServices[0].name,
+  customerAppBootstrapToken: "bootstrap-token-1",
 };
 
 type PublicBookingMutation = UseMutationResult<

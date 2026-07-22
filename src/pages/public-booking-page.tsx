@@ -21,6 +21,8 @@ import { usePublicServicesQuery } from "@/hooks/use-public-services-query";
 import { usePublicAvailableDatesQuery } from "@/hooks/use-public-available-dates-query";
 import { usePublicSlotsQuery } from "@/hooks/use-public-slots-query";
 import { useCreatePublicBookingMutation } from "@/hooks/use-create-public-booking-mutation";
+import { customerAppService } from "@/services/customer-app-service";
+import { setCustomerAppSession } from "@/session/customer-app-session-storage";
 import { ApiError, BOOKING_CONFLICT_ERROR_CODE, MULTI_DAY_CONFLICT_ERROR_CODE } from "@/types/api";
 import type {
   CreatePublicBookingResponse,
@@ -339,7 +341,23 @@ export function PublicBookingPage() {
           customerEmail: customerEmail.trim(),
         },
         {
-          onSuccess: (booking) => {
+          onSuccess: async (booking) => {
+            if (professional?.tenantSlug && booking.customerAppBootstrapToken) {
+              try {
+                const session = await customerAppService.bootstrapSession(professional.tenantSlug, {
+                  bookingBootstrapToken: booking.customerAppBootstrapToken,
+                });
+
+                setCustomerAppSession(professional.tenantSlug, {
+                  token: session.sessionToken,
+                  expiresAt: session.expiresAt,
+                  customerName: session.customer.name,
+                });
+              } catch {
+                // Preserve the booking flow even if the customer app bootstrap fails.
+              }
+            }
+
             setBookingResult(booking);
             setBookingNotification(null);
             setCurrentStep("success");

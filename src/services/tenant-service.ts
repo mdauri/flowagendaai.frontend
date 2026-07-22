@@ -37,6 +37,7 @@ export interface UpdateTenantResponse {
 
 export interface BookingReminderSettings {
   enabled: boolean;
+  pushEnabled: boolean;
   whatsappEnabled: boolean;
   emailEnabled: boolean;
   offsets: number[];
@@ -44,6 +45,7 @@ export interface BookingReminderSettings {
 
 export interface UpdateBookingReminderSettingsInput {
   enabled: boolean;
+  pushEnabled: boolean;
   whatsappEnabled: boolean;
   emailEnabled: boolean;
   offsets: number[];
@@ -55,6 +57,13 @@ export interface SendBookingReminderTestEmailInput {
 
 export interface SendBookingReminderTestEmailResponse {
   status: "SENT";
+}
+
+export interface TenantCustomerAppSettings {
+  tenantSlug: string;
+  customerAppUrl: string;
+  whatsappMessageTemplate: string;
+  whatsappBusinessHint: string;
 }
 
 export interface SendCustomerReturnReminderTestInput {
@@ -133,6 +142,10 @@ export const tenantService = {
 
   async getBookingReminderSettings(): Promise<BookingReminderSettings> {
     return httpClient<BookingReminderSettings>("/tenants/me/booking-reminder-settings");
+  },
+
+  async getCustomerAppSettings(): Promise<TenantCustomerAppSettings> {
+    return httpClient<TenantCustomerAppSettings>("/tenants/me/customer-app-settings");
   },
 
   async updateBookingReminderSettings(

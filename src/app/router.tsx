@@ -30,6 +30,8 @@ import { MeuDiaPage } from "@/pages/meu-dia-page";
 import { SystemAdminTenantProvisionPage } from "@/pages/system-admin-tenant-provision-page";
 import { SubscriptionPlansPage } from "@/pages/subscription-plans-page";
 import { CustomerSubscriptionsPage } from "@/pages/customer-subscriptions-page";
+import { CustomerAppHomePage } from "@/pages/customer-app-home-page";
+import { CustomerAppBookingDetailPage } from "@/pages/customer-app-booking-detail-page";
 import {
   MetaWhatsAppBillingSystemAdminPage,
   MetaWhatsAppBillingTenantPage,
@@ -106,6 +108,8 @@ export function AppRouter() {
           </>
         ) : (
           <>
+            <Route path="/c/:slug" element={<CustomerAppHomePage />} />
+            <Route path="/c/:slug/bookings/:bookingId" element={<CustomerAppBookingDetailPage />} />
             <Route path="/p/:slug" element={<PublicBookingPage />} />
             <Route path="/manage/:token" element={<ManageBookingPage />} />
             <Route path="/c/:slug/catalog" element={<CatalogPage />} />

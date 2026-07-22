@@ -1,0 +1,22 @@
+{
+  "name": "Agendoro",
+  "short_name": "Agendoro",
+  "description": "App do cliente do Agendoro para acompanhar compromissos e receber lembretes.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fff7ed",
+  "theme_color": "#f59e0b",
+  "icons": [
+    {
+      "src": "/agendoro-logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/agendoro-logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
