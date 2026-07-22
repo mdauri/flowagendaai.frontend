@@ -1,5 +1,4 @@
 import { httpClient } from "@/lib/http-client";
-import type { OrderStoreSettings } from "@/types/order-module";
 import type {
   ConnectSystemAdminTenantMetaWhatsappInput,
   ListSystemAdminTenantsResponse,
@@ -74,24 +73,6 @@ export const systemAdminService = {
     );
   },
 
-  async getTenantOrderSettings(tenantId: string): Promise<OrderStoreSettings> {
-    return httpClient<OrderStoreSettings>(
-      `/system-admin/tenants/${tenantId}/order-settings`,
-    );
-  },
-
-  async updateTenantOrderSettings(
-    tenantId: string,
-    input: Partial<OrderStoreSettings>,
-  ): Promise<OrderStoreSettings> {
-    return httpClient<OrderStoreSettings>(
-      `/system-admin/tenants/${tenantId}/order-settings`,
-      {
-        method: "PATCH",
-        body: JSON.stringify(input),
-      },
-    );
-  },
   async getTenantMetaWhatsappStatus(
     tenantId: string,
   ): Promise<SystemAdminTenantMetaWhatsappStatusResponse> {

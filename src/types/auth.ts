@@ -28,8 +28,6 @@ export interface AuthTenant {
   metaWhatsappEnabled?: boolean;
   subscriptionClubAllowed?: boolean;
   subscriptionClubEnabled?: boolean;
-  orderModuleEnabled?: boolean;
-  storeActive?: boolean;
 }
 
 export interface LoginRequest {
