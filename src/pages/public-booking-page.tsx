@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { colors, typography } from "@/design-system";
 import { DateTime } from "luxon";
-import { useSearchParams, useParams } from "react-router-dom";
+import { Link, useSearchParams, useParams } from "react-router-dom";
 import { Button } from "@/components/flow/button";
 import { FeedbackBanner } from "@/components/shared/feedback-banner";
 import { DemoEnvironmentBanner } from "@/components/shared/demo-environment-banner";
@@ -32,6 +32,42 @@ import type {
   PublicSlot,
   DaySegment,
 } from "@/types/public-booking";
+import type { WaitlistPrefillParams } from "@/types/waitlist";
+
+function buildWaitlistPrefillPath(params: WaitlistPrefillParams) {
+  const searchParams = new URLSearchParams();
+
+  if (params.customerName?.trim()) {
+    searchParams.set("customerName", params.customerName.trim());
+  }
+
+  if (params.customerPhone?.trim()) {
+    searchParams.set("customerPhone", params.customerPhone.trim());
+  }
+
+  if (params.serviceId?.trim()) {
+    searchParams.set("serviceId", params.serviceId.trim());
+  }
+
+  if (params.employeeId?.trim()) {
+    searchParams.set("employeeId", params.employeeId.trim());
+  }
+
+  if (params.preferredDate?.trim()) {
+    searchParams.set("preferredDate", params.preferredDate.trim());
+  }
+
+  if (params.preferredPeriod?.trim()) {
+    searchParams.set("preferredPeriod", params.preferredPeriod.trim());
+  }
+
+  if (params.notes?.trim()) {
+    searchParams.set("notes", params.notes.trim());
+  }
+
+  const search = searchParams.toString();
+  return search ? `/app/waitlist?${search}` : "/app/waitlist";
+}
 
 function PublicTenantTopbar({ professional }: { professional: PublicProfessional }) {
   const [showLogoFallback, setShowLogoFallback] = useState(!professional.tenantLogoUrl);
@@ -506,6 +542,17 @@ export function PublicBookingPage() {
   const shouldShowBookingNotification =
     bookingNotification && currentStep !== "confirm" && currentStep !== "success";
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
+  const waitlistPrefillPath =
+    bookingNotification?.type === "conflict" && selectedService
+      ? buildWaitlistPrefillPath({
+          customerName,
+          customerPhone,
+          serviceId: selectedService.id,
+          employeeId: professional.id,
+          preferredDate: selectedDate?.toISODate() ?? undefined,
+        })
+      : null;
+
   return (
     <div
       className="min-h-screen pb-32 text-text-primary transition-colors duration-500"
@@ -675,11 +722,18 @@ export function PublicBookingPage() {
             />
           ) : null}
           {shouldShowBookingNotification && bookingNotification ? (
-            <FeedbackBanner
-              tone={bookingNotification.type === "generic" ? "danger" : "warning"}
-              title={bookingNotification.title}
-              description={bookingNotification.description}
-            />
+            <div className="space-y-3">
+              <FeedbackBanner
+                tone={bookingNotification.type === "generic" ? "danger" : "warning"}
+                title={bookingNotification.title}
+                description={bookingNotification.description}
+              />
+              {waitlistPrefillPath ? (
+                <Button as={Link} to={waitlistPrefillPath} variant="secondary" size="md">
+                  Entrar na lista de espera
+                </Button>
+              ) : null}
+            </div>
           ) : null}
         </div>
       </div>
