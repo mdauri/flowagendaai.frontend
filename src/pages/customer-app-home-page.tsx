@@ -1,8 +1,17 @@
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/flow/button";
+import { CustomerAppointmentsSection } from "@/components/customer-app/customer-appointments-section";
+import { InstallAppCard, type InstallState } from "@/components/customer-app/install-app-card";
+import { NextAppointmentCard } from "@/components/customer-app/next-appointment-card";
+import {
+  PushReminderStatusCard,
+  type PushState,
+} from "@/components/customer-app/push-reminder-status-card";
+import { TenantIdentityHeader } from "@/components/customer-app/tenant-identity-header";
 import { usePublicCustomerAppConfigQuery } from "@/hooks/use-public-customer-app-config-query";
 import { useCustomerAppBookingsQuery } from "@/hooks/use-customer-app-bookings-query";
+import { useIsStandalonePwa } from "@/hooks/use-is-standalone-pwa";
 import { customerAppService } from "@/services/customer-app-service";
 import { clearCustomerAppSession, getCustomerAppSession, setCustomerAppSession } from "@/session/customer-app-session-storage";
 import {
@@ -11,11 +20,7 @@ import {
   setStoredCustomerAppPushSubscription,
 } from "@/session/customer-app-push-storage";
 import { Loader2, Bell, Smartphone, CalendarDays, MessageCircle } from "lucide-react";
-import { DateTime } from "luxon";
 import { ApiError } from "@/types/api";
-
-type InstallState = "unavailable" | "available" | "installed" | "installing";
-type PushState = "unsupported" | "idle" | "loading" | "active" | "denied" | "error";
 
 function urlBase64ToUint8Array(value: string) {
   const padding = "=".repeat((4 - (value.length % 4)) % 4);
@@ -33,6 +38,7 @@ function urlBase64ToUint8Array(value: string) {
 export function CustomerAppHomePage() {
   const { slug } = useParams<{ slug: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
+  const isStandalone = useIsStandalonePwa();
   const configQuery = usePublicCustomerAppConfigQuery(slug);
   const [storedSessionToken, setStoredSessionToken] = useState<string | null>(() =>
     slug ? getCustomerAppSession(slug)?.token ?? null : null,
@@ -63,38 +69,23 @@ export function CustomerAppHomePage() {
       return;
     }
 
-    const standaloneMedia =
-      typeof window.matchMedia === "function"
-        ? window.matchMedia("(display-mode: standalone)")
-        : null;
-    const syncInstalledState = () => {
-      const standalone =
-        Boolean(standaloneMedia?.matches) ||
-        (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
-      setInstallState((current) => (standalone ? "installed" : current === "installed" ? "unavailable" : current));
-    };
-
-    syncInstalledState();
-
     const handleBeforeInstallPrompt = (event: Event) => {
       event.preventDefault();
       setInstallPromptEvent(event as BeforeInstallPromptEvent);
-      setInstallState(standaloneMedia?.matches ? "installed" : "available");
+      setInstallState("available");
     };
 
     const handleInstalled = () => {
       setInstallPromptEvent(null);
-      setInstallState("installed");
+      setInstallState("unavailable");
     };
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
     window.addEventListener("appinstalled", handleInstalled);
-    standaloneMedia?.addEventListener("change", syncInstalledState);
 
     return () => {
       window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
       window.removeEventListener("appinstalled", handleInstalled);
-      standaloneMedia?.removeEventListener("change", syncInstalledState);
     };
   }, []);
 
@@ -220,7 +211,7 @@ export function CustomerAppHomePage() {
     await installPromptEvent.prompt();
     const choice = await installPromptEvent.userChoice;
     setInstallPromptEvent(null);
-    setInstallState(choice.outcome === "accepted" ? "installed" : "unavailable");
+    setInstallState("unavailable");
   };
 
   const handleEnablePush = async () => {
@@ -342,210 +333,165 @@ export function CustomerAppHomePage() {
   }
 
   const { tenant, whatsappUrl } = configQuery.data;
+  const bookings =
+    storedSessionToken && bookingsQuery.isSuccess
+      ? bookingsQuery.data.bookings
+      : [];
+  const nextBooking = bookings[0] ?? null;
+  const appointmentsSection = (
+    <CustomerAppointmentsSection
+      tenantSlug={tenant.slug}
+      timezone={tenant.timezone}
+      hasSession={Boolean(storedSessionToken)}
+      bootstrapState={bootstrapState}
+      isLoading={bookingsQuery.isLoading}
+      isError={bookingsQuery.isError}
+      isSuccess={bookingsQuery.isSuccess}
+      bookings={bookings}
+    />
+  );
+  const remindersCard = (
+    <PushReminderStatusCard
+      state={pushState}
+      hasSession={Boolean(storedSessionToken)}
+      error={pushError}
+      onEnable={() => void handleEnablePush()}
+      onDisable={() => void handleDisablePush()}
+    />
+  );
+  const whatsappAction = whatsappUrl ? (
+    <Button
+      as="a"
+      href={whatsappUrl}
+      target="_blank"
+      rel="noreferrer"
+      variant="ghost"
+      size="md"
+    >
+      <MessageCircle size={16} aria-hidden="true" />
+      Falar no WhatsApp
+    </Button>
+  ) : null;
 
   return (
-    <div className="min-h-screen bg-(--bg-base) px-4 py-6">
-      <div className="mx-auto flex max-w-xl flex-col gap-6">
-        <section className="rounded-3xl border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-6 shadow-[0_18px_45px_rgba(52,42,31,0.10)] backdrop-blur-sm">
-          <p className="text-xs font-bold uppercase tracking-[0.08em] text-primary">App do cliente</p>
-          <h1 className="mt-2 text-3xl font-black text-[var(--theme-text-primary)]">
-            {tenant.name}
-          </h1>
-          <p className="mt-3 text-sm leading-6 text-text-soft">
-            {tenant.description?.trim() || "Agende mais rapido, acompanhe seus compromissos e ative lembretes neste aparelho."}
-          </p>
+    <div
+      className="min-h-screen bg-(--bg-base) px-4 py-5"
+      style={{ paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))" }}
+    >
+      <div className={`mx-auto flex max-w-xl flex-col ${isStandalone ? "gap-4" : "gap-6"}`}>
+        {isStandalone ? (
+          <>
+            <section className="rounded-3xl border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-4 backdrop-blur-sm">
+              <TenantIdentityHeader
+                name={tenant.name}
+                logoUrl={tenant.logoUrl}
+                compact
+              />
+            </section>
 
-          <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <div className="rounded-2xl border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-elevated)] p-4">
-              <CalendarDays size={18} className="text-primary" aria-hidden="true" />
-              <p className="mt-2 text-sm font-semibold text-[var(--theme-text-primary)]">Agendar</p>
-              <p className="mt-1 text-sm text-text-soft">Continue usando o fluxo atual sem perder a nova entrada do app.</p>
-            </div>
-            <div className="rounded-2xl border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-elevated)] p-4">
-              <Smartphone size={18} className="text-primary" aria-hidden="true" />
-              <p className="mt-2 text-sm font-semibold text-[var(--theme-text-primary)]">Instalar</p>
-              <p className="mt-1 text-sm text-text-soft">Depois do agendamento, instale o app para voltar mais rapido.</p>
-            </div>
-            <div className="rounded-2xl border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-elevated)] p-4">
-              <Bell size={18} className="text-primary" aria-hidden="true" />
-              <p className="mt-2 text-sm font-semibold text-[var(--theme-text-primary)]">Lembretes</p>
-              <p className="mt-1 text-sm text-text-soft">Ative lembretes no aparelho quando estiver pronto.</p>
-            </div>
-          </div>
-
-          <div className="mt-6 flex flex-col gap-3">
-            <Button as={Link} to={`/c/${tenant.slug}/catalog`} size="md">
-              Agendar agora
-            </Button>
-            {whatsappUrl ? (
-              <Button as="a" href={whatsappUrl} target="_blank" rel="noreferrer" variant="ghost" size="md">
-                <MessageCircle size={16} aria-hidden="true" />
-                Falar no WhatsApp
-              </Button>
+            {nextBooking ? (
+              <NextAppointmentCard
+                booking={nextBooking}
+                tenantSlug={tenant.slug}
+                timezone={tenant.timezone}
+              />
+            ) : storedSessionToken && bookingsQuery.isSuccess ? (
+              <section className="rounded-3xl border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-5">
+                <CalendarDays size={22} className="text-primary" aria-hidden="true" />
+                <h2 className="mt-4 text-xl font-black text-[var(--theme-text-primary)]">
+                  Você ainda não tem compromissos agendados.
+                </h2>
+                <p className="mt-2 text-sm leading-6 text-text-soft">
+                  Agende seu próximo horário em poucos passos.
+                </p>
+                <Button
+                  as={Link}
+                  to={`/c/${tenant.slug}/catalog`}
+                  size="md"
+                  className="mt-5 w-full"
+                >
+                  Agendar horário
+                </Button>
+              </section>
+            ) : !storedSessionToken ? (
+              <section className="rounded-3xl border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-5">
+                <CalendarDays size={22} className="text-primary" aria-hidden="true" />
+                <h2 className="mt-4 text-xl font-black text-[var(--theme-text-primary)]">
+                  Seus compromissos neste aparelho
+                </h2>
+                <p className="mt-2 text-sm leading-6 text-text-soft">
+                  Seus compromissos aparecem aqui depois que você agenda ou abre um
+                  link de lembrete neste aparelho.
+                </p>
+                <Button
+                  as={Link}
+                  to={`/c/${tenant.slug}/catalog`}
+                  size="md"
+                  className="mt-5 w-full"
+                >
+                  Agendar horário
+                </Button>
+              </section>
             ) : null}
-          </div>
 
-          <div className="mt-6 grid grid-cols-1 gap-3">
-            <div className="rounded-2xl border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-elevated)] p-4">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-sm font-semibold text-[var(--theme-text-primary)]">Instalar neste aparelho</p>
+            {appointmentsSection}
+            {remindersCard}
+            {whatsappAction}
+          </>
+        ) : (
+          <>
+            <section className="rounded-3xl border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-6 shadow-[0_18px_45px_rgba(52,42,31,0.10)] backdrop-blur-sm">
+              <TenantIdentityHeader
+                name={tenant.name}
+                logoUrl={tenant.logoUrl}
+                description={tenant.description}
+              />
+              <div className="mt-6 flex flex-col gap-3">
+                <Button as={Link} to={`/c/${tenant.slug}/catalog`} size="md">
+                  Agendar agora
+                </Button>
+                {whatsappAction}
+              </div>
+              <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <div className="rounded-2xl border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-elevated)] p-4">
+                  <CalendarDays size={18} className="text-primary" aria-hidden="true" />
+                  <p className="mt-2 text-sm font-semibold text-[var(--theme-text-primary)]">
+                    Agendar
+                  </p>
                   <p className="mt-1 text-sm text-text-soft">
-                    {installState === "installed"
-                      ? "O app ja esta instalado neste aparelho."
-                      : "Use o atalho do PWA para voltar direto aos seus compromissos."}
+                    Agende seu horário em poucos passos.
                   </p>
                 </div>
-                <Smartphone size={18} className="mt-1 text-primary" aria-hidden="true" />
-              </div>
-              <div className="mt-4">
-                {installState === "available" ? (
-                  <Button type="button" size="md" variant="secondary" onClick={() => void handleInstall()}>
-                    Instalar app
-                  </Button>
-                ) : installState === "installing" ? (
-                  <div className="flex items-center gap-2 text-sm text-text-soft">
-                    <Loader2 size={16} className="animate-spin" aria-hidden="true" />
-                    Abrindo prompt de instalacao...
-                  </div>
-                ) : (
-                  <p className="text-sm text-text-soft">
-                    {installState === "installed"
-                      ? "Instalacao concluida."
-                      : "Se o navegador nao mostrar o prompt, use o menu Compartilhar ou Instalar do proprio browser."}
+                <div className="rounded-2xl border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-elevated)] p-4">
+                  <Smartphone size={18} className="text-primary" aria-hidden="true" />
+                  <p className="mt-2 text-sm font-semibold text-[var(--theme-text-primary)]">
+                    Instalar
                   </p>
-                )}
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-elevated)] p-4">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-sm font-semibold text-[var(--theme-text-primary)]">Lembretes push</p>
                   <p className="mt-1 text-sm text-text-soft">
-                    {storedSessionToken
-                      ? "Ative lembretes neste aparelho para receber avisos antes do compromisso."
-                      : "Ative push depois que este aparelho estiver vinculado a um agendamento."}
+                    Volte mais rápido aos seus compromissos.
                   </p>
                 </div>
-                <Bell size={18} className="mt-1 text-primary" aria-hidden="true" />
-              </div>
-              <div className="mt-4 flex flex-col gap-2">
-                {pushState === "loading" ? (
-                  <div className="flex items-center gap-2 text-sm text-text-soft">
-                    <Loader2 size={16} className="animate-spin" aria-hidden="true" />
-                    Atualizando notificacoes...
-                  </div>
-                ) : null}
-
-                {pushState === "unsupported" ? (
-                  <p className="text-sm text-text-soft">
-                    Este navegador nao oferece push web para esta experiencia agora.
+                <div className="rounded-2xl border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-elevated)] p-4">
+                  <Bell size={18} className="text-primary" aria-hidden="true" />
+                  <p className="mt-2 text-sm font-semibold text-[var(--theme-text-primary)]">
+                    Lembretes
                   </p>
-                ) : null}
-
-                {pushState === "denied" ? (
-                  <p className="text-sm text-[color:var(--theme-feedback-danger-text)]">
-                    A permissao foi negada neste navegador. Reative nas configuracoes do site para voltar a receber push.
+                  <p className="mt-1 text-sm text-text-soft">
+                    Receba avisos antes do seu horário.
                   </p>
-                ) : null}
-
-                {pushState === "error" && pushError ? (
-                  <p className="text-sm text-[color:var(--theme-feedback-danger-text)]">{pushError}</p>
-                ) : null}
-
-                {pushState === "active" ? (
-                  <>
-                    <p className="text-sm text-[var(--theme-text-primary)]">
-                      Lembretes push ativos neste aparelho.
-                    </p>
-                    <Button type="button" size="md" variant="ghost" onClick={() => void handleDisablePush()}>
-                      Desativar lembretes neste aparelho
-                    </Button>
-                  </>
-                ) : null}
-
-                {(pushState === "idle" || pushState === "error") && storedSessionToken ? (
-                  <Button
-                    type="button"
-                    size="md"
-                    variant="secondary"
-                    onClick={() => void handleEnablePush()}
-                  >
-                    Ativar lembretes neste aparelho
-                  </Button>
-                ) : null}
+                </div>
               </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="rounded-3xl border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-6 backdrop-blur-sm">
-          <h2 className="text-lg font-bold text-[var(--theme-text-primary)]">Meus compromissos</h2>
-          {bootstrapState === "loading" ? (
-            <div className="mt-4 flex items-center gap-2 text-sm text-text-soft">
-              <Loader2 size={16} className="animate-spin" aria-hidden="true" />
-              Vinculando este aparelho aos seus compromissos...
-            </div>
-          ) : null}
-
-          {bootstrapState === "error" ? (
-            <p className="mt-2 text-sm leading-6 text-[color:var(--theme-feedback-danger-text)]">
-              Nao foi possivel ativar seus compromissos por este link. Tente novamente a partir do link recebido.
-            </p>
-          ) : null}
-
-          {!storedSessionToken ? (
-            <div className="mt-4 rounded-2xl border border-dashed border-[var(--theme-border-subtle)] px-4 py-5 text-sm text-text-soft">
-              Seus compromissos vao aparecer aqui depois que voce agendar ou abrir um link de lembrete neste aparelho.
-            </div>
-          ) : null}
-
-          {storedSessionToken && bookingsQuery.isLoading ? (
-            <div className="mt-4 flex items-center gap-2 text-sm text-text-soft">
-              <Loader2 size={16} className="animate-spin" aria-hidden="true" />
-              Carregando seus compromissos...
-            </div>
-          ) : null}
-
-          {storedSessionToken && bookingsQuery.isSuccess && bookingsQuery.data.bookings.length === 0 ? (
-            <div className="mt-4 rounded-2xl border border-dashed border-[var(--theme-border-subtle)] px-4 py-5 text-sm text-text-soft">
-              Nenhum compromisso futuro encontrado neste tenant.
-            </div>
-          ) : null}
-
-          {storedSessionToken && bookingsQuery.isSuccess && bookingsQuery.data.bookings.length > 0 ? (
-            <div className="mt-4 space-y-3">
-              {bookingsQuery.data.bookings.map((booking) => {
-                const start = DateTime.fromISO(booking.start, { zone: "utc" }).setZone(
-                  tenant.timezone,
-                );
-                const end = DateTime.fromISO(booking.end, { zone: "utc" }).setZone(
-                  tenant.timezone,
-                );
-
-                return (
-                  <Link
-                    key={booking.id}
-                    to={`/c/${tenant.slug}/bookings/${booking.id}`}
-                    className="block rounded-2xl border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-elevated)] p-4"
-                  >
-                    <p className="text-sm font-semibold text-[var(--theme-text-primary)]">
-                      {booking.serviceName || "Compromisso"}
-                    </p>
-                    <p className="mt-1 text-sm text-text-soft">
-                      {booking.professionalName || "Profissional nao informado"}
-                    </p>
-                    <p className="mt-2 text-sm text-[var(--theme-text-primary)]">
-                      {start.setLocale("pt-BR").toFormat("dd/LL/yyyy 'as' HH:mm")} -{" "}
-                      {end.toFormat("HH:mm")}
-                    </p>
-                  </Link>
-                );
-              })}
-            </div>
-          ) : null}
-        </section>
+              <div className="mt-6 grid gap-3">
+                <InstallAppCard
+                  state={installState}
+                  onInstall={() => void handleInstall()}
+                />
+                {remindersCard}
+              </div>
+            </section>
+            {appointmentsSection}
+          </>
+        )}
       </div>
     </div>
   );
