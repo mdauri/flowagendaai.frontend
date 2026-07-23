@@ -670,6 +670,7 @@ export function PublicBookingPage() {
               booking={bookingResult}
               timezone={timezone}
               shareUrl={shareUrl}
+              customerAppPath={`/c/${professional.tenantSlug}`}
               onNewBooking={resetFlow}
             />
           ) : null}

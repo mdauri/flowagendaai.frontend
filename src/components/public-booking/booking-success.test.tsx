@@ -39,25 +39,33 @@ describe("BookingSuccess", () => {
   const baseProps = {
     timezone: "America/Sao_Paulo",
     shareUrl: "https://example.com/booking",
+    customerAppPath: "/c/tenant-demo",
     onNewBooking: vi.fn(),
   };
 
   it("shows MultiDayBadge and affected days for multi-day booking", () => {
-    renderWithProviders(<BookingSuccess {...baseProps} booking={multiDayBooking} />);
+    renderWithProviders(<BookingSuccess {...baseProps} booking={multiDayBooking} />, {
+      withRouter: true,
+    });
 
     expect(screen.getByText("Multi-dia: 3 dias")).toBeInTheDocument();
     expect(screen.getByText(/Dias afetados/)).toBeInTheDocument();
   });
 
   it("does not show extra section for single-day booking", () => {
-    renderWithProviders(<BookingSuccess {...baseProps} booking={singleDayBooking} />);
+    renderWithProviders(<BookingSuccess {...baseProps} booking={singleDayBooking} />, {
+      withRouter: true,
+    });
 
     expect(screen.queryByText(/Multi-dia/)).not.toBeInTheDocument();
     expect(screen.queryByText(/Dias afetados/)).not.toBeInTheDocument();
   });
 
   it("Add to calendar button present for both types", () => {
-    const { rerender } = renderWithProviders(<BookingSuccess {...baseProps} booking={singleDayBooking} />);
+    const { rerender } = renderWithProviders(
+      <BookingSuccess {...baseProps} booking={singleDayBooking} />,
+      { withRouter: true }
+    );
     expect(screen.getByText(/Adicionar ao calend[aá]rio/)).toBeInTheDocument();
 
     rerender(<BookingSuccess {...baseProps} booking={multiDayBooking} />);
@@ -65,9 +73,22 @@ describe("BookingSuccess", () => {
   });
 
   it("Success message renders correctly", () => {
-    renderWithProviders(<BookingSuccess {...baseProps} booking={multiDayBooking} />);
+    renderWithProviders(<BookingSuccess {...baseProps} booking={multiDayBooking} />, {
+      withRouter: true,
+    });
 
     expect(screen.getByText("Agendamento confirmado!")).toBeInTheDocument();
+  });
+
+  it("links back to the customer app after booking", () => {
+    renderWithProviders(
+      <BookingSuccess {...baseProps} booking={singleDayBooking} />,
+      { withRouter: true }
+    );
+
+    expect(
+      screen.getByRole("link", { name: "Ver meus compromissos" })
+    ).toHaveAttribute("href", "/c/tenant-demo");
   });
 
   it("shows awaiting deposit copy when booking requires sinal", () => {
@@ -81,7 +102,8 @@ describe("BookingSuccess", () => {
           depositStatus: "PENDING",
           depositAmountCents: 5000,
         }}
-      />
+      />,
+      { withRouter: true }
     );
 
     expect(screen.getByText("Agendamento aguardando sinal")).toBeInTheDocument();

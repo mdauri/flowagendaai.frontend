@@ -11,15 +11,23 @@ import { CancelBookingDialog } from "@/components/bookings/cancel-booking-dialog
 import { useCancelPublicBookingMutation } from "@/hooks/use-cancel-public-booking-mutation";
 import { FeedbackBanner } from "@/components/shared/feedback-banner";
 import { ApiError } from "@/types/api";
+import { Link } from "react-router-dom";
 
 interface BookingSuccessProps {
   booking: CreatePublicBookingResponse;
   timezone: string;
   shareUrl: string;
+  customerAppPath: string;
   onNewBooking: () => void;
 }
 
-export function BookingSuccess({ booking, timezone, shareUrl, onNewBooking }: BookingSuccessProps) {
+export function BookingSuccess({
+  booking,
+  timezone,
+  shareUrl,
+  customerAppPath,
+  onNewBooking,
+}: BookingSuccessProps) {
   const [copied, setCopied] = useState(false);
   const cancelPublicBookingMutation = useCancelPublicBookingMutation();
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
@@ -120,7 +128,17 @@ export function BookingSuccess({ booking, timezone, shareUrl, onNewBooking }: Bo
         )}
       </Card>
 
-      <div className="flex flex-col gap-3 sm:flex-row pt-2">
+      <Button
+        as={Link}
+        to={customerAppPath}
+        className="w-full"
+        variant="primary"
+        size="md"
+      >
+        Ver meus compromissos
+      </Button>
+
+      <div className="flex flex-col gap-3 sm:flex-row">
         <Button
           className="w-full"
           variant="secondary"
@@ -130,7 +148,7 @@ export function BookingSuccess({ booking, timezone, shareUrl, onNewBooking }: Bo
         >
            Adicionar ao calendário
         </Button>
-        <Button className="w-full" variant="primary" onClick={onNewBooking} size="md">
+        <Button className="w-full" variant="secondary" onClick={onNewBooking} size="md">
           Novo agendamento
         </Button>
       </div>
