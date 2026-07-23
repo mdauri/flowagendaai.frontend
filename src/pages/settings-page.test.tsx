@@ -385,7 +385,7 @@ describe("SettingsPage", () => {
       withRouter: true,
     });
 
-    expect(screen.getByText("Lembrete de retorno automatico")).toBeInTheDocument();
+    expect(screen.getByText("Lembrete de retorno automático")).toBeInTheDocument();
     expect(
       screen.getAllByRole("checkbox", { name: "Ativar lembrete de retorno automático" })[0]
     ).toBeInTheDocument();

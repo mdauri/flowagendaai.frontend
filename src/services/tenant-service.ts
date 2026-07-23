@@ -10,6 +10,9 @@ export interface UpdateTenantInput {
   daysAfterLastService?: number;
   reactivationCooldownDays?: number;
   reactivationTemplateName?: string | null;
+  reactivationPushEnabled?: boolean;
+  reactivationWhatsappEnabled?: boolean;
+  reactivationEmailEnabled?: boolean;
   subscriptionClubEnabled?: boolean;
 }
 
@@ -26,6 +29,9 @@ export interface UpdateTenantResponse {
   daysAfterLastService?: number;
   reactivationCooldownDays?: number;
   reactivationTemplateName?: string | null;
+  reactivationPushEnabled?: boolean;
+  reactivationWhatsappEnabled?: boolean;
+  reactivationEmailEnabled?: boolean;
   depositModuleEnabled: boolean;
   depositPaymentProvider: "MANUAL" | "MERCADO_PAGO";
   depositProviderConfigured: boolean;

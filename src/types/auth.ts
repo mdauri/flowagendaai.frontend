@@ -20,6 +20,9 @@ export interface AuthTenant {
   daysAfterLastService?: number;
   reactivationCooldownDays?: number;
   reactivationTemplateName?: string | null;
+  reactivationPushEnabled?: boolean;
+  reactivationWhatsappEnabled?: boolean;
+  reactivationEmailEnabled?: boolean;
   depositModuleEnabled: boolean;
   depositPaymentProvider: "MANUAL" | "MERCADO_PAGO";
   depositProviderConfigured: boolean;
