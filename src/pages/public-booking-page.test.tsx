@@ -431,6 +431,39 @@ describe("PublicBookingPage", () => {
     });
   });
 
+  it("offers a prefilled waitlist link when booking returns booking conflict", async () => {
+    const conflictError = new ApiError(
+      409,
+      BOOKING_CONFLICT_ERROR_CODE,
+      "conflict",
+      "req"
+    );
+
+    createMutationMock((variables, options) => {
+      options?.onError?.(conflictError, variables, undefined, {} as never);
+      return Promise.resolve(mockBooking);
+    });
+
+    renderPage();
+    const user = userEvent.setup();
+
+    await progressToSlotStep(user);
+    await user.click(await screen.findByRole("button", { name: /10:00 – 11:00/i }));
+    await user.click(screen.getByRole("button", { name: /Continuar/i }));
+    await user.type(screen.getByPlaceholderText(/Seu nome/i), "João da Silva");
+    await user.type(screen.getByPlaceholderText(/\+55 \(11\) 9xxxx-xxxx/i), "11912345678");
+    await user.click(screen.getByRole("button", { name: /Continuar/i }));
+
+    const waitlistLink = await screen.findByRole("link", {
+      name: /Entrar na lista de espera/i,
+    });
+
+    expect(waitlistLink).toHaveAttribute(
+      "href",
+      `/app/waitlist?customerName=Jo%C3%A3o+da+Silva&customerPhone=%2B55+%2811%29+91234-5678&serviceId=service-1&employeeId=prof-123&preferredDate=${encodeURIComponent(DateTime.now().setZone(mockProfessional.tenantTimezone).toISODate() ?? "")}`,
+    );
+  });
+
   it("shows multi-day conflict banner when API returns MULTI_DAY_CONFLICT details", async () => {
     const multiDayConflictError = new ApiError(
       409,

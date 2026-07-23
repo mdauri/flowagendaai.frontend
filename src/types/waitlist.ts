@@ -35,6 +35,16 @@ export interface WaitlistFilters {
   status?: WaitlistEntryStatus;
 }
 
+export interface WaitlistPrefillParams {
+  customerName?: string;
+  customerPhone?: string;
+  serviceId?: string;
+  employeeId?: string;
+  preferredDate?: string;
+  preferredPeriod?: WaitlistPeriod;
+  notes?: string;
+}
+
 export interface CreateWaitlistInput {
   customerName: string;
   customerPhone: string;

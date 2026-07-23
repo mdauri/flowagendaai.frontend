@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { DateTime } from "luxon";
 import { Loader2 } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
 import { Button } from "@/components/flow/button";
 import { Card, CardDescription, CardTitle } from "@/components/flow/card";
 import { Badge } from "@/components/flow/badge";
@@ -23,6 +24,7 @@ import type {
   WaitlistEntryStatus,
   WaitlistPeriod,
   WaitlistFilters,
+  WaitlistPrefillParams,
 } from "@/types/waitlist";
 import type { Service } from "@/types/service";
 import type { Professional } from "@/types/professional";
@@ -149,15 +151,36 @@ function resolveProfessionalLabel(professional: Professional | undefined) {
   return professional ? professional.name : "Profissional removido";
 }
 
+function readPrefillFromSearchParams(searchParams: URLSearchParams): WaitlistPrefillParams {
+  const preferredPeriod = searchParams.get("preferredPeriod");
+
+  return {
+    customerName: searchParams.get("customerName") ?? undefined,
+    customerPhone: searchParams.get("customerPhone") ?? undefined,
+    serviceId: searchParams.get("serviceId") ?? undefined,
+    employeeId: searchParams.get("employeeId") ?? undefined,
+    preferredDate: searchParams.get("preferredDate") ?? undefined,
+    preferredPeriod:
+      preferredPeriod === "MORNING" ||
+      preferredPeriod === "AFTERNOON" ||
+      preferredPeriod === "EVENING"
+        ? preferredPeriod
+        : undefined,
+    notes: searchParams.get("notes") ?? undefined,
+  };
+}
+
 export function WaitlistPage() {
   const auth = useAuth();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
   const servicesQuery = useServicesQuery();
   const professionalsQuery = useProfessionalsQuery();
 
   const [draftFilters, setDraftFilters] = useState<WaitlistFilters>({});
   const [appliedFilters, setAppliedFilters] = useState<WaitlistFilters>({});
   const [form, setForm] = useState<DraftFormState>(emptyDraftFormState);
+  const prefill = useMemo(() => readPrefillFromSearchParams(searchParams), [searchParams]);
 
   const waitlistQuery = useWaitlistQuery(appliedFilters);
   const createWaitlistMutation = useCreateWaitlistMutation();
@@ -187,6 +210,31 @@ export function WaitlistPage() {
   const items = waitlistQuery.data?.items ?? [];
   const activeCount = items.filter((item) => item.status === "WAITING").length;
   const offeredCount = items.filter((item) => item.status === "OFFERED").length;
+
+  useEffect(() => {
+    if (
+      !prefill.customerName &&
+      !prefill.customerPhone &&
+      !prefill.serviceId &&
+      !prefill.employeeId &&
+      !prefill.preferredDate &&
+      !prefill.preferredPeriod &&
+      !prefill.notes
+    ) {
+      return;
+    }
+
+    setForm((current) => ({
+      ...current,
+      customerName: prefill.customerName ?? current.customerName,
+      customerPhone: prefill.customerPhone ?? current.customerPhone,
+      serviceId: prefill.serviceId ?? current.serviceId,
+      employeeId: prefill.employeeId ?? current.employeeId,
+      preferredDate: prefill.preferredDate ?? current.preferredDate,
+      preferredPeriod: prefill.preferredPeriod ?? current.preferredPeriod,
+      notes: prefill.notes ?? current.notes,
+    }));
+  }, [prefill]);
 
   function handleApplyFilters() {
     setAppliedFilters({
