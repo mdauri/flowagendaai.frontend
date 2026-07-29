@@ -30,8 +30,30 @@ import { SystemAdminTenantControlCenterPage } from "@/pages/system-admin-tenant-
 import { TermsPage } from "@/pages/terms-page";
 import { ProfessionalServiceManager } from "@/components/professional-service-manager";
 import { ProtectedRoute } from "@/components/app/protected-route";
+import { getLastCustomerAppTenantSlug } from "@/session/customer-app-last-tenant-storage";
 import { ForgotPage } from "../pages/forgot-password-page";
 import { useAuth } from "@/hooks/use-auth";
+
+function CustomerAppEntryBlockedPage() {
+  const lastTenantSlug = getLastCustomerAppTenantSlug();
+
+  if (lastTenantSlug) {
+    return <Navigate to={`/c/${encodeURIComponent(lastTenantSlug)}`} replace />;
+  }
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-(--bg-base) px-4">
+      <div className="max-w-md rounded-2xl border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-6 text-center">
+        <h1 className="text-xl font-bold text-[var(--theme-text-primary)]">
+          Nao foi possivel abrir este app.
+        </h1>
+        <p className="mt-2 text-sm text-text-soft">
+          Use o link do estabelecimento para continuar.
+        </p>
+      </div>
+    </div>
+  );
+}
 
 function AppIndexRedirect() {
   const auth = useAuth();
@@ -67,6 +89,7 @@ export function AppRouter() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/c" element={<CustomerAppEntryBlockedPage />} />
         <Route path="/c/:slug" element={<CustomerAppHomePage />} />
         <Route path="/c/:slug/bookings/:bookingId" element={<CustomerAppBookingDetailPage />} />
         <Route path="/p/:slug" element={<PublicBookingPage />} />

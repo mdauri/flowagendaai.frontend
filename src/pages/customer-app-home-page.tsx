@@ -14,6 +14,7 @@ import { useCustomerAppBookingsQuery } from "@/hooks/use-customer-app-bookings-q
 import { useIsStandalonePwa } from "@/hooks/use-is-standalone-pwa";
 import { customerAppService } from "@/services/customer-app-service";
 import { clearCustomerAppSession, getCustomerAppSession, setCustomerAppSession } from "@/session/customer-app-session-storage";
+import { setLastCustomerAppTenantSlug } from "@/session/customer-app-last-tenant-storage";
 import {
   clearStoredCustomerAppPushSubscription,
   getStoredCustomerAppPushSubscription,
@@ -58,6 +59,7 @@ export function CustomerAppHomePage() {
       return;
     }
 
+    setLastCustomerAppTenantSlug(slug);
     setStoredSessionToken(getCustomerAppSession(slug)?.token ?? null);
     setPushSubscriptionId(
       getStoredCustomerAppPushSubscription(slug)?.subscriptionId ?? null,
