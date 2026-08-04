@@ -5,10 +5,12 @@ import { Card, CardDescription, CardTitle } from "@/components/flow/card";
 import { Button } from "@/components/flow/button";
 import { Input } from "@/components/flow/input";
 import { Checkbox } from "@/components/flow/checkbox";
+import { Select, type SelectOption } from "@/components/flow/select";
 import { PageState } from "@/components/shared/page-state";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { useHolidaysQuery } from "@/hooks/use-holidays-query";
+import { useProfessionalsQuery } from "@/hooks/use-professionals-query";
 import { useCreateHolidayMutation } from "@/hooks/use-create-holiday-mutation";
 import { useUpdateHolidayMutation } from "@/hooks/use-update-holiday-mutation";
 import { useDeleteHolidayMutation } from "@/hooks/use-delete-holiday-mutation";
@@ -17,6 +19,7 @@ import { formatIsoDateTimeToBrDate, parseBrDateToIsoDate } from "@/lib/date-br";
 import type { Holiday } from "@/types/holiday";
 
 interface FormState {
+  professionalId: string;
   dateBr: string;
   name: string;
   description: string;
@@ -26,6 +29,7 @@ interface FormState {
 }
 
 const emptyForm: FormState = {
+  professionalId: "",
   dateBr: "",
   name: "",
   description: "",
@@ -68,6 +72,7 @@ export function HolidaysPage() {
   const auth = useAuth();
   const { toast } = useToast();
   const timezone = auth.tenant?.timezone ?? "America/Sao_Paulo";
+  const professionalsQuery = useProfessionalsQuery();
 
   const todayIso = useMemo(() => DateTime.now().setZone(timezone).toFormat("yyyy-MM-dd"), [timezone]);
   const [startDateBr, setStartDateBr] = useState<string>(() => {
@@ -81,7 +86,6 @@ export function HolidaysPage() {
 
   const startDateIso = parseBrDateToIsoDate(startDateBr) ?? undefined;
   const endDateIso = parseBrDateToIsoDate(endDateBr) ?? undefined;
-
   const listQuery = useHolidaysQuery({ startDate: startDateIso, endDate: endDateIso });
   const createMutation = useCreateHolidayMutation();
   const updateMutation = useUpdateHolidayMutation();
@@ -92,6 +96,24 @@ export function HolidaysPage() {
     ...emptyForm,
     dateBr: DateTime.fromISO(todayIso, { zone: "utc" }).toFormat("dd/MM/yyyy"),
   }));
+  const professionals = professionalsQuery.data?.professionals ?? [];
+  const professionalOptions = useMemo<SelectOption[]>(
+    () => [
+      { value: "", label: "Todos os profissionais" },
+      ...professionals.map((professional) => ({
+        value: professional.id,
+        label: professional.name,
+      })),
+    ],
+    [professionals],
+  );
+  const professionalNameById = useMemo(
+    () =>
+      new Map(
+        professionals.map((professional) => [professional.id, professional.name] as const),
+      ),
+    [professionals],
+  );
 
   if (!auth.tenant) {
     return (
@@ -140,6 +162,7 @@ export function HolidaysPage() {
         await updateMutation.mutateAsync({
           id: editingId,
           input: {
+            professionalId: form.professionalId || null,
             date: dateIso,
             name: form.name.trim(),
             description: form.description.trim() ? form.description.trim() : null,
@@ -151,6 +174,7 @@ export function HolidaysPage() {
         toast({ title: "Atualizado", description: "Bloqueio atualizado com sucesso." });
       } else {
         await createMutation.mutateAsync({
+          professionalId: form.professionalId || null,
           date: dateIso,
           name: form.name.trim(),
           description: form.description.trim() ? form.description.trim() : null,
@@ -187,6 +211,7 @@ export function HolidaysPage() {
   function startEdit(item: Holiday) {
     setEditingId(item.id);
     setForm({
+      professionalId: item.professionalId ?? "",
       dateBr: formatIsoDateTimeToBrDate(item.date, timezone),
       name: item.name,
       description: item.description ?? "",
@@ -258,8 +283,22 @@ export function HolidaysPage() {
 
       <Card className="p-4">
         <CardTitle>{editingId ? "Editar bloqueio" : "Adicionar bloqueio"}</CardTitle>
+        <CardDescription className="mt-2">
+          Escolha se o bloqueio vale para todos os profissionais ou apenas para um profissional específico.
+        </CardDescription>
 
         <form className="mt-4 grid gap-4" onSubmit={handleSubmit}>
+          <label className="grid gap-2 text-sm font-semibold text-white">
+            Escopo do bloqueio
+            <Select
+              value={form.professionalId}
+              options={professionalOptions}
+              onValueChange={(value) => setForm((prev) => ({ ...prev, professionalId: value }))}
+              placeholder="Selecione o escopo"
+              disabled={professionalsQuery.isLoading}
+            />
+          </label>
+
           <div className="grid gap-3 md:grid-cols-2">
             <label className="grid gap-2 text-sm font-semibold text-white">
               Data (dd/mm/aaaa)
@@ -391,6 +430,9 @@ export function HolidaysPage() {
                       {item.name}
                     </p>
                     <p className="mt-1 text-xs text-text-soft">
+                      {item.professionalId
+                        ? `${professionalNameById.get(item.professionalId) ?? "Profissional removido"} • `
+                        : "Todos os profissionais • "}
                       {formatHolidayTimeRange(item, timezone)}
                       {item.description ? ` — ${item.description}` : ""}
                     </p>

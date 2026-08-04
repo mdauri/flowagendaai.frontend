@@ -6,10 +6,11 @@ interface ListHolidaysResponse {
 }
 
 export const holidaysService = {
-  async list(input: { startDate?: string; endDate?: string } = {}) {
+  async list(input: { startDate?: string; endDate?: string; professionalId?: string } = {}) {
     const params = new URLSearchParams();
     if (input.startDate) params.set("startDate", input.startDate);
     if (input.endDate) params.set("endDate", input.endDate);
+    if (input.professionalId) params.set("professionalId", input.professionalId);
 
     const query = params.toString();
     return httpClient<ListHolidaysResponse>(`/holidays${query ? `?${query}` : ""}`);
@@ -35,4 +36,3 @@ export const holidaysService = {
     });
   },
 };
-

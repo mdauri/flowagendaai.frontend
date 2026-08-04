@@ -327,6 +327,42 @@ describe("PublicBookingPage", () => {
     expect(screen.getByRole("button", { name: /Ver horários/i })).toBeDisabled();
   });
 
+  it("permite selecionar um dia visivel do mes seguinte sem trocar o mes manualmente", async () => {
+    const adjacentMonthDate = DateTime.now()
+      .setZone(mockProfessional.tenantTimezone)
+      .startOf("month")
+      .plus({ months: 1 });
+
+    mockAvailableDatesQuery.mockReturnValue(
+      createAvailableDatesResponse({
+        data: {
+          tenantTimezone: mockProfessional.tenantTimezone,
+          availableDates: [adjacentMonthDate.toISODate() ?? ""],
+        },
+      })
+    );
+
+    renderPage();
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole("button", { name: /Selecionar Corte Feminino/i }));
+
+    const dayButtons = await screen.findAllByRole("button", {
+      name: new RegExp(`^${adjacentMonthDate.day}$`),
+    });
+    const adjacentMonthButton = dayButtons.find((button) => !button.hasAttribute("disabled"));
+    expect(adjacentMonthButton).toBeDefined();
+
+    await user.click(adjacentMonthButton!);
+
+    expect(
+      screen.getByText(
+        new RegExp(adjacentMonthDate.setLocale("pt-BR").toFormat("LLLL yyyy"), "i"),
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Ver horários/i })).toBeEnabled();
+  });
+
   it("shows empty state when there are no slots", async () => {
     mockSlotsQuery.mockReturnValue(
       createSlotsResponse({ data: { slots: [], tenantTimezone: mockProfessional.tenantTimezone } })

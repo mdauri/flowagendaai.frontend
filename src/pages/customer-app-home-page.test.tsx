@@ -90,11 +90,15 @@ describe("CustomerAppHomePage", () => {
 
     expect(screen.getByText("App do cliente")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Test Studio" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Agendar agora" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Agende aqui" })).toHaveAttribute(
       "href",
       "/c/test-studio/catalog",
     );
-    expect(screen.getByText("Instalar neste aparelho")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Meus compromissos" })).toHaveAttribute(
+      "href",
+      "/c/test-studio",
+    );
+    expect(screen.queryByText("Instalar neste aparelho")).not.toBeInTheDocument();
     expect(screen.getAllByText("Lembretes").length).toBeGreaterThan(0);
     expect(screen.getByRole("heading", { name: "Meus compromissos" })).toBeInTheDocument();
   });

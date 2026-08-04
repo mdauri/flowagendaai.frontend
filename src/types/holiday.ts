@@ -1,6 +1,7 @@
 export interface Holiday {
   id: string;
   tenantId: string;
+  professionalId: string | null;
   date: string; // ISO datetime (UTC) returned by API
   name: string;
   description: string | null;
@@ -12,6 +13,7 @@ export interface Holiday {
 }
 
 export interface CreateHolidayInput {
+  professionalId?: string | null;
   date: string; // YYYY-MM-DD
   name: string;
   description?: string | null;
@@ -21,6 +23,7 @@ export interface CreateHolidayInput {
 }
 
 export interface UpdateHolidayInput {
+  professionalId?: string | null;
   date?: string; // YYYY-MM-DD
   name?: string;
   description?: string | null;
@@ -28,4 +31,3 @@ export interface UpdateHolidayInput {
   startTime?: string | null; // HH:MM
   endTime?: string | null; // HH:MM
 }
-

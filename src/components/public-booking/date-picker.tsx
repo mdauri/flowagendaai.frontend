@@ -92,7 +92,7 @@ export function CalendarGrid({
           const hasSlots = availableDates.has(day.toISODate() ?? "");
           const isPast = day < minDate.startOf("day");
           const unavailable = !hasSlots;
-          const disabled = !isCurrentMonth || isOutOfRange(day) || unavailable;
+          const disabled = isOutOfRange(day) || unavailable;
           const isToday = day.hasSame(minDate.startOf("day"), "day");
 
           return (
@@ -109,7 +109,13 @@ export function CalendarGrid({
               )}
               style={{
                 backgroundColor: isSelected ? colors.brand.primary : "transparent",
-                color: isSelected ? colors.text.dark : (disabled ? colors.text.muted : colors.text.primary),
+                color: isSelected
+                  ? colors.text.dark
+                  : disabled
+                    ? colors.text.muted
+                    : isCurrentMonth
+                      ? colors.text.primary
+                      : colors.text.soft,
                 fontWeight: isSelected || isToday ? 700 : 500,
                 opacity: disabled ? (isPast ? 0.3 : 0.4) : 1,
                 "--control-focus-ring": semanticTokens.interaction.focus.ring,

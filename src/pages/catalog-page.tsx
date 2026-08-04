@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { colors, typography } from "@/design-system";
 import { ServiceCard } from "@/components/catalog/service-card";
 import { CatalogSkeleton } from "@/components/catalog/catalog-skeleton";
@@ -26,6 +27,10 @@ export function CatalogPage() {
     null,
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   // Fetch professionals when a service is selected
   const professionalsQuery = useProfessionalsByServiceQuery(
@@ -79,6 +84,60 @@ export function CatalogPage() {
     }
   }, [catalog?.tenant?.name]);
 
+  const serviceCount = catalog?.services.length ?? 0;
+  const showCarouselControls = serviceCount > 1;
+  const serviceIndicators = useMemo(
+    () => Array.from({ length: serviceCount }, (_, index) => index),
+    [serviceCount],
+  );
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+
+    if (!container) {
+      return;
+    }
+
+    const updateScrollState = () => {
+      const { scrollLeft, scrollWidth, clientWidth } = container;
+      const maxScrollLeft = Math.max(0, scrollWidth - clientWidth);
+      setCanScrollLeft(scrollLeft > 4);
+      setCanScrollRight(scrollLeft < maxScrollLeft - 4);
+
+      const cards = Array.from(
+        container.querySelectorAll<HTMLElement>("[data-service-slide]"),
+      );
+      if (cards.length === 0) {
+        setActiveIndex(0);
+        return;
+      }
+
+      const viewportCenter = scrollLeft + clientWidth / 2;
+      let closestIndex = 0;
+      let closestDistance = Number.POSITIVE_INFINITY;
+
+      cards.forEach((card, index) => {
+        const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+        const distance = Math.abs(cardCenter - viewportCenter);
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestIndex = index;
+        }
+      });
+
+      setActiveIndex(closestIndex);
+    };
+
+    updateScrollState();
+    container.addEventListener("scroll", updateScrollState, { passive: true });
+    window.addEventListener("resize", updateScrollState);
+
+    return () => {
+      container.removeEventListener("scroll", updateScrollState);
+      window.removeEventListener("resize", updateScrollState);
+    };
+  }, [serviceCount]);
+
   const handleBook = (serviceId: string) => {
     if (!slug) return;
     setSelectedServiceId(serviceId);
@@ -103,6 +162,17 @@ export function CatalogPage() {
 
   const handleRetry = () => {
     catalogQuery.refetch();
+  };
+
+  const scrollServices = (direction: "prev" | "next") => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const distance = Math.max(container.clientWidth * 0.82, 280);
+    container.scrollBy({
+      left: direction === "next" ? distance : -distance,
+      behavior: "smooth",
+    });
   };
 
   const publicTopbar = (
@@ -213,20 +283,79 @@ export function CatalogPage() {
           />
         )}
 
-        {/* Services Grid */}
+        {/* Services Carousel */}
         <main>
-          <section
-            aria-label="Serviços disponíveis"
-            className="mx-auto grid max-w-[1120px] grid-cols-1 justify-center gap-4 sm:grid-cols-2 md:gap-5 lg:grid-cols-3"
-          >
-            {catalog.services.map((service) => (
-              <ServiceCard
-                key={service.id}
-                service={service}
-                tenantSlug={slug ?? ""}
-                onBook={handleBook}
-              />
-            ))}
+          <section aria-label="Serviços disponíveis" className="mx-auto max-w-[1120px]">
+            <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold text-[var(--theme-text-primary)]">
+                  Escolha seu serviço
+                </p>
+                <p className="text-sm text-text-soft">
+                  Deslize para ver todas as opções disponíveis.
+                </p>
+              </div>
+              {showCarouselControls ? (
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => scrollServices("prev")}
+                    disabled={!canScrollLeft}
+                    className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] text-[var(--theme-text-primary)] transition disabled:cursor-not-allowed disabled:opacity-35"
+                    aria-label="Ver serviços anteriores"
+                  >
+                    <ChevronLeft size={18} aria-hidden="true" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => scrollServices("next")}
+                    disabled={!canScrollRight}
+                    className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] text-[var(--theme-text-primary)] transition disabled:cursor-not-allowed disabled:opacity-35"
+                    aria-label="Ver próximos serviços"
+                  >
+                    <ChevronRight size={18} aria-hidden="true" />
+                  </button>
+                </div>
+              ) : null}
+            </div>
+
+            <div
+              ref={scrollContainerRef}
+              className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 pr-[12vw] sm:pr-0"
+            >
+              {catalog.services.map((service) => (
+                <div
+                  key={service.id}
+                  data-service-slide
+                  className="min-w-0 shrink-0 basis-[86%] snap-start sm:basis-[48%] lg:basis-[31.5%]"
+                >
+                  <ServiceCard
+                    service={service}
+                    tenantSlug={slug ?? ""}
+                    onBook={handleBook}
+                  />
+                </div>
+              ))}
+            </div>
+
+            {showCarouselControls ? (
+              <div className="mt-3 flex items-center justify-center gap-2" aria-label="Posição no catálogo">
+                {serviceIndicators.map((index) => (
+                  <span
+                    key={index}
+                    className="h-2 rounded-full transition-all"
+                    style={{
+                      width: index === activeIndex ? 18 : 8,
+                      backgroundColor:
+                        index === activeIndex
+                          ? colors.brand.primary
+                          : "rgba(120, 120, 120, 0.35)",
+                    }}
+                    aria-hidden="true"
+                  />
+                ))}
+              </div>
+            ) : null}
           </section>
         </main>
       </div>
