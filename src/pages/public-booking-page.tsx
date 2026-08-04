@@ -182,9 +182,11 @@ export function PublicBookingPage() {
   const [calendarMonth, setCalendarMonth] = useState(() => minDate.startOf("month"));
   const monthRange = useMemo(() => {
     const monthStart = calendarMonth.startOf("month");
-    const monthEnd = calendarMonth.endOf("month");
-    const from = monthStart < minDate ? minDate : monthStart;
-    const to = monthEnd > maxDate ? maxDate : monthEnd;
+    const startOffset = monthStart.weekday % 7;
+    const firstVisibleDay = monthStart.minus({ days: startOffset });
+    const lastVisibleDay = firstVisibleDay.plus({ days: 41 }).endOf("day");
+    const from = firstVisibleDay < minDate ? minDate : firstVisibleDay;
+    const to = lastVisibleDay > maxDate ? maxDate : lastVisibleDay;
 
     if (from > to) {
       return null;
@@ -244,7 +246,6 @@ export function PublicBookingPage() {
 
   useEffect(() => {
     if (!selectedDate || !availableDatesQuery.data) return;
-    if (!selectedDate.hasSame(calendarMonth, "month")) return;
     const selectedDateKey = selectedDate.toISODate();
 
     if (!selectedDateKey) return;
@@ -306,7 +307,11 @@ export function PublicBookingPage() {
   };
 
   const handleDateSelect = (date: DateTime) => {
-    setSelectedDate(date.setZone(tenantTimezone).startOf("day"));
+    const normalizedDate = date.setZone(tenantTimezone).startOf("day");
+    setSelectedDate(normalizedDate);
+    if (!normalizedDate.hasSame(calendarMonth, "month")) {
+      setCalendarMonth(normalizedDate.startOf("month"));
+    }
     setSelectedSlot(null);
     setBookingNotification(null);
     setHasTriedCustomerSubmit(false);

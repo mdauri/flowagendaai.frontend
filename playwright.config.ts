@@ -26,6 +26,18 @@ export default defineConfig({
       testMatch: /.*\.setup\.ts/,
     },
     {
+      name: "public-mobile",
+      use: {
+        ...devices["iPhone 13"],
+      },
+    },
+    {
+      name: "public-mobile-chromium",
+      use: {
+        ...devices["Pixel 7"],
+      },
+    },
+    {
       name: "chromium",
       use: {
         ...devices["Desktop Chrome"],

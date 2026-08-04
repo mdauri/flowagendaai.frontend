@@ -3,10 +3,14 @@ import { holidaysService } from "@/services/holidays-service";
 
 export const HOLIDAYS_QUERY_KEY = ["holidays"] as const;
 
-export function useHolidaysQuery(input: { startDate?: string; endDate?: string }) {
+export function useHolidaysQuery(input: { startDate?: string; endDate?: string; professionalId?: string }) {
   return useQuery({
-    queryKey: [...HOLIDAYS_QUERY_KEY, input.startDate ?? null, input.endDate ?? null],
+    queryKey: [
+      ...HOLIDAYS_QUERY_KEY,
+      input.startDate ?? null,
+      input.endDate ?? null,
+      input.professionalId ?? null,
+    ],
     queryFn: () => holidaysService.list(input),
   });
 }
-

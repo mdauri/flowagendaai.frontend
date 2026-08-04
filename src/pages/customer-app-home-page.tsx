@@ -374,6 +374,10 @@ export function CustomerAppHomePage() {
       Falar no WhatsApp
     </Button>
   ) : null;
+  const shouldShowInstallAction = !isStandalone && installState === "available";
+  const shouldShowReminderAction = pushState === "idle" && Boolean(storedSessionToken);
+  const shouldShowAppointmentsAction =
+    !isStandalone && (installState !== "available" || pushState === "active" || Boolean(storedSessionToken));
 
   return (
     <div
@@ -450,8 +454,25 @@ export function CustomerAppHomePage() {
               />
               <div className="mt-6 flex flex-col gap-3">
                 <Button as={Link} to={`/c/${tenant.slug}/catalog`} size="md">
-                  Agendar agora
+                  Agende aqui
                 </Button>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {shouldShowInstallAction ? (
+                    <Button type="button" variant="secondary" size="md" onClick={() => void handleInstall()}>
+                      Instale o aplicativo
+                    </Button>
+                  ) : null}
+                  {shouldShowAppointmentsAction ? (
+                    <Button as={Link} to={`/c/${tenant.slug}`} variant="secondary" size="md">
+                      Meus compromissos
+                    </Button>
+                  ) : null}
+                  {shouldShowReminderAction ? (
+                    <Button type="button" variant="ghost" size="md" onClick={() => void handleEnablePush()}>
+                      Ative seus lembretes
+                    </Button>
+                  ) : null}
+                </div>
                 {whatsappAction}
               </div>
               <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -461,7 +482,7 @@ export function CustomerAppHomePage() {
                     Agendar
                   </p>
                   <p className="mt-1 text-sm text-text-soft">
-                    Agende seu horário em poucos passos.
+                    Agende seu horario em poucos passos.
                   </p>
                 </div>
                 <div className="rounded-2xl border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-elevated)] p-4">
@@ -470,7 +491,7 @@ export function CustomerAppHomePage() {
                     Instalar
                   </p>
                   <p className="mt-1 text-sm text-text-soft">
-                    Volte mais rápido aos seus compromissos.
+                    Acesse mais rapido seus compromissos neste aparelho.
                   </p>
                 </div>
                 <div className="rounded-2xl border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-elevated)] p-4">
@@ -479,15 +500,17 @@ export function CustomerAppHomePage() {
                     Lembretes
                   </p>
                   <p className="mt-1 text-sm text-text-soft">
-                    Receba avisos antes do seu horário.
+                    Receba avisos antes do seu horario.
                   </p>
                 </div>
               </div>
               <div className="mt-6 grid gap-3">
-                <InstallAppCard
-                  state={installState}
-                  onInstall={() => void handleInstall()}
-                />
+                {installState !== "unavailable" ? (
+                  <InstallAppCard
+                    state={installState}
+                    onInstall={() => void handleInstall()}
+                  />
+                ) : null}
                 {remindersCard}
               </div>
             </section>
