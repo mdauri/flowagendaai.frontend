@@ -14,6 +14,8 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     environment: production
+    outputs:
+      frontend_image_ref: ${{ steps.capture-frontend-image-ref.outputs.image_ref }}
 
     permissions:
       contents: read
@@ -59,8 +61,8 @@ jobs:
           VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
           VITE_FRONTEND_URL: ${{ secrets.VITE_FRONTEND_URL}}
           VITE_WHATSAPP_LINK: ${{ secrets.VITE_WHATSAPP_LINK }}
-          VITE_META_APP_ID: $${{ secrets.VITE_META_APP_ID }}
-          VITE_META_WHATSAPP_CONFIGURATION_ID: $${{ secrets.VITE_META_WHATSAPP_CONFIGURATION_ID }}
+          VITE_META_APP_ID: ${{ secrets.VITE_META_APP_ID }}
+          VITE_META_WHATSAPP_CONFIGURATION_ID: ${{ secrets.VITE_META_WHATSAPP_CONFIGURATION_ID }}
 
       - name: Metadata da imagem Frontend
         id: meta-frontend
@@ -72,6 +74,7 @@ jobs:
             type=sha
 
       - name: Build e push da imagem Frontend
+        id: build-frontend
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -85,10 +88,16 @@ jobs:
             VITE_META_APP_ID=${{ secrets.VITE_META_APP_ID }}
             VITE_META_WHATSAPP_CONFIGURATION_ID=${{ secrets.VITE_META_WHATSAPP_CONFIGURATION_ID }}
 
+      - name: Capturar referencia imutavel da imagem Frontend
+        id: capture-frontend-image-ref
+        run: echo "image_ref=${FRONTEND_IMAGE_NAME}@${{ steps.build-frontend.outputs.digest }}" >> "$GITHUB_OUTPUT"
+
   deploy:
     runs-on: ubuntu-latest
     environment: production
     needs: build-and-push
+    env:
+      DEPLOY_IMAGE_REF: ${{ needs.build-and-push.outputs.frontend_image_ref }}
 
     steps:
       - name: Checkout
@@ -111,7 +120,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "deploy/docker-compose.prod.yml,deploy/deploy.sh"
+          source: "deploy/docker-compose.prod.yml,deploy/deploy.sh,deploy/rollback.sh"
           target: "/opt/agendoro-frontend"
           strip_components: 1
 
@@ -120,13 +129,15 @@ jobs:
         env:
           GHCR_USERNAME: ${{ github.repository_owner }}
           GHCR_TOKEN: ${{ secrets.GHCR_PAT }}
+          DEPLOY_IMAGE_REF: ${{ env.DEPLOY_IMAGE_REF }}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          envs: GHCR_USERNAME,GHCR_TOKEN
+          envs: GHCR_USERNAME,GHCR_TOKEN,DEPLOY_IMAGE_REF
           script: |
             mkdir -p /opt/agendoro-frontend
             chmod +x /opt/agendoro-frontend/deploy.sh
+            chmod +x /opt/agendoro-frontend/rollback.sh
             cd /opt/agendoro-frontend
             /opt/agendoro-frontend/deploy.sh

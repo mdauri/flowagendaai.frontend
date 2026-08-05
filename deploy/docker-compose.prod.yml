@@ -1,6 +1,6 @@
 services:
   frontend:
-    image: ghcr.io/mdauri/agendoro-frontend:latest
+    image: ${AGENDORO_FRONTEND_IMAGE:?missing AGENDORO_FRONTEND_IMAGE}
     container_name: agendoro-frontend
     restart: unless-stopped
     networks:
