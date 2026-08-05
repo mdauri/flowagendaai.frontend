@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Loader2, MapPin } from "lucide-react";
 import { Button } from "@/components/flow/button";
 import { Input } from "@/components/flow/input";
@@ -51,6 +51,13 @@ export function GeolocationAddressInput({
 }: GeolocationAddressInputProps) {
   const [geoState, setGeoState] = useState<GeolocationState>("idle");
   const [isGeocoding, setIsGeocoding] = useState(false);
+  const isMountedRef = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   const handleDetectLocation = useCallback(async () => {
     if (!isGeolocationAvailable()) {
@@ -73,9 +80,16 @@ export function GeolocationAddressInput({
       const { latitude, longitude } = position.coords;
 
       const result = await tenantService.geocode({ latitude, longitude });
+      if (!isMountedRef.current) {
+        return;
+      }
       onChange(result.formattedAddress);
       setGeoState("success");
     } catch (err) {
+      if (!isMountedRef.current) {
+        return;
+      }
+
       if (err instanceof GeolocationPositionError) {
         if (err.code === GeolocationPositionError.PERMISSION_DENIED) {
           setGeoState("permission-denied");
@@ -92,7 +106,9 @@ export function GeolocationAddressInput({
         onError?.("REVERSE_GEOCODE_FAILED");
       }
     } finally {
-      setIsGeocoding(false);
+      if (isMountedRef.current) {
+        setIsGeocoding(false);
+      }
     }
   }, [onChange, onError]);
 
