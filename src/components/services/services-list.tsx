@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { Pencil, Trash2, Users } from "lucide-react";
 import { Badge } from "@/components/flow/badge";
 import { Button } from "@/components/flow/button";

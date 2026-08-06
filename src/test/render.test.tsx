@@ -1,6 +1,6 @@
 import { screen } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
-import { useLocation } from "react-router-dom";
+import { useLocation } from "react-router";
 import { renderWithProviders } from "@/test/render";
 
 function RouterProbe() {

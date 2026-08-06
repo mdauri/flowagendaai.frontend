@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { DateTime } from "luxon";
 import { Loader2 } from "lucide-react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router";
 import { Button } from "@/components/flow/button";
 import { Card, CardDescription, CardTitle } from "@/components/flow/card";
 import { Badge } from "@/components/flow/badge";

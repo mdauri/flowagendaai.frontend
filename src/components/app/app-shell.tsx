@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink } from "react-router";
 import { Card } from "@/components/flow/card";
 import { UserIdentityHeaderCard } from "@/components/app/user-identity-header-card";
 import { DemoEnvironmentBanner } from "@/components/shared/demo-environment-banner";

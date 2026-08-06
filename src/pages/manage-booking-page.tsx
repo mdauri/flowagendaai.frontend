@@ -1,5 +1,5 @@
 import { useMemo, useState, type ReactNode } from "react";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import { DateTime } from "luxon";
 import { Badge } from "@/components/flow/badge";
 import { Button } from "@/components/flow/button";
