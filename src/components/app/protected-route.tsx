@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate } from "react-router";
 import { FeedbackBanner } from "@/components/shared/feedback-banner";
 import { PageState } from "@/components/shared/page-state";
 import { useRequireAuth } from "@/hooks/use-require-auth";

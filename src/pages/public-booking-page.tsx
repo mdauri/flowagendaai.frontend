@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { colors, typography } from "@/design-system";
 import { DateTime } from "luxon";
-import { Link, useSearchParams, useParams } from "react-router-dom";
+import { Link, useSearchParams, useParams } from "react-router";
 import { Button } from "@/components/flow/button";
 import { FeedbackBanner } from "@/components/shared/feedback-banner";
 import { DemoEnvironmentBanner } from "@/components/shared/demo-environment-banner";

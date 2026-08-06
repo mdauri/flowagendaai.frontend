@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { DateTime } from "luxon";
 import { ChevronRight, Loader2 } from "lucide-react";
 import type { CustomerAppBooking } from "@/services/customer-app-service";

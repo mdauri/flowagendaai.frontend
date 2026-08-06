@@ -5,7 +5,7 @@ import {
   type DefaultOptions,
 } from "@tanstack/react-query";
 import { render } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router";
 import { ThemeProvider } from "@/theme/theme-provider";
 
 interface RenderWithProvidersOptions {

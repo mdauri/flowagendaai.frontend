@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Loader2 } from "lucide-react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router";
 import { Card, CardDescription, CardTitle } from "@/components/flow/card";
 import { SectionHeading } from "@/components/flow/section-heading";
 import { Select, type SelectOption } from "@/components/flow/select";

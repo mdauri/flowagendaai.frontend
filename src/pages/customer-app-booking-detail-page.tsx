@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router";
 import { DateTime } from "luxon";
 import { Button } from "@/components/flow/button";
 import { getCustomerAppSession } from "@/session/customer-app-session-storage";

@@ -1,4 +1,4 @@
-import { Navigate } from "react-router-dom";
+import { Navigate } from "react-router";
 import { AuthShell } from "@/components/auth/auth-shell";
 
 import { PageState } from "@/components/shared/page-state";

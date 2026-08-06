@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { colors, typography } from "@/design-system";
 import { ServiceCard } from "@/components/catalog/service-card";

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router";
 import { renderWithProviders } from "@/test/render";
 import { ManageBookingPage } from "./manage-booking-page";
 import { ApiError } from "@/types/api";

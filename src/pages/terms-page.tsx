@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 
 import { Card } from "@/components/landing/flow/card";
 import { compositionPatterns, semanticTokens } from "@/design-system";

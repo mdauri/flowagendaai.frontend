@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { LogIn, MessageCircle } from "lucide-react";
 import { Button } from "@/components/landing/flow/button";
 import { ThemeSwitcher } from "@/components/app/theme-switcher";
