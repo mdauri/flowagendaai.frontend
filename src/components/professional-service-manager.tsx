@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router";
 import { ChevronLeft, AlertCircle, Save, XCircle } from "lucide-react";
 import { FeedbackBanner } from "@/components/shared/feedback-banner";
 import { useProfessionalsWithServicesQuery } from "@/hooks/use-professionals-with-services-query";

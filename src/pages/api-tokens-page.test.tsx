@@ -1,5 +1,5 @@
 import { screen } from "@testing-library/react";
-import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
+import { MemoryRouter, Route, Routes, useLocation } from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { ApiTokensPage } from "@/pages/api-tokens-page";
 import { renderWithProviders } from "@/test/render";

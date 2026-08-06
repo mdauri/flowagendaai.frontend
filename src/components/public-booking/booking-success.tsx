@@ -11,7 +11,7 @@ import { CancelBookingDialog } from "@/components/bookings/cancel-booking-dialog
 import { useCancelPublicBookingMutation } from "@/hooks/use-cancel-public-booking-mutation";
 import { FeedbackBanner } from "@/components/shared/feedback-banner";
 import { ApiError } from "@/types/api";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 
 interface BookingSuccessProps {
   booking: CreatePublicBookingResponse;

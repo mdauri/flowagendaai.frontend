@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { PageState } from "@/components/shared/page-state";
 
 export function ProfessionalNotFoundState() {
