@@ -28,6 +28,13 @@ interface FormValues {
   tenantName: string;
   tenantSlug: string;
   tenantTimezone: string;
+  billingEmail: string;
+  billingCpfCnpj: string;
+  billingPhone: string;
+  billingAddress: string;
+  billingAddressNumber: string;
+  billingPostalCode: string;
+  billingProvince: string;
   adminName: string;
   adminEmail: string;
 }
@@ -36,6 +43,13 @@ interface FormErrors {
   tenantName?: string;
   tenantSlug?: string;
   tenantTimezone?: string;
+  billingEmail?: string;
+  billingCpfCnpj?: string;
+  billingPhone?: string;
+  billingAddress?: string;
+  billingAddressNumber?: string;
+  billingPostalCode?: string;
+  billingProvince?: string;
   adminName?: string;
   adminEmail?: string;
 }
@@ -44,6 +58,13 @@ const emptyFormValues: FormValues = {
   tenantName: "",
   tenantSlug: "",
   tenantTimezone: "America/Sao_Paulo",
+  billingEmail: "",
+  billingCpfCnpj: "",
+  billingPhone: "",
+  billingAddress: "",
+  billingAddressNumber: "",
+  billingPostalCode: "",
+  billingProvince: "",
   adminName: "",
   adminEmail: "",
 };
@@ -56,6 +77,10 @@ function normalizeSlug(input: string): string {
     .trim()
     .toLowerCase()
     .replace(/\s+/g, "-");
+}
+
+function onlyDigits(input: string): string {
+  return input.replace(/\D/g, "");
 }
 
 function validateForm(values: FormValues): FormErrors {
@@ -71,6 +96,34 @@ function validateForm(values: FormValues): FormErrors {
 
   if (!values.tenantTimezone) {
     errors.tenantTimezone = "Selecione um timezone.";
+  }
+
+  if (!/^\S+@\S+\.\S+$/.test(values.billingEmail.trim())) {
+    errors.billingEmail = "Email de cobranca invalido.";
+  }
+
+  if (!/^\d{11}$|^\d{14}$/.test(values.billingCpfCnpj)) {
+    errors.billingCpfCnpj = "Informe CPF com 11 digitos ou CNPJ com 14 digitos.";
+  }
+
+  if (!/^\d{10,11}$/.test(values.billingPhone)) {
+    errors.billingPhone = "Informe telefone com DDD, somente numeros.";
+  }
+
+  if (values.billingAddress.trim().length < 2) {
+    errors.billingAddress = "Informe o logradouro.";
+  }
+
+  if (values.billingAddressNumber.trim().length < 1) {
+    errors.billingAddressNumber = "Informe o numero.";
+  }
+
+  if (!/^\d{8}$/.test(values.billingPostalCode)) {
+    errors.billingPostalCode = "Informe CEP com 8 digitos.";
+  }
+
+  if (values.billingProvince.trim().length < 2) {
+    errors.billingProvince = "Informe o bairro.";
   }
 
   if (values.adminName.trim().length < 2) {
@@ -159,6 +212,13 @@ export function SystemAdminTenantProvisionPage() {
       "tenantName",
       "tenantSlug",
       "tenantTimezone",
+      "billingEmail",
+      "billingCpfCnpj",
+      "billingPhone",
+      "billingAddress",
+      "billingAddressNumber",
+      "billingPostalCode",
+      "billingProvince",
       "adminName",
       "adminEmail",
     ];
@@ -176,7 +236,7 @@ export function SystemAdminTenantProvisionPage() {
       setGlobalError("Existem campos invalidos. Revise o formulario.");
 
       const firstErrorField = getFirstFieldError(validationErrors);
-      if (firstErrorField === "tenantName" || firstErrorField === "tenantSlug" || firstErrorField === "adminName" || firstErrorField === "adminEmail") {
+      if (firstErrorField && firstErrorField !== "tenantTimezone") {
         firstErrorFieldRef.current?.focus();
       }
 
@@ -188,6 +248,13 @@ export function SystemAdminTenantProvisionPage() {
         name: values.tenantName.trim(),
         slug: values.tenantSlug.trim().toLowerCase(),
         timezone: values.tenantTimezone,
+        billingEmail: values.billingEmail.trim().toLowerCase(),
+        billingCpfCnpj: values.billingCpfCnpj,
+        billingPhone: values.billingPhone,
+        billingAddress: values.billingAddress.trim(),
+        billingAddressNumber: values.billingAddressNumber.trim(),
+        billingPostalCode: values.billingPostalCode,
+        billingProvince: values.billingProvince.trim(),
       },
       adminUser: {
         name: values.adminName.trim(),
@@ -338,6 +405,166 @@ export function SystemAdminTenantProvisionPage() {
                   {fieldErrors.tenantTimezone}
                 </p>
               ) : null}
+            </div>
+
+            <div className="rounded-3xl border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-5">
+              <div>
+                <h2 className="text-sm font-semibold uppercase tracking-[0.16em] text-text-soft">
+                  Dados de cobranca Asaas
+                </h2>
+                <p className="mt-2 text-sm text-text-soft">
+                  Esses dados identificam o pagador da mensalidade SaaS no checkout recorrente.
+                </p>
+              </div>
+
+              <div className="mt-5 grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <label htmlFor="billing-email" className="text-sm font-semibold text-white">
+                    Email de cobranca
+                  </label>
+                  <Input
+                    id="billing-email"
+                    ref={fieldErrors.billingEmail ? firstErrorFieldRef : undefined}
+                    value={values.billingEmail}
+                    onChange={(event) => updateValue("billingEmail", event.target.value)}
+                    placeholder="financeiro@clinicaexemplo.com"
+                    aria-invalid={Boolean(fieldErrors.billingEmail)}
+                    aria-describedby={fieldErrors.billingEmail ? "billing-email-error" : undefined}
+                    disabled={provisionMutation.isPending}
+                  />
+                  {fieldErrors.billingEmail ? (
+                    <p id="billing-email-error" className="text-sm text-red-300" role="alert">
+                      {fieldErrors.billingEmail}
+                    </p>
+                  ) : null}
+                </div>
+
+                <div className="space-y-2">
+                  <label htmlFor="billing-cpf-cnpj" className="text-sm font-semibold text-white">
+                    CPF/CNPJ
+                  </label>
+                  <Input
+                    id="billing-cpf-cnpj"
+                    ref={fieldErrors.billingCpfCnpj ? firstErrorFieldRef : undefined}
+                    value={values.billingCpfCnpj}
+                    onChange={(event) => updateValue("billingCpfCnpj", onlyDigits(event.target.value))}
+                    placeholder="Somente numeros"
+                    aria-invalid={Boolean(fieldErrors.billingCpfCnpj)}
+                    aria-describedby={fieldErrors.billingCpfCnpj ? "billing-cpf-cnpj-error" : undefined}
+                    disabled={provisionMutation.isPending}
+                  />
+                  {fieldErrors.billingCpfCnpj ? (
+                    <p id="billing-cpf-cnpj-error" className="text-sm text-red-300" role="alert">
+                      {fieldErrors.billingCpfCnpj}
+                    </p>
+                  ) : null}
+                </div>
+
+                <div className="space-y-2">
+                  <label htmlFor="billing-phone" className="text-sm font-semibold text-white">
+                    Telefone
+                  </label>
+                  <Input
+                    id="billing-phone"
+                    ref={fieldErrors.billingPhone ? firstErrorFieldRef : undefined}
+                    value={values.billingPhone}
+                    onChange={(event) => updateValue("billingPhone", onlyDigits(event.target.value))}
+                    placeholder="11999999999"
+                    aria-invalid={Boolean(fieldErrors.billingPhone)}
+                    aria-describedby={fieldErrors.billingPhone ? "billing-phone-error" : undefined}
+                    disabled={provisionMutation.isPending}
+                  />
+                  {fieldErrors.billingPhone ? (
+                    <p id="billing-phone-error" className="text-sm text-red-300" role="alert">
+                      {fieldErrors.billingPhone}
+                    </p>
+                  ) : null}
+                </div>
+
+                <div className="space-y-2">
+                  <label htmlFor="billing-postal-code" className="text-sm font-semibold text-white">
+                    CEP
+                  </label>
+                  <Input
+                    id="billing-postal-code"
+                    ref={fieldErrors.billingPostalCode ? firstErrorFieldRef : undefined}
+                    value={values.billingPostalCode}
+                    onChange={(event) => updateValue("billingPostalCode", onlyDigits(event.target.value))}
+                    placeholder="01001000"
+                    aria-invalid={Boolean(fieldErrors.billingPostalCode)}
+                    aria-describedby={fieldErrors.billingPostalCode ? "billing-postal-code-error" : undefined}
+                    disabled={provisionMutation.isPending}
+                  />
+                  {fieldErrors.billingPostalCode ? (
+                    <p id="billing-postal-code-error" className="text-sm text-red-300" role="alert">
+                      {fieldErrors.billingPostalCode}
+                    </p>
+                  ) : null}
+                </div>
+
+                <div className="space-y-2">
+                  <label htmlFor="billing-address" className="text-sm font-semibold text-white">
+                    Logradouro
+                  </label>
+                  <Input
+                    id="billing-address"
+                    ref={fieldErrors.billingAddress ? firstErrorFieldRef : undefined}
+                    value={values.billingAddress}
+                    onChange={(event) => updateValue("billingAddress", event.target.value)}
+                    placeholder="Rua Exemplo"
+                    aria-invalid={Boolean(fieldErrors.billingAddress)}
+                    aria-describedby={fieldErrors.billingAddress ? "billing-address-error" : undefined}
+                    disabled={provisionMutation.isPending}
+                  />
+                  {fieldErrors.billingAddress ? (
+                    <p id="billing-address-error" className="text-sm text-red-300" role="alert">
+                      {fieldErrors.billingAddress}
+                    </p>
+                  ) : null}
+                </div>
+
+                <div className="space-y-2">
+                  <label htmlFor="billing-address-number" className="text-sm font-semibold text-white">
+                    Numero
+                  </label>
+                  <Input
+                    id="billing-address-number"
+                    ref={fieldErrors.billingAddressNumber ? firstErrorFieldRef : undefined}
+                    value={values.billingAddressNumber}
+                    onChange={(event) => updateValue("billingAddressNumber", event.target.value)}
+                    placeholder="123"
+                    aria-invalid={Boolean(fieldErrors.billingAddressNumber)}
+                    aria-describedby={fieldErrors.billingAddressNumber ? "billing-address-number-error" : undefined}
+                    disabled={provisionMutation.isPending}
+                  />
+                  {fieldErrors.billingAddressNumber ? (
+                    <p id="billing-address-number-error" className="text-sm text-red-300" role="alert">
+                      {fieldErrors.billingAddressNumber}
+                    </p>
+                  ) : null}
+                </div>
+
+                <div className="space-y-2">
+                  <label htmlFor="billing-province" className="text-sm font-semibold text-white">
+                    Bairro
+                  </label>
+                  <Input
+                    id="billing-province"
+                    ref={fieldErrors.billingProvince ? firstErrorFieldRef : undefined}
+                    value={values.billingProvince}
+                    onChange={(event) => updateValue("billingProvince", event.target.value)}
+                    placeholder="Centro"
+                    aria-invalid={Boolean(fieldErrors.billingProvince)}
+                    aria-describedby={fieldErrors.billingProvince ? "billing-province-error" : undefined}
+                    disabled={provisionMutation.isPending}
+                  />
+                  {fieldErrors.billingProvince ? (
+                    <p id="billing-province-error" className="text-sm text-red-300" role="alert">
+                      {fieldErrors.billingProvince}
+                    </p>
+                  ) : null}
+                </div>
+              </div>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">

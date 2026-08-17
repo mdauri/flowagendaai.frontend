@@ -1,5 +1,6 @@
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import type { ReactNode } from "react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { ApiError } from "@/types/api";
 import { LoginForm } from "@/components/auth/login-form";
@@ -20,6 +21,11 @@ vi.mock("react-router", async () => {
 
   return {
     ...actual,
+    Link: ({ children, to, className }: { children: ReactNode; to: string; className?: string }) => (
+      <a href={to} className={className}>
+        {children}
+      </a>
+    ),
     useNavigate: () => navigateMock,
   };
 });

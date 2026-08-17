@@ -25,6 +25,13 @@ function resolveHttpsConfig(mode) {
         cert: fs.readFileSync(resolvedCertPath),
     };
 }
+function resolveAllowedHosts(mode) {
+    const env = loadEnv(mode, process.cwd(), "");
+    const configuredHosts = env.VITE_DEV_ALLOWED_HOSTS?.split(",")
+        .map((host) => host.trim())
+        .filter(Boolean) ?? [];
+    return [".trycloudflare.com", ...configuredHosts];
+}
 export default defineConfig(({ mode }) => ({
     plugins: [react(), tailwindcss()],
     resolve: {
@@ -57,6 +64,7 @@ export default defineConfig(({ mode }) => ({
     server: {
         host: "localhost",
         port: 5173,
+        allowedHosts: resolveAllowedHosts(mode),
         https: resolveHttpsConfig(mode),
     },
 }));

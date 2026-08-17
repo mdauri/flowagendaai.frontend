@@ -11,6 +11,7 @@ import { DiscardChangesDialog } from "@/components/system-admin/discard-changes-
 import { SubscriptionClubPanel } from "@/components/system-admin/subscription-club-panel";
 import { SystemAdminGate } from "@/components/system-admin/system-admin-gate";
 import { TenantDepositFeePanel } from "@/components/system-admin/tenant-deposit-fee-panel";
+import { TenantBillingPanel } from "@/components/system-admin/tenant-billing-panel";
 import { useAuth } from "@/hooks/use-auth";
 import { useSystemAdminTenantsQuery } from "@/hooks/use-system-admin-tenants-query";
 import { cn } from "@/lib/cn";
@@ -31,6 +32,10 @@ const moduleTabs = [
   {
     key: "deposit-fee",
     label: "Sinal Online",
+  },
+  {
+    key: "billing",
+    label: "Billing SaaS",
   },
 ] as const;
 
@@ -123,6 +128,8 @@ export function SystemAdminTenantControlCenterPage() {
         return <SubscriptionClubPanel tenantId={selectedTenantId || null} onDirtyChange={setActiveModuleDirty} />;
       case "deposit-fee":
         return <TenantDepositFeePanel tenantId={selectedTenantId || null} onDirtyChange={setActiveModuleDirty} />;
+      case "billing":
+        return <TenantBillingPanel tenantId={selectedTenantId || null} />;
       case "whatsapp":
       default:
         return <WhatsAppIntegrationConfig tenantId={selectedTenantId || null} onDirtyChange={setActiveModuleDirty} />;

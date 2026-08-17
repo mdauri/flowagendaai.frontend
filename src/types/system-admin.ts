@@ -3,6 +3,13 @@ export interface ProvisionTenantInput {
     name: string;
     slug: string;
     timezone: string;
+    billingEmail: string;
+    billingCpfCnpj: string;
+    billingPhone: string;
+    billingAddress: string;
+    billingAddressNumber: string;
+    billingPostalCode: string;
+    billingProvince: string;
   };
   adminUser: {
     name: string;

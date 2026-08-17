@@ -209,6 +209,21 @@ export function AppShell({
                 Configuracoes
               </NavLink>
             ) : null}
+            {!isProfessional ? (
+              <NavLink
+                to="/app/billing"
+                className={({ isActive }) =>
+                  cn(
+                    "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
+                    isActive
+                      ? "border-primary bg-primary text-black"
+                      : "border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] text-text-soft hover:border-[var(--theme-border-default)] hover:text-[var(--theme-text-primary)]",
+                  )
+                }
+              >
+                Faturamento
+              </NavLink>
+            ) : null}
             {user.role === "system-admin" && !isProfessional ? (
               <NavLink
                 to="/app/system-admin/tenants/central"

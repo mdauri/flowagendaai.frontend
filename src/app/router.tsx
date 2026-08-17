@@ -15,6 +15,7 @@ import { ServicesPage } from "@/pages/services-page";
 import { WaitlistPage } from "@/pages/waitlist-page";
 import { SlotsPage } from "@/pages/slots-page";
 import { SettingsPage } from "@/pages/settings-page";
+import { BillingPage } from "@/pages/billing-page";
 import { HolidaysPage } from "@/pages/holidays-page";
 import { MeuDiaPage } from "@/pages/meu-dia-page";
 import { SystemAdminTenantProvisionPage } from "@/pages/system-admin-tenant-provision-page";
@@ -129,6 +130,14 @@ export function AppRouter() {
             element={
               <BlockProfessionalRoute>
                 <SettingsPage />
+              </BlockProfessionalRoute>
+            }
+          />
+          <Route
+            path="billing"
+            element={
+              <BlockProfessionalRoute>
+                <BillingPage />
               </BlockProfessionalRoute>
             }
           />

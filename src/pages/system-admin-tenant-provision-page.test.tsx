@@ -27,6 +27,16 @@ const authState = {
   isBootstrapping: false,
 };
 
+async function fillBillingFields(user: ReturnType<typeof userEvent.setup>) {
+  await user.type(screen.getByLabelText("Email de cobranca"), "financeiro@aurora.com");
+  await user.type(screen.getByLabelText("CPF/CNPJ"), "12345678000195");
+  await user.type(screen.getByLabelText("Telefone"), "11999999999");
+  await user.type(screen.getByLabelText("CEP"), "01001000");
+  await user.type(screen.getByLabelText("Logradouro"), "Rua Aurora");
+  await user.type(screen.getByLabelText("Numero"), "123");
+  await user.type(screen.getByLabelText("Bairro"), "Centro");
+}
+
 vi.mock("@/hooks/use-auth", () => ({
   useAuth: () => authState,
 }));
@@ -109,6 +119,7 @@ describe("SystemAdminTenantProvisionPage", () => {
 
     await user.type(screen.getByLabelText("Nome do tenant"), "Clinica Aurora");
     await user.type(screen.getByLabelText("Identificador (slug)"), "Clínica Aurora");
+    await fillBillingFields(user);
     await user.type(screen.getByLabelText("Nome do admin inicial"), "Admin Aurora");
     await user.type(screen.getByLabelText("Email do admin inicial"), "ADMIN@AURORA.COM");
 
@@ -120,6 +131,13 @@ describe("SystemAdminTenantProvisionPage", () => {
           name: "Clinica Aurora",
           slug: "clinicaaurora",
           timezone: "America/Sao_Paulo",
+          billingEmail: "financeiro@aurora.com",
+          billingCpfCnpj: "12345678000195",
+          billingPhone: "11999999999",
+          billingAddress: "Rua Aurora",
+          billingAddressNumber: "123",
+          billingPostalCode: "01001000",
+          billingProvince: "Centro",
         },
         adminUser: {
           name: "Admin Aurora",
@@ -150,6 +168,7 @@ describe("SystemAdminTenantProvisionPage", () => {
 
     await user.type(screen.getByLabelText("Nome do tenant"), "Clinica Boreal");
     await user.type(screen.getByLabelText("Identificador (slug)"), "clinica-boreal");
+    await fillBillingFields(user);
     await user.type(screen.getByLabelText("Nome do admin inicial"), "Admin Boreal");
     await user.type(screen.getByLabelText("Email do admin inicial"), "admin@boreal.com");
 
