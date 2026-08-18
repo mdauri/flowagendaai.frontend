@@ -1,6 +1,6 @@
 import { Button } from "@/components/landing/flow/button";
 import { Card } from "@/components/landing/flow/card";
-const WHATSAPP_LINK = import.meta.env.VITE_WHATSAPP_LINK ?? "#";
+import { trackLandingEvent } from "@/lib/landing-analytics";
 
 export function CTASection() {
   return (
@@ -13,30 +13,34 @@ export function CTASection() {
         <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.22em] text-secondary">
-              Pronto para automatizar?
+              Pronto para começar?
             </p>
             <h2 className="mt-3 text-3xl font-black tracking-tight text-[var(--theme-text-primary)] md:text-5xl">
-              Fale com a gente agora e comece a receber agendamentos no
-              automático
+              Comece seu teste e veja o Agendoro funcionando no seu negócio
             </h2>
             <p className="mt-4 max-w-2xl text-base leading-7 text-text-soft md:text-lg">
-              Conta sobre o seu negócio pelo WhatsApp e em até 48 horas seu
-              sistema de agendamento está no ar — configurado, testado e
-              funcionando sozinho.
+              Crie sua conta, configure sua agenda e compartilhe seu link de
+              agendamento. O teste gratuito dá acesso ao Agendoro sem cartão de
+              crédito.
             </p>
           </div>
 
           <div className="flex flex-col gap-4 sm:flex-row lg:flex-col">
             <Button
               as="a"
-              href={"https://wa.me/5512982933873?text=Agendoro"}
-              //target="_blank"
-              //rel="noopener noreferrer"
+              href="/signup"
+              onClick={() =>
+                trackLandingEvent("landing_trial_cta_clicked", {
+                  sourceSection: "final_cta",
+                  target: "/signup",
+                  planContext: "agendoro",
+                })
+              }
             >
-              Falar no WhatsApp agora
+              Testar grátis por 14 dias
             </Button>
-            <Button as="a" href="#como-funciona" variant="secondary">
-              Ver como funciona
+            <Button as="a" href="#precos" variant="secondary">
+              Ver preços
             </Button>
           </div>
         </div>

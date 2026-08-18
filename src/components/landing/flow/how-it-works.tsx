@@ -1,30 +1,30 @@
-import { MessageCircle, Settings, Zap } from "lucide-react";
+import { BellRing, Link2, Settings } from "lucide-react";
 import { Button } from "@/components/landing/flow/button";
 import { Card } from "@/components/landing/flow/card";
 import { semanticTokens, shadows } from "@/design-system";
-const WHATSAPP_LINK = import.meta.env.VITE_WHATSAPP_LINK ?? "#";
+import { trackLandingEvent } from "@/lib/landing-analytics";
 
 const steps = [
   {
-    icon: MessageCircle,
-    number: "01",
-    title: "Escolha seu plano",
-    description:
-      "Decida entre organizar sua agenda manualmente ou automatizar todo o seu atendimento via WhatsApp.",
-  },
-  {
     icon: Settings,
-    number: "02",
-    title: "Configure do seu jeito",
+    number: "01",
+    title: "Configure seu negócio",
     description:
-      "Cadastre seus serviços e profissionais em minutos ou deixe que nossa equipe faça a implantação completa para você.",
+      "Cadastre serviços, profissionais, horários e regras de disponibilidade.",
   },
   {
-    icon: Zap,
-    number: "03",
-    title: "Sua agenda roda sozinha",
+    icon: Link2,
+    number: "02",
+    title: "Compartilhe seu link",
     description:
-      "Seus clientes agendam direto pelo seu link exclusivo, recebem confirmações e você ganha tempo para o que importa.",
+      "Use sua página pública para receber agendamentos sem depender de troca de mensagens.",
+  },
+  {
+    icon: BellRing,
+    number: "03",
+    title: "Clientes agendam e recebem lembretes",
+    description:
+      "O cliente escolhe o horário, acompanha compromissos e recebe lembretes conforme sua configuração.",
   },
 ];
 
@@ -37,11 +37,11 @@ export function HowItWorks() {
             Como funciona
           </p>
           <h2 className="mt-3 text-3xl font-black tracking-tight text-[var(--theme-text-primary)] md:text-5xl">
-            Simples assim — em 3 passos
+            Comece em 3 passos
           </h2>
           <p className="mt-4 text-base leading-7 text-text-soft">
-            Sem configuração técnica, sem tutoriais, sem dor de cabeça. Você
-            fala com a gente e a gente resolve tudo.
+            Configure sua agenda, compartilhe seu link e deixe seus clientes
+            escolherem horários disponíveis.
           </p>
         </div>
 
@@ -78,11 +78,16 @@ export function HowItWorks() {
         <div className="mt-10 flex justify-center">
           <Button
             as="a"
-            href={"https://wa.me/5512982933873?text=Agendoro"}
-            //target="_blank"
-            //rel="noopener noreferrer"
+            href="#precos"
+            onClick={() =>
+              trackLandingEvent("landing_pricing_clicked", {
+                sourceSection: "pricing",
+                target: "#precos",
+                planContext: "agendoro",
+              })
+            }
           >
-            Começar agora pelo WhatsApp
+            Ver preços
           </Button>
         </div>
       </div>

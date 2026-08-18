@@ -11,34 +11,34 @@ import {
   PainSection,
   PricingSection,
   SectionHeading,
-  TestimonialCard,
 } from "@/components/landing/flow";
 import { Card } from "@/components/landing/flow/card";
 import { compositionPatterns, semanticTokens } from "@/design-system";
+import { trackLandingEvent } from "@/lib/landing-analytics";
 
 const features = [
   {
-    title: "Agenda inteligente",
+    title: "Cliente agenda sozinho",
     description:
-      "Organize horários, profissionais e serviços com uma experiência simples, bonita e pronta para converter mais clientes.",
+      "Seu link fica disponível para o cliente escolher serviço, profissional e horário quando for melhor para ele.",
   },
   {
-    title: "WhatsApp + automação",
+    title: "Rotina mais organizada",
     description:
-      "Confirmações e lembretes automáticos direto no WhatsApp. Menos faltas, menos trabalho manual, mais resultado.",
+      "Agenda, profissionais, serviços, bloqueios e clientes ficam em um só lugar para reduzir conflitos.",
   },
   {
-    title: "Link de agendamento próprio",
+    title: "Lembretes automáticos",
     description:
-      "Seu cliente escolhe o horário em segundos, sem precisar falar com ninguém. Tudo centralizado no Agendoro.",
+      "Reduza faltas com lembretes por push, e-mail e canais configurados conforme a rotina do negócio.",
   },
 ];
 
 const benefits = [
-  "Mais agendamentos sem aumentar a equipe",
-  "Zero furo com confirmação automática pelo WhatsApp",
-  "Visual profissional que transmite confiança",
-  "Organização completa da sua agenda em minutos",
+  "Atendimento disponível 24h pelo link",
+  "Menos retrabalho administrativo",
+  "Mais clareza para equipe e profissionais",
+  "Experiência mobile para o cliente",
 ];
 
 const audiences = [
@@ -50,21 +50,42 @@ const audiences = [
   "Profissionais autônomos",
 ];
 
-const testimonials = [
+const resourceModules = [
   {
-    name: "Marina S.",
-    role: "Nail designer",
-    text: "Antes eu perdia clientes porque esquecia de responder no WhatsApp. Agora tudo funciona no automático. Melhor investimento que fiz!",
+    title: "Agenda e equipe",
+    items: [
+      "Agenda desktop e mobile",
+      "Gestão de profissionais",
+      "Gestão de serviços",
+      "Bloqueios e indisponibilidades",
+    ],
   },
   {
-    name: "Carlos R.",
-    role: "Estética automotiva",
-    text: "Minha agenda vivia bagunçada. Com o Agendoro, meus clientes agendam sozinhos e eu não perco mais nenhum horário.",
+    title: "Agendamento online",
+    items: [
+      "Página pública de agendamento",
+      "Link próprio",
+      "Catálogo de serviços",
+      "Clientes ilimitados",
+    ],
   },
   {
-    name: "Fernanda L.",
-    role: "Salão de beleza",
-    text: "Em uma semana já vi diferença. Menos faltas, menos confusão e mais clientes agendando sem eu precisar fazer nada.",
+    title: "Experiência do cliente",
+    items: [
+      "PWA do cliente",
+      "Instalação do app",
+      "Meus compromissos",
+      "Notificações push",
+    ],
+  },
+  {
+    title: "Automações nativas",
+    items: [
+      "Lembretes por push",
+      "Lembretes por e-mail",
+      "Múltiplos lembretes configuráveis",
+      "Lista de espera e lembrete de retorno",
+    ],
   },
 ];
 
@@ -85,8 +106,8 @@ export function LandingPage() {
           <div className="mx-auto max-w-7xl">
             <SectionHeading
               eyebrow="Benefícios"
-              title="Tudo que você precisa para parar de perder clientes"
-              description="Cada parte do Agendoro foi pensada para funcionar sozinha, sem você precisar configurar nada ou entender de tecnologia."
+              title="Mais organização para você. Mais autonomia para o cliente."
+              description="Menos tempo respondendo manualmente, mais clareza para a equipe e uma experiência profissional para quem agenda."
             />
 
             <div className="mt-10 grid gap-6 lg:grid-cols-3">
@@ -105,7 +126,7 @@ export function LandingPage() {
                   Por que funciona
                 </p>
                 <h3 className="mt-3 text-2xl font-black text-[var(--theme-text-primary)] md:text-4xl">
-                  Simples pra você, profissional pro seu cliente
+                  Simples para operar, profissional para quem agenda
                 </h3>
               </div>
               <div className="grid gap-3">
@@ -123,6 +144,36 @@ export function LandingPage() {
           </div>
         </section>
 
+        <section id="recursos" className="px-6 py-18 md:px-10 lg:px-16">
+          <div className="mx-auto max-w-7xl">
+            <SectionHeading
+              eyebrow="Recursos"
+              title="Os módulos essenciais para uma agenda profissional"
+              description="O Agendoro reúne operação, agendamento online, experiência do cliente e lembretes em uma plataforma única para pequenos negócios."
+            />
+
+            <div className="mt-10 grid gap-6 lg:grid-cols-2">
+              {resourceModules.map((module) => (
+                <Card
+                  key={module.title}
+                  variant="surface"
+                  padding="lg"
+                  className="h-full"
+                >
+                  <h3 className="text-xl font-black text-[var(--theme-text-primary)]">
+                    {module.title}
+                  </h3>
+                  <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                    {module.items.map((item) => (
+                      <GlassListItem key={item} icon="✓" label={item} />
+                    ))}
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
         <section id="segmentos" className="px-6 py-18 md:px-10 lg:px-16">
           <Card
             padding="lg"
@@ -133,13 +184,18 @@ export function LandingPage() {
               <SectionHeading
                 eyebrow="Segmentos"
                 title="Para qualquer negócio que vive de horário marcado"
-                description="O Agendoro funciona para estética automotiva, beleza, saúde, consultórios e qualquer serviço que precise de agenda organizada."
+                description="Estética, beleza, saúde, consultórios e serviços locais ganham uma agenda mais previsível sem depender de conversa manual para cada horário."
               />
               <Button
                 as="a"
                 href="#precos"
-                //target="_blank"
-                //rel="noopener noreferrer"
+                onClick={() =>
+                  trackLandingEvent("landing_pricing_clicked", {
+                    sourceSection: "pricing",
+                    target: "#precos",
+                    planContext: "agendoro",
+                  })
+                }
               >
                 Quero o Agendoro no meu negócio
               </Button>
@@ -159,26 +215,12 @@ export function LandingPage() {
                   </div>
                   <p className="mt-2 text-sm leading-6 text-text-muted">
                     Estrutura profissional para atrair clientes, organizar
-                    horários e elevar percepção de valor.
+                    horários e oferecer uma experiência consistente.
                   </p>
                 </Card>
               ))}
             </div>
           </Card>
-        </section>
-
-        <section id="depoimentos" className="px-6 py-18 md:px-10 lg:px-16">
-          <div className="mx-auto max-w-7xl">
-            <SectionHeading
-              eyebrow="Depoimentos"
-              title="Quem já usa o Agendoro conta"
-            />
-            <div className="mt-10 grid gap-6 lg:grid-cols-3">
-              {testimonials.map((item) => (
-                <TestimonialCard key={item.name} {...item} />
-              ))}
-            </div>
-          </div>
         </section>
         <PricingSection />
         <CTASection />

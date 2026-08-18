@@ -2,46 +2,45 @@ import { Button } from "@/components/landing/flow/button";
 import { Card } from "@/components/landing/flow/card";
 import { GlassListItem } from "@/components/landing/flow/glass-list-item";
 import { semanticTokens } from "@/design-system";
-
-const WHATSAPP_LINK = import.meta.env.VITE_WHATSAPP_LINK ?? "#";
+import { trackLandingEvent } from "@/lib/landing-analytics";
 
 const pains = [
   {
     icon: "✗",
-    problem: "Clientes desistindo",
+    problem: "Clientes esperando resposta",
     description:
-      "Mensagem sem resposta no WhatsApp é cliente marcando horário com o concorrente.",
+      "Enquanto você atende, novas mensagens podem ficar para depois e o cliente procura outro horário.",
   },
   {
     icon: "✗",
-    problem: "Horários duplicados",
+    problem: "Horários em conflito",
     description:
-      "Dois clientes no mesmo horário. Resultado: confusão, cancelamento e reputação em risco.",
+      "Sem uma agenda centralizada, fica mais fácil marcar duas coisas no mesmo horário.",
   },
   {
     icon: "✗",
-    problem: "Agenda bagunçada",
+    problem: "Faltas sem lembrete",
     description:
-      "Sem controle dos horários você perde tempo, perde dinheiro e perde o fio da meada todo dia.",
+      "Sem avisos automáticos, o cliente pode esquecer o compromisso e deixar buracos na rotina.",
   },
 ];
 
 const solutions = [
   {
     icon: "✓",
-    label: "Seus clientes agendam sozinhos, sem precisar de você",
+    label: "Link próprio para agendamento online",
   },
   {
     icon: "✓",
-    label: "Confirmações automáticas pelo WhatsApp — zero furo",
+    label: "Agenda completa no desktop e no celular",
   },
   {
     icon: "✓",
-    label: "Link de agendamento profissional e personalizado",
+    label: "Lembretes automáticos por push e e-mail",
   },
   {
     icon: "✓",
-    label: "Comece a organizar hoje mesmo ou deixe que nós automatizamos",
+    label: "PWA do cliente com área Meus compromissos",
   },
 ];
 
@@ -56,12 +55,12 @@ export function PainSection() {
               O problema
             </p>
             <h2 className="mt-3 text-3xl font-black tracking-tight text-[var(--theme-text-primary)] md:text-5xl">
-              Agenda bagunçada é dinheiro saindo pelo ralo
+              Agenda manual custa tempo e cria buracos na rotina
             </h2>
             <p className="mt-4 text-base leading-7 text-text-soft">
-              O custo de um esquecimento ou de uma mensagem não respondida é
-              mais alto do que você imagina. Não é falta de competência, é falta
-              de sistema.
+              Quando tudo depende de mensagem, caderno ou planilha, clientes
+              esperam resposta, horários se cruzam e faltas passam
+              despercebidas.
             </p>
 
             <div className="mt-8 space-y-4">
@@ -97,12 +96,12 @@ export function PainSection() {
               A solução
             </p>
             <h3 className="mt-3 text-2xl font-black tracking-tight text-[var(--theme-text-primary)] md:text-3xl">
-              Organizamos seu negócio ou automatizamos seu crescimento.
+              Uma agenda online para organizar o dia e deixar o cliente agendar sozinho
             </h3>
             <p className="mt-4 text-sm leading-7 text-text-soft">
-              Tenha controle total da sua agenda por R$ 97/mês, com link de
-              agendamento próprio. Quando estiver pronto, evolua para a
-              automação completa com robô de WhatsApp.
+              O Agendoro centraliza horários, profissionais, serviços,
+              clientes, agendamento online e lembretes em uma experiência
+              simples para você e para seu cliente.
             </p>
 
             <div className="mt-7 space-y-3">
@@ -112,8 +111,19 @@ export function PainSection() {
             </div>
 
             <div className="mt-8">
-              <Button as="a" href="#precos" className="w-full">
-                Escolher meu plano agora
+              <Button
+                as="a"
+                href="#precos"
+                className="w-full"
+                onClick={() =>
+                  trackLandingEvent("landing_pricing_clicked", {
+                    sourceSection: "pricing",
+                    target: "#precos",
+                    planContext: "agendoro",
+                  })
+                }
+              >
+                Ver planos
               </Button>
             </div>
           </Card>

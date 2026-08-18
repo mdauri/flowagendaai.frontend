@@ -1,7 +1,8 @@
 import { Link } from "react-router";
-import { LogIn, MessageCircle } from "lucide-react";
+import { LogIn } from "lucide-react";
 import { Button } from "@/components/landing/flow/button";
 import { ThemeSwitcher } from "@/components/app/theme-switcher";
+import { trackLandingEvent } from "@/lib/landing-analytics";
 
 const FRONTEND_URL =
   import.meta.env.VITE_FRONTEND_URL ?? "http://localhost:5173";
@@ -33,11 +34,11 @@ export function Navbar() {
           <a href="#beneficios" className="transition hover:text-[var(--theme-text-primary)]">
             Benefícios
           </a>
-          <a href="#segmentos" className="transition hover:text-[var(--theme-text-primary)]">
-            Segmentos
+          <a href="#recursos" className="transition hover:text-[var(--theme-text-primary)]">
+            Recursos
           </a>
-          <a href="#depoimentos" className="transition hover:text-[var(--theme-text-primary)]">
-            Depoimentos
+          <a href="#precos" className="transition hover:text-[var(--theme-text-primary)]">
+            Preços
           </a>
         </nav>
         <div className="flex items-center gap-2">
@@ -54,15 +55,19 @@ export function Navbar() {
             Entrar
           </Button>
           <Button
-            size="md"
+            size="sm"
             as="a"
-            href={"https://wa.me/5512982933873?text=Agendoro"}
+            href="/signup"
+            onClick={() =>
+              trackLandingEvent("landing_trial_cta_clicked", {
+                sourceSection: "navbar",
+                target: "/signup",
+                planContext: "agendoro",
+              })
+            }
             className="hidden sm:inline-flex"
-            //target="_blank"
-            //rel="noopener noreferrer"
           >
-            <MessageCircle className="w-6 h-6" />
-            Quero vender mais
+            Testar grátis
           </Button>
         </div>
       </div>

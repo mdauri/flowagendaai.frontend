@@ -2,24 +2,25 @@ import { Badge } from "@/components/landing/flow/badge";
 import { Button } from "@/components/landing/flow/button";
 import { Card } from "@/components/landing/flow/card";
 import { radius, semanticTokens, shadows } from "@/design-system";
+import { trackLandingEvent } from "@/lib/landing-analytics";
 
 const agendaItems = [
   {
     time: "08:00",
-    title: "Lavagem premium SUV",
+    title: "Limpeza de pele",
     badge: "Confirmado",
     badgeVariant: "success",
   },
   {
     time: "10:30",
-    title: "Higienização interior",
-    badge: "WhatsApp enviado",
+    title: "Corte masculino",
+    badge: "Lembrete enviado",
     badgeVariant: "info",
   },
   {
     time: "14:00",
-    title: "Alongamento de unhas",
-    badge: "Pagamento pendente",
+    title: "Manicure",
+    badge: "Cliente agendou online",
     badgeVariant: "warning",
   },
   {
@@ -31,21 +32,21 @@ const agendaItems = [
 ] as const;
 
 const heroKpis = [
-  ["+2.500", "agendamentos realizados"],
-  ["+120", "clientes atendidos"],
-  ["48h", "para sua agenda rodar sozinha"],
+  ["14 dias", "grátis para testar"],
+  ["Até 3", "profissionais inclusos"],
+  ["Ilimitados", "agendamentos no mês"],
 ] as const;
 
 const heroMetrics = [
   {
-    label: "Taxa de ocupação",
-    value: "87%",
-    detail: "Semana aquecida",
+    label: "Cliente",
+    value: "PWA",
+    detail: "App instalável e Meus compromissos",
   },
   {
-    label: "Mensagens automáticas",
-    value: "142",
-    detail: "Confirmações enviadas",
+    label: "Lembretes",
+    value: "Push + e-mail",
+    detail: "Canais nativos do Agendoro",
   },
 ] as const;
 
@@ -84,7 +85,7 @@ function HeroAgendaItem({
         <div>
           <p className="font-semibold text-[var(--theme-text-primary)]">{title}</p>
           <p className="text-sm text-text-muted">
-            Confirmação enviada via WhatsApp
+            Agendamento online pelo link
           </p>
         </div>
       </div>
@@ -113,43 +114,55 @@ function HeroMetricCard({
 
 export function Hero() {
   return (
-    <section className="px-6 pb-16 pt-10 md:px-10 lg:px-16 lg:pt-16">
+    <section className="px-6 pb-12 pt-8 md:px-10 lg:px-16 lg:pt-12">
       <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[1.08fr_0.92fr]">
         <div>
           <Badge
             variant="subtle"
             className="mb-6 px-4 py-2 text-sm text-badge-text"
           >
-            Sua agenda organizada · WhatsApp · Link próprio
+            Sistema de agendamento online para pequenos negócios
           </Badge>
 
-          <h1 className="max-w-4xl text-4xl font-black leading-tight tracking-tight text-[var(--theme-text-primary)] md:text-6xl lg:text-7xl">
+          <h1 className="max-w-4xl text-4xl font-black leading-tight tracking-tight text-[var(--theme-text-primary)] md:text-5xl lg:text-6xl">
             Sua agenda organizada.
             <span className="bg-linear-to-r from-primary via-secondary to-tertiary bg-clip-text text-transparent">
-              {" "}
-              Seus clientes encantados.
+              {" "}Seus clientes agendando sozinhos.
             </span>
           </h1>
 
-          <p className="mt-6 max-w-2xl text-base leading-7 text-text-soft md:text-lg">
-            Tenha uma plataforma profissional para gerir seus horários,
-            profissionais e serviços por apenas R$ 97/mês, ou automatize seu
-            atendimento via WhatsApp.
+          <p className="mt-5 max-w-2xl text-base leading-7 text-text-soft md:text-lg">
+            Gerencie horários, profissionais, serviços, clientes e lembretes em
+            uma plataforma simples para negócios que vivem de agenda.
           </p>
 
-          <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-            <Button as="a" href="/signup">
-              Organizar minha agenda
+          <p className="mt-4 text-sm font-bold text-secondary md:text-base">
+            R$ 97/mês · até 3 profissionais · agendamentos ilimitados
+          </p>
+
+          <div className="mt-6 flex flex-col gap-4 sm:flex-row">
+            <Button
+              as="a"
+              href="/signup"
+              onClick={() =>
+                trackLandingEvent("landing_trial_cta_clicked", {
+                  sourceSection: "hero",
+                  target: "/signup",
+                  planContext: "agendoro",
+                })
+              }
+            >
+              Testar grátis por 14 dias
             </Button>
-            <Button as="a" href="#beneficios" variant="secondary">
-              Ver benefícios
+            <Button as="a" href="#como-funciona" variant="secondary">
+              Ver como funciona
             </Button>
           </div>
 
-          <div className="mt-10 grid gap-4 sm:grid-cols-3">
-            <HeroKpiCard title="+2.500" subtitle="agendamentos realizados" />
-            <HeroKpiCard title="+120" subtitle="clientes atendidos" />
-            <HeroKpiCard title="5 min" subtitle="para organizar seu negócio" />
+          <div className="mt-8 grid gap-4 sm:grid-cols-3">
+            {heroKpis.map(([title, subtitle]) => (
+              <HeroKpiCard key={title} title={title} subtitle={subtitle} />
+            ))}
           </div>
         </div>
 
