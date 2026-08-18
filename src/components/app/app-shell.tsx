@@ -1,6 +1,7 @@
 import type { PropsWithChildren } from "react";
 import { NavLink } from "react-router";
 import { Card } from "@/components/flow/card";
+import { Button } from "@/components/flow/button";
 import { UserIdentityHeaderCard } from "@/components/app/user-identity-header-card";
 import { DemoEnvironmentBanner } from "@/components/shared/demo-environment-banner";
 import { cn } from "@/lib/cn";
@@ -24,6 +25,14 @@ export function AppShell({
   const canUseSubscriptionClub = Boolean(
     tenant.subscriptionClubAllowed && tenant.subscriptionClubEnabled
   );
+  const entitlement = tenant.entitlement;
+  const trialDaysRemaining = entitlement?.trialDaysRemaining;
+  const showTrialBanner = entitlement?.accessStatus === "TRIAL_ACTIVE";
+  const showPastDueBanner = entitlement?.accessStatus === "PAST_DUE";
+  const trialToneClass =
+    typeof trialDaysRemaining === "number" && trialDaysRemaining <= 3
+      ? "border-amber-300/45 bg-amber-500/10"
+      : "border-sky-300/35 bg-sky-500/10";
 
   return (
     <div className="min-h-screen px-4 py-4 sm:px-6 md:px-10 lg:px-16">
@@ -38,6 +47,26 @@ export function AppShell({
               {tenant.name}
             </span>
           </p>
+          {showTrialBanner ? (
+            <div className={cn("mt-4 flex flex-col gap-3 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between", trialToneClass)}>
+              <p className="text-sm font-medium text-[var(--theme-text-primary)]">
+                Voce esta no periodo gratuito. Restam {trialDaysRemaining ?? 0} dias.
+              </p>
+              <Button as={NavLink} to="/app/billing" size="sm" className="w-full sm:w-auto">
+                Assinar Agendoro
+              </Button>
+            </div>
+          ) : null}
+          {showPastDueBanner ? (
+            <div className="mt-4 flex flex-col gap-3 rounded-lg border border-amber-300/45 bg-amber-500/10 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm font-medium text-[var(--theme-text-primary)]">
+                Existe uma cobranca em atraso. Regularize para evitar suspensao.
+              </p>
+              <Button as={NavLink} to="/app/billing" size="sm" className="w-full sm:w-auto">
+                Regularizar
+              </Button>
+            </div>
+          ) : null}
           <nav
             aria-label="Navegacao principal da operacao"
             className="mt-5 flex min-w-0 flex-wrap gap-2 sm:gap-3"

@@ -1,6 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { billingService } from "@/services/billing-service";
-import type { BillingCustomerInput } from "@/types/billing";
+import type {
+  BillingCheckoutInput,
+  BillingCustomerInput,
+  BillingOneTimePurchaseInput,
+} from "@/types/billing";
 
 export const BILLING_STATUS_QUERY_KEY = ["billing", "status"] as const;
 export const BILLING_PAYMENTS_QUERY_KEY = ["billing", "payments"] as const;
@@ -23,9 +27,20 @@ export function useBillingPaymentsQuery() {
 export function useCreateBillingCheckoutMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: () => billingService.createCheckout(),
+    mutationFn: (input?: BillingCheckoutInput) => billingService.createCheckout(input),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: BILLING_STATUS_QUERY_KEY });
+    },
+  });
+}
+
+export function useCreateBillingOneTimePurchaseMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: BillingOneTimePurchaseInput) => billingService.createOneTimePurchase(input),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: BILLING_STATUS_QUERY_KEY });
+      void queryClient.invalidateQueries({ queryKey: BILLING_PAYMENTS_QUERY_KEY });
     },
   });
 }

@@ -1,7 +1,10 @@
 import { httpClient } from "@/lib/http-client";
 import type {
   BillingCheckoutResponse,
+  BillingCheckoutInput,
   BillingCustomerInput,
+  BillingOneTimePurchaseInput,
+  BillingOneTimePurchaseResponse,
   BillingPaymentsResponse,
   BillingStatusResponse,
   SystemAdminBillingTenantSummary,
@@ -16,9 +19,17 @@ export const billingService = {
     return httpClient<BillingPaymentsResponse>("/billing/payments");
   },
 
-  async createCheckout(): Promise<BillingCheckoutResponse> {
+  async createCheckout(input: BillingCheckoutInput = {}): Promise<BillingCheckoutResponse> {
     return httpClient<BillingCheckoutResponse>("/billing/checkout", {
       method: "POST",
+      body: JSON.stringify(input),
+    });
+  },
+
+  async createOneTimePurchase(input: BillingOneTimePurchaseInput): Promise<BillingOneTimePurchaseResponse> {
+    return httpClient<BillingOneTimePurchaseResponse>("/billing/one-time-purchases", {
+      method: "POST",
+      body: JSON.stringify(input),
     });
   },
 

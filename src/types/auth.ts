@@ -31,6 +31,28 @@ export interface AuthTenant {
   metaWhatsappEnabled?: boolean;
   subscriptionClubAllowed?: boolean;
   subscriptionClubEnabled?: boolean;
+  entitlement?: TenantEntitlement;
+}
+
+export interface TenantEntitlement {
+  canAccess: boolean;
+  accessStatus:
+    | "NOT_CONFIGURED"
+    | "BILLING_EXEMPT"
+    | "TRIAL_ACTIVE"
+    | "ACTIVE"
+    | "PAYMENT_PENDING"
+    | "PAST_DUE"
+    | "SUSPENDED"
+    | "CANCELED";
+  subscriptionStatus: string;
+  trialStartsAt: string | null;
+  trialEndsAt: string | null;
+  trialDaysRemaining: number | null;
+  isBillingExempt: boolean;
+  billingExemptAt: string | null;
+  billingExemptReason: string | null;
+  reason: string | null;
 }
 
 export interface LoginRequest {
