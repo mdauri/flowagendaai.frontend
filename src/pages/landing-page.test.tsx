@@ -15,27 +15,27 @@ function renderLandingPage() {
 }
 
 describe("LandingPage", () => {
-  test("aponta CTAs primarios de trial para signup publico", () => {
+  test("exibe precos comerciais do catalogo e CTAs seguros", () => {
     renderLandingPage();
 
-    expect(screen.getByRole("link", { name: "Organizar minha agenda" })).toHaveAttribute(
+    const trialLinks = screen.getAllByRole("link", { name: "Testar grátis por 14 dias" });
+    expect(trialLinks.length).toBeGreaterThan(0);
+    expect(trialLinks[0]).toHaveAttribute(
       "href",
       "/signup"
     );
-    expect(screen.getByRole("link", { name: "Começar no Essencial" })).toHaveAttribute(
-      "href",
-      "/signup"
-    );
+    expect(document.body).toHaveTextContent("R$ 97");
+    expect(document.body).toHaveTextContent("R$ 970/ano");
+    expect(document.body).toHaveTextContent("Profissional adicional: R$ 15/mês");
+    expect(document.body).toHaveTextContent("+ R$ 100/mês");
+    expect(document.body).toHaveTextContent("Implantação assistida: R$ 197");
+    expect(document.body).toHaveTextContent("Implantação WhatsApp: R$ 297");
   });
 
-  test("preserva CTAs secundarios e automacao fora do signup", () => {
+  test("preserva o CTA comercial do adicional WhatsApp", () => {
     renderLandingPage();
 
-    expect(screen.getByRole("link", { name: "Ver benefícios" })).toHaveAttribute(
-      "href",
-      "#beneficios"
-    );
-    expect(screen.getByRole("link", { name: "Escolher Automação Pro" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Falar sobre o adicional" })).toHaveAttribute(
       "href",
       expect.stringContaining("https://wa.me/")
     );
