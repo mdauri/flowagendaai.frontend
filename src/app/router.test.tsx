@@ -92,6 +92,10 @@ vi.mock("@/pages/login-page", () => ({
   LoginPage: () => <RouteDebug label="login-page" />,
 }));
 
+vi.mock("@/pages/signup-page", () => ({
+  SignupPage: () => <RouteDebug label="signup-page" />,
+}));
+
 vi.mock("../pages/forgot-password-page", () => ({
   ForgotPage: () => <RouteDebug label="forgot-password-page" />,
 }));
@@ -210,6 +214,13 @@ describe("AppRouter", () => {
 
     expect(screen.getByText("landing-page")).toBeInTheDocument();
     expect(screen.getByTestId("route-pathname")).toHaveTextContent("/");
+  });
+
+  test("renderiza signup publico em /signup", () => {
+    renderRouterAt("/signup");
+
+    expect(screen.getByText("signup-page")).toBeInTheDocument();
+    expect(screen.getByTestId("route-pathname")).toHaveTextContent("/signup");
   });
 
   test("redireciona /c para o ultimo tenant salvo quando existir", async () => {

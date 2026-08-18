@@ -4,6 +4,7 @@ import { AvailabilityPage } from "@/pages/availability-page";
 import { CatalogPage } from "@/pages/catalog-page";
 import { DashboardPage } from "@/pages/dashboard-page";
 import { LoginPage } from "@/pages/login-page";
+import { SignupPage } from "@/pages/signup-page";
 import { LandingPage } from "@/pages/landing-page";
 import { ProfessionalsPage } from "@/pages/professionals-page";
 import { ProfessionalRemovalPage } from "@/pages/professional-removal-page";
@@ -88,6 +89,7 @@ export function AppRouter() {
         <Route path="/termos-de-uso" element={<TermsPage />} />
         <Route path="/politica-de-privacidade" element={<PrivacyPolicyPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
         <Route path="/forgot-password" element={<ForgotPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/c" element={<CustomerAppEntryBlockedPage />} />

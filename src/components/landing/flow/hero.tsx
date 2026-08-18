@@ -3,8 +3,6 @@ import { Button } from "@/components/landing/flow/button";
 import { Card } from "@/components/landing/flow/card";
 import { radius, semanticTokens, shadows } from "@/design-system";
 
-const WHATSAPP_LINK = import.meta.env.VITE_WHATSAPP_LINK ?? "#";
-
 const agendaItems = [
   {
     time: "08:00",
@@ -140,12 +138,7 @@ export function Hero() {
           </p>
 
           <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-            <Button
-              as="a"
-              href="#precos"
-              //target="_blank"
-              //rel="noopener noreferrer"
-            >
+            <Button as="a" href="/signup">
               Organizar minha agenda
             </Button>
             <Button as="a" href="#beneficios" variant="secondary">

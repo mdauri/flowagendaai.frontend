@@ -1,5 +1,6 @@
 export type TenantSubscriptionStatus =
   | "NOT_CONFIGURED"
+  | "TRIALING"
   | "PENDING"
   | "ACTIVE"
   | "OVERDUE"

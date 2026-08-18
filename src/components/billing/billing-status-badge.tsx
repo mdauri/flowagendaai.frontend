@@ -4,6 +4,7 @@ import type { TenantBillingPaymentStatus, TenantSubscriptionStatus } from "@/typ
 export function subscriptionStatusLabel(status: TenantSubscriptionStatus) {
   const labels: Record<TenantSubscriptionStatus, string> = {
     NOT_CONFIGURED: "Nao configurada",
+    TRIALING: "Teste gratis",
     PENDING: "Pagamento pendente",
     ACTIVE: "Ativa",
     OVERDUE: "Em atraso",
@@ -33,7 +34,9 @@ export function SubscriptionStatusBadge({ status }: { status: TenantSubscription
   const variant =
     status === "ACTIVE"
       ? "success"
-      : status === "GRACE_PERIOD" || status === "OVERDUE" || status === "PENDING"
+      : status === "TRIALING"
+        ? "info"
+        : status === "GRACE_PERIOD" || status === "OVERDUE" || status === "PENDING"
         ? "warning"
         : status === "SUSPENDED" || status === "CANCELED"
           ? "danger"

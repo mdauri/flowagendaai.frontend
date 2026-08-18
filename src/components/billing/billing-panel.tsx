@@ -97,6 +97,12 @@ export function BillingPanel() {
   const payments = paymentsQuery.data?.items ?? [];
   const isBlocked = status.subscription.status === "SUSPENDED";
   const canCancel = ["ACTIVE", "PENDING", "GRACE_PERIOD", "OVERDUE"].includes(status.subscription.status);
+  const checkoutLabel =
+    status.subscription.status === "ACTIVE"
+      ? "Atualizar pagamento"
+      : status.subscription.status === "TRIALING"
+        ? "Ativar assinatura"
+        : "Regularizar assinatura";
 
   return (
     <div className="grid gap-6">
@@ -169,7 +175,7 @@ export function BillingPanel() {
               disabled={!status.enabled || checkoutMutation.isPending}
             >
               {checkoutMutation.isPending ? <Loader2 size={16} className="animate-spin" /> : <CreditCard size={16} />}
-              {status.subscription.status === "ACTIVE" ? "Atualizar pagamento" : "Regularizar assinatura"}
+              {checkoutLabel}
             </Button>
             {canCancel ? (
               <Button

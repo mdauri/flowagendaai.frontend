@@ -2,8 +2,6 @@ import { Button } from "@/components/landing/flow/button";
 import { Card } from "@/components/landing/flow/card";
 import { GlassListItem } from "@/components/landing/flow/glass-list-item";
 
-const WHATSAPP_LINK = import.meta.env.VITE_WHATSAPP_LINK ?? "#";
-
 const essentialFeatures = [
   "Link de Agendamento Profissional",
   "Agenda Completa (Desktop e Mobile)",
@@ -74,13 +72,9 @@ export function PricingSection() {
 
             <Button
               as="a"
-              href={
-                "https://wa.me/5512982933873?text=Quero%20o%20plano%20Start%20"
-              }
+              href="/signup"
               variant="secondary"
               className="w-full"
-              target="_blank"
-              rel="noopener noreferrer"
             >
               Começar no Essencial
             </Button>
