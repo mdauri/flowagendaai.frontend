@@ -39,6 +39,10 @@ export interface BillingStatusResponse {
     }>;
     total: number;
   };
+  oneTimePurchases: {
+    items: BillingOneTimePurchase[];
+    paidTotal: number;
+  };
   seats: {
     includedProfessionals: number;
     additionalProfessionals: number;
@@ -149,6 +153,26 @@ export interface BillingOneTimePurchaseResponse {
   paymentUrl: string;
   externalReference: string;
   amount: number;
+}
+
+export type OneTimePurchaseSetupStatus = "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED" | "BLOCKED";
+
+export interface BillingOneTimePurchase {
+  id: string;
+  tenantId?: string;
+  tenantName?: string;
+  tenantSlug?: string | null;
+  productCode: string;
+  description: string;
+  amount: number;
+  status: string;
+  setupStatus: OneTimePurchaseSetupStatus;
+  paidAt: string | null;
+  createdAt: string;
+}
+
+export interface SystemAdminOneTimePurchasesResponse {
+  items: BillingOneTimePurchase[];
 }
 
 export interface SystemAdminBillingTenantSummary {
