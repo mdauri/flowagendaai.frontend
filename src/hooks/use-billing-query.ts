@@ -4,11 +4,13 @@ import type {
   BillingCheckoutInput,
   BillingCustomerInput,
   BillingOneTimePurchaseInput,
+  OneTimePurchaseSetupStatus,
 } from "@/types/billing";
 
 export const BILLING_STATUS_QUERY_KEY = ["billing", "status"] as const;
 export const BILLING_PAYMENTS_QUERY_KEY = ["billing", "payments"] as const;
 export const SYSTEM_ADMIN_BILLING_QUERY_KEY = ["system-admin", "billing"] as const;
+export const SYSTEM_ADMIN_ONE_TIME_PURCHASES_QUERY_KEY = ["system-admin", "billing", "one-time-purchases"] as const;
 
 export function useBillingStatusQuery() {
   return useQuery({
@@ -78,6 +80,25 @@ export function useSystemAdminTenantBillingQuery(tenantId: string | null) {
     queryKey: [...SYSTEM_ADMIN_BILLING_QUERY_KEY, tenantId],
     queryFn: () => billingService.getSystemAdminTenantBilling(tenantId as string),
     enabled: Boolean(tenantId),
+  });
+}
+
+export function useSystemAdminOneTimePurchasesQuery() {
+  return useQuery({
+    queryKey: SYSTEM_ADMIN_ONE_TIME_PURCHASES_QUERY_KEY,
+    queryFn: () => billingService.listSystemAdminOneTimePurchases(),
+  });
+}
+
+export function useUpdateOneTimePurchaseSetupStatusMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ purchaseId, setupStatus }: { purchaseId: string; setupStatus: OneTimePurchaseSetupStatus }) =>
+      billingService.updateOneTimePurchaseSetupStatus(purchaseId, setupStatus),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: SYSTEM_ADMIN_ONE_TIME_PURCHASES_QUERY_KEY });
+      void queryClient.invalidateQueries({ queryKey: SYSTEM_ADMIN_BILLING_QUERY_KEY });
+    },
   });
 }
 

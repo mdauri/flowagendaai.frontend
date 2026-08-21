@@ -5,8 +5,11 @@ import type {
   BillingCustomerInput,
   BillingOneTimePurchaseInput,
   BillingOneTimePurchaseResponse,
+  BillingOneTimePurchase,
   BillingPaymentsResponse,
   BillingStatusResponse,
+  OneTimePurchaseSetupStatus,
+  SystemAdminOneTimePurchasesResponse,
   SystemAdminBillingTenantSummary,
 } from "@/types/billing";
 
@@ -53,6 +56,20 @@ export const billingService = {
   async getSystemAdminTenantBilling(tenantId: string): Promise<BillingStatusResponse & { payments: BillingPaymentsResponse["items"] }> {
     return httpClient<BillingStatusResponse & { payments: BillingPaymentsResponse["items"] }>(
       `/system-admin/tenants/${tenantId}/billing`,
+    );
+  },
+
+  async listSystemAdminOneTimePurchases(): Promise<SystemAdminOneTimePurchasesResponse> {
+    return httpClient<SystemAdminOneTimePurchasesResponse>("/system-admin/billing/one-time-purchases");
+  },
+
+  async updateOneTimePurchaseSetupStatus(
+    purchaseId: string,
+    setupStatus: OneTimePurchaseSetupStatus,
+  ): Promise<BillingOneTimePurchase> {
+    return httpClient<BillingOneTimePurchase>(
+      `/system-admin/billing/one-time-purchases/${purchaseId}/setup-status`,
+      { method: "PATCH", body: JSON.stringify({ setupStatus }) },
     );
   },
 
