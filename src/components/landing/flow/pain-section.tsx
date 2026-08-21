@@ -7,21 +7,21 @@ import { trackLandingEvent } from "@/lib/landing-analytics";
 const pains = [
   {
     icon: "✗",
-    problem: "Clientes esperando resposta",
+    problem: "Faltas deixam dinheiro na mesa",
     description:
-      "Enquanto você atende, novas mensagens podem ficar para depois e o cliente procura outro horário.",
+      "Sem lembretes automáticos, o cliente esquece e o horário fica vazio. Uma falta por semana já é mais de R$ 300 no final do mês.",
   },
   {
     icon: "✗",
-    problem: "Horários em conflito",
+    problem: "Conflitos viram retrabalho",
     description:
-      "Sem uma agenda centralizada, fica mais fácil marcar duas coisas no mesmo horário.",
+      "Horários duplicados, bloqueios esquecidos e alterações manuais bagunçam a rotina da equipe.",
   },
   {
     icon: "✗",
-    problem: "Faltas sem lembrete",
+    problem: "Cliente demora, você perde oportunidade",
     description:
-      "Sem avisos automáticos, o cliente pode esquecer o compromisso e deixar buracos na rotina.",
+      "Quando a resposta depende de mensagem, o cliente pode desistir ou procurar outro profissional.",
   },
 ];
 
@@ -48,19 +48,17 @@ export function PainSection() {
   return (
     <section className="px-6 py-18 md:px-10 lg:px-16">
       <div className="mx-auto max-w-7xl">
-        <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
-          {/* Lado esquerdo — dores */}
-          <div>
+        <div className="grid gap-6 lg:grid-cols-2 lg:items-stretch">
+          <Card variant="premium" padding="lg" className="flex h-full flex-col md:p-10">
             <p className="text-sm font-semibold uppercase tracking-[0.22em] text-secondary">
               O problema
             </p>
             <h2 className="mt-3 text-3xl font-black tracking-tight text-[var(--theme-text-primary)] md:text-5xl">
-              Agenda manual custa tempo e cria buracos na rotina
+              Agenda manual faz você perder tempo, clientes e horários
             </h2>
             <p className="mt-4 text-base leading-7 text-text-soft">
-              Quando tudo depende de mensagem, caderno ou planilha, clientes
-              esperam resposta, horários se cruzam e faltas passam
-              despercebidas.
+              Quando tudo depende de mensagem, caderno ou planilha, o negócio
+              para quando você para.
             </p>
 
             <div className="mt-8 space-y-4">
@@ -88,20 +86,21 @@ export function PainSection() {
                 </div>
               ))}
             </div>
-          </div>
+            <a href="#solucao" className="mt-6 inline-block text-sm font-semibold text-secondary transition hover:text-[var(--theme-text-primary)]">
+              Veja como o Agendoro resolve isso →
+            </a>
+          </Card>
 
-          {/* Lado direito — solução */}
-          <Card variant="premium" padding="lg" className="md:p-10">
+          <Card id="solucao" variant="premium" padding="lg" className="flex h-full flex-col md:p-10">
             <p className="text-sm font-semibold uppercase tracking-[0.22em] text-secondary">
               A solução
             </p>
             <h3 className="mt-3 text-2xl font-black tracking-tight text-[var(--theme-text-primary)] md:text-3xl">
-              Uma agenda online para organizar o dia e deixar o cliente agendar sozinho
+              Sua agenda organizada em minutos. Seu cliente agendando sozinho em segundos.
             </h3>
             <p className="mt-4 text-sm leading-7 text-text-soft">
-              O Agendoro centraliza horários, profissionais, serviços,
-              clientes, agendamento online e lembretes em uma experiência
-              simples para você e para seu cliente.
+              O Agendoro centraliza horários, profissionais, serviços, clientes,
+              agendamento online e lembretes em uma experiência simples.
             </p>
 
             <div className="mt-7 space-y-3">
@@ -110,7 +109,7 @@ export function PainSection() {
               ))}
             </div>
 
-            <div className="mt-8">
+            <div className="mt-8 lg:mt-auto lg:pt-8">
               <Button
                 as="a"
                 href="#precos"
@@ -123,7 +122,7 @@ export function PainSection() {
                   })
                 }
               >
-                Ver planos
+              Ver planos e preços →
               </Button>
             </div>
           </Card>

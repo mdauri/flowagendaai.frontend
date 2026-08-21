@@ -117,27 +117,18 @@ export function Hero() {
     <section className="px-6 pb-12 pt-8 md:px-10 lg:px-16 lg:pt-12">
       <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[1.08fr_0.92fr]">
         <div>
-          <Badge
-            variant="subtle"
-            className="mb-6 px-4 py-2 text-sm text-badge-text"
-          >
-            Sistema de agendamento online para pequenos negócios
-          </Badge>
+          <p className="mb-6 text-sm font-semibold uppercase tracking-[0.18em] text-secondary">
+            Agendamento online para negócios que vivem de horário marcado
+          </p>
 
           <h1 className="max-w-4xl text-4xl font-black leading-tight tracking-tight text-[var(--theme-text-primary)] md:text-5xl lg:text-6xl">
-            Sua agenda organizada.
-            <span className="bg-linear-to-r from-primary via-secondary to-tertiary bg-clip-text text-transparent">
-              {" "}Seus clientes agendando sozinhos.
-            </span>
+            Reduza faltas e ganhe tempo com uma agenda online que trabalha por você
           </h1>
 
           <p className="mt-5 max-w-2xl text-base leading-7 text-text-soft md:text-lg">
-            Gerencie horários, profissionais, serviços, clientes e lembretes em
-            uma plataforma simples para negócios que vivem de agenda.
-          </p>
-
-          <p className="mt-4 text-sm font-bold text-secondary md:text-base">
-            R$ 97/mês · até 3 profissionais · agendamentos ilimitados
+            Seus clientes escolhem horários sozinhos pelo seu link, recebem
+            lembretes automáticos e você gerencia agenda, equipe e serviços em
+            um só lugar.
           </p>
 
           <div className="mt-6 flex flex-col gap-4 sm:flex-row">
@@ -152,14 +143,18 @@ export function Hero() {
                 })
               }
             >
-              Testar grátis por 14 dias
+              Começar teste grátis de 14 dias
             </Button>
             <Button as="a" href="#como-funciona" variant="secondary">
               Ver como funciona
             </Button>
           </div>
 
-          <div className="mt-8 grid gap-4 sm:grid-cols-3">
+          <p className="mt-4 text-sm text-text-muted">
+            🔒 14 dias grátis · Sem cartão de crédito · Cancele quando quiser
+          </p>
+
+          <div className="mt-7 grid gap-3 sm:grid-cols-3">
             {heroKpis.map(([title, subtitle]) => (
               <HeroKpiCard key={title} title={title} subtitle={subtitle} />
             ))}

@@ -12,3 +12,4 @@ export * from "./glass-list-item";
 export * from "./testimonial-card";
 export * from "./pricing-section";
 export * from "./cta-section";
+export * from "./faq-section";

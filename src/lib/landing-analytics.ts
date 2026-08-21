@@ -6,6 +6,7 @@ export type LandingEventName =
 export type LandingEventSource =
   | "navbar"
   | "hero"
+  | "how_it_works"
   | "pricing"
   | "final_cta";
 

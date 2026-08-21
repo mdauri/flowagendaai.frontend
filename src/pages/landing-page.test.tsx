@@ -30,6 +30,12 @@ describe("LandingPage", () => {
     expect(document.body).toHaveTextContent("+ R$ 100/mês");
     expect(document.body).toHaveTextContent("Implantação assistida: R$ 197");
     expect(document.body).toHaveTextContent("Implantação WhatsApp: R$ 297");
+    expect(document.body).toHaveTextContent(
+      "Reduza faltas e ganhe tempo com uma agenda online que trabalha por você"
+    );
+    expect(document.body).toHaveTextContent("Dúvidas frequentes");
+    expect(document.body).toHaveTextContent("Faltas deixam dinheiro na mesa");
+    expect(document.body).not.toHaveTextContent("Mais de 100 negócios");
   });
 
   test("preserva o CTA comercial do adicional WhatsApp", () => {

@@ -29,12 +29,11 @@ export function PricingSection() {
             Investimento
           </p>
           <h2 className="mt-3 text-3xl font-black tracking-tight text-[var(--theme-text-primary)] md:text-5xl">
-            Um plano principal, adicionais quando fizer sentido
+            Comece com agenda online completa por R$ 97/mês
           </h2>
           <p className="mt-4 text-base leading-7 text-text-soft">
-            Comece com o Agendoro completo por R$ 97/mês. Se quiser, adicione a
-            automação WhatsApp depois, sem transformar isso em requisito para
-            usar a plataforma.
+            Inclui até 3 profissionais, agendamentos ilimitados, página pública,
+            lembretes e área do cliente. Teste por 14 dias sem cartão.
           </p>
           <p className="mt-2 text-sm font-semibold text-success">14 dias grátis, sem cartão.</p>
         </div>
@@ -51,13 +50,12 @@ export function PricingSection() {
                 </span>
                 <span className="mb-2 text-sm text-text-muted">/mês</span>
               </div>
-              <p className="mt-4 text-sm font-bold text-success">
-                R$ 970/ano — pague 10 meses e use 12
+              <p className="mt-4 inline-flex w-fit rounded-full bg-badge px-3 py-2 text-sm font-bold text-success">
+                💰 Economize 2 meses — R$ 970/ano
               </p>
               <p className="mt-2 text-sm leading-7 text-text-soft">
-                Para pequenos negócios que precisam de agenda organizada,
-                agendamento online, lembretes e uma experiência profissional
-                para o cliente.
+                Agenda online completa para organizar sua operação e deixar o
+                cliente agendar sozinho.
               </p>
             </div>
 
@@ -105,17 +103,22 @@ export function PricingSection() {
                 Agendoro + WhatsApp: R$ 197/mês
               </p>
               <p className="mt-2 text-sm leading-7 text-text-soft">
-                Adiciona automações de atendimento e lembretes pelo WhatsApp
-                para negócios que querem esse canal integrado ao Agendoro.
+                Adicione automações de atendimento e lembretes pelo WhatsApp
+                quando fizer sentido para o seu negócio.
               </p>
 
               <div className="mt-6 space-y-3 border-t border-[var(--theme-border-subtle)] pt-6">
                 <GlassListItem icon="✓" label="Implantação WhatsApp: R$ 297" />
-                <GlassListItem
-                  icon="!"
-                  label="Custos de mensagens cobrados pela Meta não estão incluídos."
-                />
               </div>
+              <details className="mt-4 text-xs text-text-muted">
+                <summary className="inline-flex cursor-pointer list-none items-center gap-1 font-semibold text-secondary [&::-webkit-details-marker]:hidden">
+                  <span aria-hidden="true">ℹ️</span> Sobre os custos de mensagens
+                </summary>
+                <p className="mt-2 leading-5">
+                  As mensagens enviadas pelo WhatsApp têm custos cobrados pela
+                  Meta, que não estão incluídos no valor do add-on.
+                </p>
+              </details>
               <Button
                 as="a"
                 href={

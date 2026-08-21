@@ -10,6 +10,7 @@ import {
   Navbar,
   PainSection,
   PricingSection,
+  FAQSection,
   SectionHeading,
 } from "@/components/landing/flow";
 import { Card } from "@/components/landing/flow/card";
@@ -18,27 +19,27 @@ import { trackLandingEvent } from "@/lib/landing-analytics";
 
 const features = [
   {
-    title: "Cliente agenda sozinho",
+    title: "Reduza faltas com lembretes automáticos",
     description:
-      "Seu link fica disponível para o cliente escolher serviço, profissional e horário quando for melhor para ele.",
+      "Envie lembretes por push, e-mail e canais configurados para diminuir esquecimentos e manter a agenda cheia.",
   },
   {
-    title: "Rotina mais organizada",
+    title: "Economize tempo no WhatsApp",
     description:
-      "Agenda, profissionais, serviços, bloqueios e clientes ficam em um só lugar para reduzir conflitos.",
+      "Seu cliente acessa o link, escolhe serviço, profissional e horário sem você intermediar cada conversa.",
   },
   {
-    title: "Lembretes automáticos",
+    title: "Evite conflitos de agenda",
     description:
-      "Reduza faltas com lembretes por push, e-mail e canais configurados conforme a rotina do negócio.",
+      "Serviços, profissionais, bloqueios e horários centralizados para reduzir marcações erradas e retrabalho.",
   },
 ];
 
 const benefits = [
-  "Atendimento disponível 24h pelo link",
-  "Menos retrabalho administrativo",
-  "Mais clareza para equipe e profissionais",
-  "Experiência mobile para o cliente",
+  "Mais horários preenchidos com agendamento 24h",
+  "Menos mensagens pendentes no dia a dia",
+  "Equipe mais independente para atender",
+  "Cliente acompanha tudo pelo celular",
 ];
 
 const audiences = [
@@ -50,9 +51,24 @@ const audiences = [
   "Profissionais autônomos",
 ];
 
+const audienceDescriptions: Record<string, string> = {
+  "Estética automotiva":
+    "Vitrificação, polimento e higienização com tempo correto na agenda. Cliente agenda pelo link e recebe lembrete antes de chegar.",
+  "Salões de beleza":
+    "Corte, coloração e tratamentos em uma agenda única. Profissionais veem a fila do dia no celular, sem sobreposição.",
+  "Manicures e nail designers":
+    "Alongamento, banho de gel e manutenção com tempo certo entre atendimentos. Menos 'esqueci', mais cadeiras cheias.",
+  "Lash designers":
+    "Classic, volume e híbrido com bloqueios automáticos entre atendimentos. Agenda que respeita o tempo de cada técnica.",
+  "Barbearias premium":
+    "Corte, barba e combos com duração precisa. Cliente escolhe o barbeiro e o horário pelo link próprio — até de madrugada.",
+  "Profissionais autônomos":
+    "Uma agenda que trabalha quando você descansa. Clientes agendam 24h e recebem lembretes automáticos.",
+};
+
 const resourceModules = [
   {
-    title: "Agenda e equipe",
+    title: "Controle a agenda da equipe",
     items: [
       "Agenda desktop e mobile",
       "Gestão de profissionais",
@@ -61,7 +77,7 @@ const resourceModules = [
     ],
   },
   {
-    title: "Agendamento online",
+    title: "Receba agendamentos online",
     items: [
       "Página pública de agendamento",
       "Link próprio",
@@ -70,7 +86,7 @@ const resourceModules = [
     ],
   },
   {
-    title: "Experiência do cliente",
+    title: "Dê autonomia ao cliente",
     items: [
       "PWA do cliente",
       "Instalação do app",
@@ -79,7 +95,7 @@ const resourceModules = [
     ],
   },
   {
-    title: "Automações nativas",
+    title: "Automatize lembretes e retornos",
     items: [
       "Lembretes por push",
       "Lembretes por e-mail",
@@ -106,8 +122,8 @@ export function LandingPage() {
           <div className="mx-auto max-w-7xl">
             <SectionHeading
               eyebrow="Benefícios"
-              title="Mais organização para você. Mais autonomia para o cliente."
-              description="Menos tempo respondendo manualmente, mais clareza para a equipe e uma experiência profissional para quem agenda."
+              title="Ganhe tempo na operação e reduza faltas sem depender de conversa manual"
+              description="Menos tempo respondendo, mais clareza para a equipe e uma experiência profissional para quem agenda."
             />
 
             <div className="mt-10 grid gap-6 lg:grid-cols-3">
@@ -126,7 +142,7 @@ export function LandingPage() {
                   Por que funciona
                 </p>
                 <h3 className="mt-3 text-2xl font-black text-[var(--theme-text-primary)] md:text-4xl">
-                  Simples para operar, profissional para quem agenda
+                  O que muda no seu dia com o Agendoro
                 </h3>
               </div>
               <div className="grid gap-3">
@@ -148,8 +164,8 @@ export function LandingPage() {
           <div className="mx-auto max-w-7xl">
             <SectionHeading
               eyebrow="Recursos"
-              title="Os módulos essenciais para uma agenda profissional"
-              description="O Agendoro reúne operação, agendamento online, experiência do cliente e lembretes em uma plataforma única para pequenos negócios."
+              title="Tudo que você precisa para agendar, lembrar e organizar clientes"
+              description="O Agendoro reúne operação, agendamento online, experiência do cliente e lembretes em uma plataforma única."
             />
 
             <div className="mt-10 grid gap-6 lg:grid-cols-2">
@@ -183,8 +199,8 @@ export function LandingPage() {
             <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
               <SectionHeading
                 eyebrow="Segmentos"
-                title="Para qualquer negócio que vive de horário marcado"
-                description="Estética, beleza, saúde, consultórios e serviços locais ganham uma agenda mais previsível sem depender de conversa manual para cada horário."
+                title="Feito para quem vive de horário marcado"
+                description="Estética, beleza, saúde, consultórios e serviços locais ganham uma agenda mais previsível."
               />
               <Button
                 as="a"
@@ -214,8 +230,7 @@ export function LandingPage() {
                     {audience}
                   </div>
                   <p className="mt-2 text-sm leading-6 text-text-muted">
-                    Estrutura profissional para atrair clientes, organizar
-                    horários e oferecer uma experiência consistente.
+                    {audienceDescriptions[audience]}
                   </p>
                 </Card>
               ))}
@@ -223,6 +238,7 @@ export function LandingPage() {
           </Card>
         </section>
         <PricingSection />
+        <FAQSection />
         <CTASection />
 
         <footer className="px-6 pb-10 md:px-10 lg:px-16">

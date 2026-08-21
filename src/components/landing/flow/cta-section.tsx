@@ -16,12 +16,12 @@ export function CTASection() {
               Pronto para começar?
             </p>
             <h2 className="mt-3 text-3xl font-black tracking-tight text-[var(--theme-text-primary)] md:text-5xl">
-              Comece seu teste e veja o Agendoro funcionando no seu negócio
+              Coloque sua agenda online ainda hoje
             </h2>
             <p className="mt-4 max-w-2xl text-base leading-7 text-text-soft md:text-lg">
-              Crie sua conta, configure sua agenda e compartilhe seu link de
-              agendamento. O teste gratuito dá acesso ao Agendoro sem cartão de
-              crédito.
+              Crie sua conta, configure seus serviços e compartilhe seu link
+              para começar a receber agendamentos sem depender de mensagens
+              manuais.
             </p>
           </div>
 
@@ -37,7 +37,7 @@ export function CTASection() {
                 })
               }
             >
-              Testar grátis por 14 dias
+              Começar teste grátis de 14 dias
             </Button>
             <Button as="a" href="#precos" variant="secondary">
               Ver preços

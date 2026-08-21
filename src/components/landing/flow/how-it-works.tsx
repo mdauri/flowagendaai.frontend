@@ -24,7 +24,7 @@ const steps = [
     number: "03",
     title: "Clientes agendam e recebem lembretes",
     description:
-      "O cliente escolhe o horário, acompanha compromissos e recebe lembretes conforme sua configuração.",
+      "O cliente escolhe o horário, acompanha compromissos e recebe lembretes automáticos.",
   },
 ];
 
@@ -37,11 +37,10 @@ export function HowItWorks() {
             Como funciona
           </p>
           <h2 className="mt-3 text-3xl font-black tracking-tight text-[var(--theme-text-primary)] md:text-5xl">
-            Comece em 3 passos
+            Configure hoje. Agende amanhã.
           </h2>
           <p className="mt-4 text-base leading-7 text-text-soft">
-            Configure sua agenda, compartilhe seu link e deixe seus clientes
-            escolherem horários disponíveis.
+            Três passos para deixar sua agenda trabalhando por você:
           </p>
         </div>
 
@@ -78,16 +77,16 @@ export function HowItWorks() {
         <div className="mt-10 flex justify-center">
           <Button
             as="a"
-            href="#precos"
+            href="/signup"
             onClick={() =>
-              trackLandingEvent("landing_pricing_clicked", {
-                sourceSection: "pricing",
-                target: "#precos",
+              trackLandingEvent("landing_trial_cta_clicked", {
+                sourceSection: "how_it_works",
+                target: "/signup",
                 planContext: "agendoro",
               })
             }
           >
-            Ver preços
+            Começar teste grátis →
           </Button>
         </div>
       </div>
