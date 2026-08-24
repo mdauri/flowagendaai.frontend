@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 import { demoClick, demoPause, demoType, highlight, installDemoHarness, showCaption, showChecklistContext } from "./helpers/onboarding-demo";
 import { mockOnboardingVideoApi, videoSteps } from "./helpers/onboarding-video-fixture";
 
-test.use({ video: "on" });
+test.use({ video: { mode: "on", size: { width: 1280, height: 720 } } });
 
 for (const [videoKey, label] of videoSteps) {
   test(`gera video onboarding ${videoKey}`, async ({ page }) => {

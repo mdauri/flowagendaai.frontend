@@ -16,6 +16,7 @@ const videoKeys = [
   "test-booking",
   "publish",
 ];
+const demoBootstrapTrimSeconds = 3.5;
 
 fs.mkdirSync(outputDir, { recursive: true });
 for (const entry of fs.readdirSync(outputDir)) {
@@ -51,6 +52,25 @@ function findVideo(directory, key) {
   return null;
 }
 
+function trimDemoBootstrap(source, target) {
+  const result = spawnSync("ffmpeg", [
+    "-y",
+    "-loglevel", "error",
+    "-i", source,
+    "-ss", String(demoBootstrapTrimSeconds),
+    "-c:v", "libvpx",
+    "-deadline", "realtime",
+    "-cpu-used", "8",
+    "-crf", "10",
+    "-b:v", "0",
+    "-an",
+    target,
+  ], { cwd: root, stdio: "inherit" });
+  if (result.status !== 0) {
+    throw new Error(`Nao foi possivel remover o bootstrap visual do video ${source}`);
+  }
+}
+
 const manifest = { version: "", videos: {} };
 for (const key of videoKeys) {
   const source = findVideo(resultsDir, key);
@@ -58,7 +78,10 @@ for (const key of videoKeys) {
   if (!source || !fs.existsSync(source) || fs.statSync(source).size === 0) {
     throw new Error(`Video ausente ou vazio para ${key}: ${source}`);
   }
-  fs.copyFileSync(source, target);
+  const rawTarget = `${target}.raw.webm`;
+  fs.copyFileSync(source, rawTarget);
+  trimDemoBootstrap(rawTarget, target);
+  fs.rmSync(rawTarget, { force: true });
   const hash = crypto.createHash("sha256").update(fs.readFileSync(target)).digest("hex").slice(0, 16);
   manifest.videos[key] = hash;
 }

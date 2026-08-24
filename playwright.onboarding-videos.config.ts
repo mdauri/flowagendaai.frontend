@@ -10,7 +10,7 @@ export default defineConfig({
   reporter: "line",
   use: {
     baseURL: "http://127.0.0.1:5181",
-    video: "on",
+    video: { mode: "on", size: { width: 1280, height: 720 } },
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
     ...devices["Desktop Chrome"],
