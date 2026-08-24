@@ -10,6 +10,14 @@ import { useProfessionalsQuery } from "@/hooks/use-professionals-query";
 import { useServicesQuery } from "@/hooks/use-services-query";
 import { ApiError } from "@/types/api";
 
+vi.mock("@/services/onboarding-service", () => ({
+  onboardingService: {
+    getActivation: vi.fn(),
+    createTestSession: vi.fn(),
+    publish: vi.fn(),
+  },
+}));
+
 vi.mock("@/services/dashboard-service", () => ({
   dashboardService: {
     getSummary: vi.fn(),
@@ -36,6 +44,9 @@ const mockedDashboardService = vi.mocked(dashboardService);
 const mockedBookingsService = vi.mocked(bookingsService);
 const mockedUseProfessionalsQuery = vi.mocked(useProfessionalsQuery);
 const mockedUseServicesQuery = vi.mocked(useServicesQuery);
+const mockedOnboardingService = await import("@/services/onboarding-service").then(
+  ({ onboardingService }) => onboardingService
+);
 
 const successResponse = {
   date: "2026-03-30",
@@ -109,6 +120,24 @@ function createDeferredPromise<T>() {
 
 describe("DashboardPage", () => {
   beforeEach(() => {
+    vi.mocked(mockedOnboardingService.getActivation).mockResolvedValue({
+      isComplete: true,
+      remainingSteps: 0,
+      items: [],
+      publicUrl: null,
+      testBookingUrl: null,
+      milestones: {
+        tenantCreatedAt: "2026-03-30T12:00:00.000Z",
+        publishedAt: null,
+        firstRealBookingAt: null,
+        onboardingCompletedAt: null,
+      },
+      metrics: {
+        timeToFirstRealBookingMs: null,
+        timeToPublishMs: null,
+        publishToFirstBookingMs: null,
+      },
+    });
     vi.spyOn(DateTime, "local").mockReturnValue(
       DateTime.fromISO("2026-03-30T15:00:00.000Z") as ReturnType<typeof DateTime.local>
     );
@@ -134,7 +163,7 @@ describe("DashboardPage", () => {
     const deferred = createDeferredPromise<typeof successResponse>();
     mockedDashboardService.getSummary.mockReturnValue(deferred.promise);
 
-    renderWithProviders(<DashboardPage />);
+    renderWithProviders(<DashboardPage />, { withRouter: true });
 
     expect(
       screen.getByLabelText("Carregando dashboard operacional")
@@ -169,7 +198,7 @@ describe("DashboardPage", () => {
       professionalOccupancy: [],
     });
 
-    renderWithProviders(<DashboardPage />);
+    renderWithProviders(<DashboardPage />, { withRouter: true });
 
     expect(await screen.findByText("Dashboard")).toBeInTheDocument();
     expect(screen.getByText("Nenhum agendamento hoje.")).toBeInTheDocument();
@@ -183,7 +212,7 @@ describe("DashboardPage", () => {
       new ApiError(500, "INTERNAL_ERROR", "Falha ao carregar dashboard", "req-1")
     );
 
-    renderWithProviders(<DashboardPage />);
+    renderWithProviders(<DashboardPage />, { withRouter: true });
 
     expect(await screen.findByText("Falha ao carregar o dashboard")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Tentar novamente" })).toBeInTheDocument();
@@ -199,7 +228,7 @@ describe("DashboardPage", () => {
   test("renderiza sucesso com fallback de cliente nulo e dados do backend", async () => {
     mockedDashboardService.getSummary.mockResolvedValue(successResponse);
 
-    renderWithProviders(<DashboardPage />);
+    renderWithProviders(<DashboardPage />, { withRouter: true });
 
     expect(await screen.findByText("Agenda do dia")).toBeInTheDocument();
     expect(screen.getAllByText("62.50%")).toHaveLength(2);
@@ -232,7 +261,7 @@ describe("DashboardPage", () => {
       },
     });
 
-    renderWithProviders(<DashboardPage />);
+    renderWithProviders(<DashboardPage />, { withRouter: true });
 
     await screen.findByText("Agenda do dia");
 
@@ -272,7 +301,7 @@ describe("DashboardPage", () => {
       },
     });
 
-    renderWithProviders(<DashboardPage />);
+    renderWithProviders(<DashboardPage />, { withRouter: true });
 
     await screen.findByText("Agenda do dia");
 
@@ -298,7 +327,7 @@ describe("DashboardPage", () => {
       new ApiError(409, "BOOKING_CONFLICT", "Time slot is no longer available", "req-1")
     );
 
-    renderWithProviders(<DashboardPage />);
+    renderWithProviders(<DashboardPage />, { withRouter: true });
 
     await screen.findByText("Agenda do dia");
 
@@ -324,7 +353,7 @@ describe("DashboardPage", () => {
       new ApiError(409, "BOOKING_ALREADY_RESOLVED", "O agendamento ja foi resolvido.", "req-1")
     );
 
-    renderWithProviders(<DashboardPage />);
+    renderWithProviders(<DashboardPage />, { withRouter: true });
 
     await screen.findByText("Agenda do dia");
 

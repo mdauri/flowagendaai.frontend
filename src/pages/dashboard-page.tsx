@@ -22,6 +22,8 @@ import { useRescheduleBookingMutation } from "@/hooks/use-reschedule-booking-mut
 import type { DashboardSummaryBookingItem } from "@/types/dashboard";
 import { FeedbackBanner } from "@/components/shared/feedback-banner";
 import { ApiError, isBookingAlreadyResolvedApiError, isBookingConflictApiError } from "@/types/api";
+import { ActivationChecklist } from "@/components/onboarding/activation-checklist";
+import { useNavigate } from "react-router";
 
 function getInitialDashboardDate() {
   return DateTime.local().toISODate() ?? "";
@@ -30,6 +32,7 @@ function getInitialDashboardDate() {
 type DashboardStatusFilter = "" | "AWAITING_DEPOSIT" | "PENDING" | "CONFIRMED" | "CANCELLED" | "COMPLETED";
 
 export function DashboardPage() {
+  const navigate = useNavigate();
   const [date, setDate] = React.useState(getInitialDashboardDate);
   const [professionalId, setProfessionalId] = React.useState("");
   const [serviceId, setServiceId] = React.useState("");
@@ -292,6 +295,8 @@ export function DashboardPage() {
           description={feedback}
         />
       ) : null}
+
+      <ActivationChecklist onNavigate={(href) => navigate(href)} />
 
       <DashboardHeader
         date={summary.date}

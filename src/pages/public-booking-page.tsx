@@ -143,6 +143,7 @@ export function PublicBookingPage() {
   const [searchParams] = useSearchParams();
   const preselectedServiceId = searchParams.get("service");
   const preselectedDate = searchParams.get("date");
+  const onboardingTestToken = searchParams.get("onboardingTest") ?? undefined;
 
   const [currentStep, setCurrentStep] = useState<PublicBookingStep>("service");
   const [selectedService, setSelectedService] = useState<PublicServiceItem | null>(null);
@@ -380,6 +381,7 @@ export function PublicBookingPage() {
           customerName: customerName.trim(),
           customerPhone: customerPhone.trim(),
           customerEmail: customerEmail.trim(),
+          onboardingTestToken,
         },
         {
           onSuccess: async (booking) => {

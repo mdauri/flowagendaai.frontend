@@ -71,6 +71,7 @@ export interface CreatePublicBookingInput {
   customerName: string;
   customerPhone: string;
   customerEmail?: string;
+  onboardingTestToken?: string;
 }
 
 export interface CreatePublicBookingResponse {
