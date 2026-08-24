@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
+import crypto from "node:crypto";
 
 const root = process.cwd();
 const resultsDir = "/tmp/agendoro-playwright-onboarding-results";
@@ -35,14 +36,34 @@ if (runner.status !== 0) {
   process.exit(runner.status ?? 1);
 }
 
+function findVideo(directory, key) {
+  for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+    const entryPath = path.join(directory, entry.name);
+    if (entry.isDirectory()) {
+      if (entry.name.includes(`video-onboarding-${key}`) || entry.name.includes(`video-curto-para-${key}`)) {
+        const candidate = path.join(entryPath, "video.webm");
+        if (fs.existsSync(candidate)) return candidate;
+      }
+      const nested = findVideo(entryPath, key);
+      if (nested) return nested;
+    }
+  }
+  return null;
+}
+
+const manifest = { version: "", videos: {} };
 for (const key of videoKeys) {
-  const scenarioDir = path.join(resultsDir, `onboarding-videos-gera-video-curto-para-${key}`);
-  const source = path.join(scenarioDir, "video.webm");
+  const source = findVideo(resultsDir, key);
   const target = path.join(outputDir, `${key}.webm`);
-  if (!fs.existsSync(source) || fs.statSync(source).size === 0) {
+  if (!source || !fs.existsSync(source) || fs.statSync(source).size === 0) {
     throw new Error(`Video ausente ou vazio para ${key}: ${source}`);
   }
   fs.copyFileSync(source, target);
+  const hash = crypto.createHash("sha256").update(fs.readFileSync(target)).digest("hex").slice(0, 16);
+  manifest.videos[key] = hash;
 }
+
+manifest.version = crypto.createHash("sha256").update(JSON.stringify(manifest.videos)).digest("hex").slice(0, 16);
+fs.writeFileSync(path.join(outputDir, "manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`);
 
 console.log(`Videos de onboarding gerados em ${outputDir}`);
