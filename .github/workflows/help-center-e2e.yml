@@ -84,4 +84,4 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run Help Center E2E
-        run: npm run e2e -- e2e/help-center.spec.ts
+        run: npm run e2e -- e2e/help-center.spec.ts e2e/onboarding-dismissible.spec.ts
