@@ -13,6 +13,7 @@ import { ApiError } from "@/types/api";
 vi.mock("@/services/onboarding-service", () => ({
   onboardingService: {
     getActivation: vi.fn(),
+    setVisibility: vi.fn(),
     createTestSession: vi.fn(),
     publish: vi.fn(),
   },
@@ -121,6 +122,7 @@ function createDeferredPromise<T>() {
 describe("DashboardPage", () => {
   beforeEach(() => {
     vi.mocked(mockedOnboardingService.getActivation).mockResolvedValue({
+      visibility: "VISIBLE",
       isComplete: true,
       remainingSteps: 0,
       items: [],

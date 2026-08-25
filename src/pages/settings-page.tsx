@@ -10,6 +10,7 @@ import { BookingReminderConfig } from "@/components/settings/booking-reminder-co
 import { CustomerAppSettingsCard } from "@/components/settings/customer-app-settings-card";
 import { CustomerReactivationConfig } from "@/components/settings/customer-reactivation-config";
 import { SubscriptionClubConfig } from "@/components/settings/subscription-club-config";
+import { OnboardingVisibilityCard } from "@/components/settings/onboarding-visibility-card";
 import { tenantService } from "@/services/tenant-service";
 import { tenantCoverImageService } from "@/services/tenant-cover-image-service";
 import { tenantLogoImageService } from "@/services/tenant-logo-image-service";
@@ -216,6 +217,8 @@ export function SettingsPage() {
 
       {/* Subscription Club Section */}
       <SubscriptionClubConfig />
+
+      <OnboardingVisibilityCard />
 
       {/* Save Button and Feedback */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
