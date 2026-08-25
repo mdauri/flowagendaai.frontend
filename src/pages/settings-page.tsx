@@ -15,6 +15,7 @@ import { tenantService } from "@/services/tenant-service";
 import { tenantCoverImageService } from "@/services/tenant-cover-image-service";
 import { tenantLogoImageService } from "@/services/tenant-logo-image-service";
 import { Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { HelpContextualLink } from "@/components/help/help-contextual-link";
 
 type SaveState = "idle" | "saving" | "success" | "error";
 
@@ -119,6 +120,7 @@ export function SettingsPage() {
         <p className="mt-1 text-sm text-text-soft">
           Informacoes exibidas no catalogo.
         </p>
+        <HelpContextualLink href="/ajuda/primeiros-passos/configurar-empresa">Como configurar sua empresa</HelpContextualLink>
       </div>
 
       {/* Tenant Profile Section */}

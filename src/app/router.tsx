@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import { AppPage } from "@/pages/app-page";
 import { AvailabilityPage } from "@/pages/availability-page";
@@ -35,6 +36,18 @@ import { ProtectedRoute } from "@/components/app/protected-route";
 import { getLastCustomerAppTenantSlug } from "@/session/customer-app-last-tenant-storage";
 import { ForgotPage } from "../pages/forgot-password-page";
 import { useAuth } from "@/hooks/use-auth";
+const HelpCenterPage = lazy(() => import("@/pages/help-center-page").then((module) => ({ default: module.HelpCenterPage })));
+const HelpCategoryPage = lazy(() => import("@/pages/help-category-page").then((module) => ({ default: module.HelpCategoryPage })));
+const HelpArticlePage = lazy(() => import("@/pages/help-article-page").then((module) => ({ default: module.HelpArticlePage })));
+const HelpNotFoundPage = lazy(() => import("@/pages/help-not-found-page").then((module) => ({ default: module.HelpNotFoundPage })));
+
+function HelpRouteFallback() {
+  return <div className="grid min-h-screen place-items-center bg-(--bg-base) px-4 text-sm text-text-soft" role="status">Carregando a Central de Ajuda...</div>;
+}
+
+function HelpRoute({ children }: { children: React.ReactNode }) {
+  return <Suspense fallback={<HelpRouteFallback />}>{children}</Suspense>;
+}
 
 function CustomerAppEntryBlockedPage() {
   const lastTenantSlug = getLastCustomerAppTenantSlug();
@@ -92,6 +105,10 @@ export function AppRouter() {
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/forgot-password" element={<ForgotPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/ajuda" element={<HelpRoute><HelpCenterPage /></HelpRoute>} />
+        <Route path="/ajuda/:categorySlug/:articleSlug" element={<HelpRoute><HelpArticlePage /></HelpRoute>} />
+        <Route path="/ajuda/:categorySlug" element={<HelpRoute><HelpCategoryPage /></HelpRoute>} />
+        <Route path="/ajuda/*" element={<HelpRoute><HelpNotFoundPage /></HelpRoute>} />
         <Route path="/c" element={<CustomerAppEntryBlockedPage />} />
         <Route path="/c/:slug" element={<CustomerAppHomePage />} />
         <Route path="/c/:slug/bookings/:bookingId" element={<CustomerAppBookingDetailPage />} />
