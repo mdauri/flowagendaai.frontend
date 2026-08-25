@@ -14,6 +14,7 @@ import { useDeleteProfessionalMutation } from "@/hooks/use-delete-professional-m
 import { useProfessionalsQuery } from "@/hooks/use-professionals-query";
 import { useUpdateProfessionalMutation } from "@/hooks/use-update-professional-mutation";
 import { ApiError } from "@/types/api";
+import { HelpContextualLink } from "@/components/help/help-contextual-link";
 import type {
   CreateProfessionalInput,
   CreateProfessionalResponse,
@@ -120,6 +121,7 @@ export function ProfessionalsPage() {
         title="Profissionais"
         description="Equipe e acesso ao sistema"
       />
+      <HelpContextualLink href="/ajuda/profissionais/primeiro-profissional">Como configurar profissionais</HelpContextualLink>
 
       <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,26rem)_minmax(0,1fr)]">
         {canManageProfessionals ? (

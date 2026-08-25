@@ -14,6 +14,7 @@ import { useUpdateAvailabilityMutation } from "@/hooks/use-update-availability-m
 import { formatUtcTimeInTenantTimezone } from "@/lib/date-time";
 import { ApiError } from "@/types/api";
 import type { AvailabilityBaseItem, CreateAvailabilityBaseInput, UpdateAvailabilityBaseInput } from "@/types/base-availability";
+import { HelpContextualLink } from "@/components/help/help-contextual-link";
 
 export function AvailabilityPage() {
   const auth = useAuth();
@@ -99,6 +100,7 @@ export function AvailabilityPage() {
         title="Horarios de atendimento"
         description=""
       />
+      <HelpContextualLink href="/ajuda/profissionais/disponibilidade-profissional">Como configurar disponibilidade</HelpContextualLink>
 
       <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,24rem)_minmax(0,1fr)]">
         <div className="grid gap-6">

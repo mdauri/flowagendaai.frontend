@@ -1,0 +1,87 @@
+name: Help Center E2E
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - feature/central-ajuda
+
+concurrency:
+  group: help-center-e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: agendoro
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d agendoro"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Checkout frontend
+        uses: actions/checkout@v4
+
+      - name: Checkout API fixture
+        uses: actions/checkout@v4
+        with:
+          repository: mdauri/flowagendaai.api
+          ref: master
+          path: api
+          token: ${{ secrets.GHCR_PAT }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            api/package-lock.json
+
+      - name: Install API dependencies and migrate
+        working-directory: api
+        run: |
+          npm ci
+          DATABASE_URL=postgresql://postgres:postgres@localhost:5432/agendoro?schema=public npx prisma migrate deploy
+          DATABASE_URL=postgresql://postgres:postgres@localhost:5432/agendoro?schema=public npm run prisma:seed
+
+      - name: Start API
+        working-directory: api
+        run: |
+          DATABASE_URL=postgresql://postgres:postgres@localhost:5432/agendoro?schema=public \
+          REDIS_URL=redis://localhost:6379 \
+          JWT_SECRET=ci-help-center-secret \
+          FRONTEND_APP_URL=http://localhost:5173 \
+          PORT=3333 npm run dev > /tmp/agendoro-api.log 2>&1 &
+          for i in {1..30}; do code=$(curl --silent --output /dev/null --write-out '%{http_code}' http://localhost:3333/auth/me || true); if [ "$code" = "401" ] || [ "$code" = "200" ]; then exit 0; fi; sleep 1; done
+          cat /tmp/agendoro-api.log
+          exit 1
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Install official Chromium dependencies
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Help Center E2E
+        run: npm run e2e -- e2e/help-center.spec.ts

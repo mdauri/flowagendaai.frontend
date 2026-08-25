@@ -55,6 +55,16 @@ export function Navbar() {
             Entrar
           </Button>
           <Button
+            variant="ghost"
+            size="sm"
+            as="a"
+            href="/ajuda"
+            aria-label="Abrir Central de Ajuda"
+            className="hidden sm:inline-flex"
+          >
+            Ajuda
+          </Button>
+          <Button
             size="sm"
             as="a"
             href="/signup"
