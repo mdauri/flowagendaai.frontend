@@ -6,7 +6,7 @@ test.describe("onboarding dispensável", () => {
     await page.addInitScript(() => window.localStorage.setItem("agendoro:token", "onboarding-e2e-token"));
   });
 
-  test("ocultação incompleta persiste e reabre preservando o progresso", async ({ page }) => {
+  test("ocultação incompleta persiste e reabre preservando o progresso", async ({ page }, testInfo) => {
     await mockOnboardingVideoApi(page, { completedSteps: 6 });
     await page.goto("/app/dashboard");
 
@@ -28,9 +28,10 @@ test.describe("onboarding dispensável", () => {
 
     await page.goto("/app/dashboard");
     await expect(page.getByTestId("activation-checklist")).toContainText("6/8");
+    await testInfo.attach("onboarding-incomplete", { body: await page.screenshot({ fullPage: true }), contentType: "image/png" });
   });
 
-  test("ocultação do estado concluído preserva 8/8", async ({ page }) => {
+  test("ocultação do estado concluído preserva 8/8", async ({ page }, testInfo) => {
     await mockOnboardingVideoApi(page, { complete: true });
     await page.goto("/app/dashboard");
 
@@ -46,9 +47,10 @@ test.describe("onboarding dispensável", () => {
     await page.getByRole("button", { name: "Mostrar checklist de configuração" }).click();
     await page.goto("/app/dashboard");
     await expect(page.getByTestId("activation-compact")).toContainText("Ativacao concluida");
+    await testInfo.attach("onboarding-complete", { body: await page.screenshot({ fullPage: true }), contentType: "image/png" });
   });
 
-  test("fluxo de ocultação funciona em viewport mobile", async ({ page }) => {
+  test("fluxo de ocultação funciona em viewport mobile", async ({ page }, testInfo) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await mockOnboardingVideoApi(page);
     await page.goto("/app/dashboard");
@@ -61,5 +63,6 @@ test.describe("onboarding dispensável", () => {
     await page.getByRole("button", { name: "Ocultar checklist" }).click();
     await expect(page.getByTestId("activation-checklist")).not.toBeVisible();
     expect(await page.locator("body").evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+    await testInfo.attach("onboarding-mobile-dismissed", { body: await page.screenshot({ fullPage: true }), contentType: "image/png" });
   });
 });
