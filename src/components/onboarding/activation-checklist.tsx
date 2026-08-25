@@ -98,7 +98,15 @@ export function ActivationChecklist({ onNavigate }: ActivationChecklistProps) {
       size="sm"
       aria-label="Ocultar configuração inicial"
       title="Ocultar configuração inicial"
-      onClick={(event) => { dismissTriggerRef.current = event.currentTarget; setVisibilityError(null); setConfirmDismiss(true); }}
+      onClick={(event) => {
+        setVisibilityError(null);
+        if (status.isComplete) {
+          void dismiss();
+          return;
+        }
+        dismissTriggerRef.current = event.currentTarget;
+        setConfirmDismiss(true);
+      }}
       disabled={visibilityMutation.isPending}
       className="h-10 w-10 shrink-0 p-0"
     >
