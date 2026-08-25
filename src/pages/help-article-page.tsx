@@ -1,0 +1,14 @@
+import { useEffect } from "react";
+import { Link, useParams } from "react-router";
+import { HelpCenterLayout } from "@/components/help/help-center-layout";
+import { HelpBreadcrumbs } from "@/components/help/help-breadcrumbs";
+import { HelpArticleRenderer } from "@/components/help/help-article-renderer";
+import { HelpArticleList } from "@/components/help/help-article-list";
+import { Card } from "@/components/flow/card";
+import { PageState } from "@/components/shared/page-state";
+import { helpArticleBySlug, helpCategoryBySlug } from "@/help/content";
+import type { HelpCategorySlug } from "@/help/types";
+import { setHelpSeo } from "@/help/seo";
+import { trackHelpEvent } from "@/components/help/help-analytics";
+export function HelpArticlePage() { const { categorySlug, articleSlug } = useParams(); const article = articleSlug ? helpArticleBySlug.get(articleSlug) : undefined; const category = categorySlug ? helpCategoryBySlug.get(categorySlug as HelpCategorySlug) : undefined; useEffect(() => { if (article && category) { setHelpSeo({ title: article.seo.title, description: article.seo.description, path: `/ajuda/${category.slug}/${article.slug}` }); trackHelpEvent("help_article_opened", { articleSlug: article.slug, categorySlug: article.categorySlug }); } }, [article, category]); if (!article || !category || article.categorySlug !== category.slug) return <HelpNotFoundInline />; const related = article.relatedSlugs.map((slug) => helpArticleBySlug.get(slug)).filter((item): item is NonNullable<typeof article> => Boolean(item)); return <HelpCenterLayout><div className="py-8 md:py-12"><HelpBreadcrumbs items={[{ label: category.title, href: `/ajuda/${category.slug}` }, { label: article.title }]} /><article className="mt-8 max-w-3xl"><p className="text-sm font-semibold uppercase tracking-[0.18em] text-secondary">{category.title}</p><h1 className="mt-3 text-4xl font-black tracking-tight text-[var(--theme-text-primary)]">{article.title}</h1><p className="mt-4 text-lg leading-8 text-text-soft">{article.description}</p><div className="mt-8"><HelpArticleRenderer article={article} /></div></article>{related.length ? <section className="mt-12 max-w-3xl" aria-labelledby="related-title"><h2 id="related-title" className="text-2xl font-black text-[var(--theme-text-primary)]">Artigos relacionados</h2><Card variant="glass" padding="md" className="mt-4"><HelpArticleList articles={related} /></Card></section> : null}<Link to="/ajuda" className="mt-8 inline-block text-sm font-semibold text-primary underline underline-offset-4">Voltar para a Central</Link></div></HelpCenterLayout>; }
+function HelpNotFoundInline() { return <HelpCenterLayout><div className="py-16"><PageState title="Não encontramos esta página." description="Confira o endereço ou volte para a Central de Ajuda." actionLabel="Voltar para a Central" actionHref="/ajuda" /></div></HelpCenterLayout>; }

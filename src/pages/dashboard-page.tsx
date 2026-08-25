@@ -20,6 +20,7 @@ import { useCancelBookingMutation } from "@/hooks/use-cancel-booking-mutation";
 import { useMarkBookingDepositPaidMutation } from "@/hooks/use-mark-booking-deposit-paid-mutation";
 import { useRescheduleBookingMutation } from "@/hooks/use-reschedule-booking-mutation";
 import type { DashboardSummaryBookingItem } from "@/types/dashboard";
+import { HelpContextualLink } from "@/components/help/help-contextual-link";
 import { FeedbackBanner } from "@/components/shared/feedback-banner";
 import { ApiError, isBookingAlreadyResolvedApiError, isBookingConflictApiError } from "@/types/api";
 import { ActivationChecklist } from "@/components/onboarding/activation-checklist";
@@ -297,6 +298,7 @@ export function DashboardPage() {
       ) : null}
 
       <ActivationChecklist onNavigate={(href) => navigate(href)} />
+      <HelpContextualLink href="/ajuda/agenda/visao-da-agenda">Como usar a agenda</HelpContextualLink>
 
       <DashboardHeader
         date={summary.date}

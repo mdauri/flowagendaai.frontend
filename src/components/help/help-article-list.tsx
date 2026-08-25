@@ -1,0 +1,5 @@
+import { Link } from "react-router";
+import { Video } from "lucide-react";
+import type { HelpArticle } from "@/help/types";
+import { articleUrl } from "@/help/content";
+export function HelpArticleList({ articles }: { articles: HelpArticle[] }) { return <ul className="divide-y divide-[var(--theme-border-subtle)]" aria-label="Artigos da Central de Ajuda">{articles.map((article) => <li key={article.slug}><Link to={articleUrl(article)} className="group flex min-h-20 items-start justify-between gap-4 py-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"><span className="min-w-0"><span className="block font-bold text-[var(--theme-text-primary)] group-hover:text-primary">{article.title}</span><span className="mt-1 block text-sm leading-6 text-text-soft">{article.description}</span></span>{article.hasVideo ? <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-[var(--theme-border-subtle)] px-2 py-1 text-xs font-semibold text-text-soft"><Video size={13} aria-hidden="true" /> Vídeo</span> : null}</Link></li>)}</ul>; }

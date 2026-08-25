@@ -17,6 +17,7 @@ import { useDeleteHolidayMutation } from "@/hooks/use-delete-holiday-mutation";
 import { ApiError } from "@/types/api";
 import { formatIsoDateTimeToBrDate, parseBrDateToIsoDate } from "@/lib/date-br";
 import type { Holiday } from "@/types/holiday";
+import { HelpContextualLink } from "@/components/help/help-contextual-link";
 
 interface FormState {
   professionalId: string;
@@ -254,6 +255,7 @@ export function HolidaysPage() {
       <div>
         <h2 className="text-2xl font-black tracking-tight text-[var(--theme-text-primary)]">Feriados e bloqueios</h2>
         <p className="mt-2 text-sm leading-6 text-text-soft">Gerencie dias bloqueados.</p>
+        <HelpContextualLink href="/ajuda/agenda/bloquear-horario">Como bloquear horários</HelpContextualLink>
       </div>
 
       <Card className="p-4">

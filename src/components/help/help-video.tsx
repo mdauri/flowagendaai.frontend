@@ -1,0 +1,4 @@
+import { Video } from "lucide-react";
+import type { OfficialOnboardingVideoKey } from "@/help/types";
+import { videoSrc } from "@/help/videos";
+export function HelpVideo({ videoKey, title, fallbackText }: { videoKey: OfficialOnboardingVideoKey; title: string; fallbackText: string }) { return <figure className="my-6 overflow-hidden rounded-2xl border border-[var(--theme-border-subtle)] bg-black/20 p-3"><div className="flex items-center gap-2 px-2 pb-3 text-sm font-semibold text-[var(--theme-text-primary)]"><Video size={16} className="text-primary" aria-hidden="true" />{title}</div><video className="aspect-video w-full rounded-xl bg-black" controls preload="metadata" aria-label={title} src={videoSrc(videoKey)} /><figcaption className="px-2 pt-3 text-sm leading-6 text-text-soft">{fallbackText} Legendas não estão disponíveis neste vídeo.</figcaption></figure>; }

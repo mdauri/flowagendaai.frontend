@@ -17,6 +17,7 @@ import { useServicesQuery } from "@/hooks/use-services-query";
 import { ApiError } from "@/types/api";
 import type { Service } from "@/types/service";
 import type { CreateServiceInput, UpdateServiceInput } from "@/types/service";
+import { HelpContextualLink } from "@/components/help/help-contextual-link";
 
 export function ServicesPage() {
   const auth = useAuth();
@@ -75,6 +76,7 @@ export function ServicesPage() {
         title="Servicos"
         description="Catalogo do estabelecimento"
       />
+      <HelpContextualLink href="/ajuda/primeiros-passos/primeiro-servico">Como cadastrar serviços</HelpContextualLink>
 
       <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,26rem)_minmax(0,1fr)]">
         {canManageServices ? (

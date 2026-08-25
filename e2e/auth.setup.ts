@@ -2,8 +2,9 @@ import { test as setup, expect } from "@playwright/test";
 import path from "node:path";
 
 const authFile = path.join(process.cwd(), "playwright", ".auth", "user.json");
-const defaultEmail = "system-admin@agendoro.com";
-const defaultPassword = "123456";
+// These credentials are created by the API's official demo seed pack.
+const defaultEmail = "admin.demo@agendoro.com";
+const defaultPassword = "Demo@2026";
 
 setup("authenticate", async ({ page }) => {
   const email = process.env.E2E_EMAIL ?? defaultEmail;
