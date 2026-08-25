@@ -1,4 +1,5 @@
 export type ActivationItemStatus = "PENDING" | "COMPLETED";
+export type OnboardingVisibility = "VISIBLE" | "DISMISSED";
 
 export interface ActivationItem {
   id: string;
@@ -11,6 +12,7 @@ export interface ActivationItem {
 }
 
 export interface ActivationStatus {
+  visibility: OnboardingVisibility;
   isComplete: boolean;
   remainingSteps: number;
   items: ActivationItem[];

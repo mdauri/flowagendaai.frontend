@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ActivationChecklist } from "./activation-checklist";
 
 const activation = {
+  visibility: "VISIBLE" as const,
   isComplete: false,
   remainingSteps: 8,
   publicUrl: null,
@@ -16,6 +17,7 @@ const activation = {
 
 const mockedOnboardingService = vi.hoisted(() => ({
   getActivation: vi.fn(),
+  setVisibility: vi.fn(),
   createTestSession: vi.fn(),
   publish: vi.fn(),
 }));
@@ -43,5 +45,20 @@ describe("ActivationChecklist", () => {
     await user.keyboard("{Escape}");
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(trigger).toHaveFocus();
+  });
+
+  it("confirma ocultacao incompleta e persiste a preferencia", async () => {
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const user = userEvent.setup();
+    mockedOnboardingService.setVisibility.mockResolvedValue({ visibility: "DISMISSED", changed: true });
+    render(<QueryClientProvider client={client}><ActivationChecklist onNavigate={vi.fn()} /></QueryClientProvider>);
+
+    const hideButton = await screen.findByRole("button", { name: "Ocultar configuração inicial" });
+    await user.click(hideButton);
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    expect(screen.getByText(/Ainda existem etapas de configuração pendentes/)).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Ocultar checklist" }));
+
+    expect(mockedOnboardingService.setVisibility).toHaveBeenCalledWith("DISMISSED");
   });
 });

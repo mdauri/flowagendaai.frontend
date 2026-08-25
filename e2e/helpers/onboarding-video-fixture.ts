@@ -13,23 +13,33 @@ const steps = [
 
 export const videoSteps = steps;
 
-export async function mockOnboardingVideoApi(page: Page) {
+export async function mockOnboardingVideoApi(page: Page, options: { complete?: boolean } = {}) {
   let professionalCreated = false;
   let serviceCreated = false;
+  let visibility: "VISIBLE" | "DISMISSED" = "VISIBLE";
   await page.route("http://localhost:3333/**", async (route) => {
     const url = new URL(route.request().url());
     const method = route.request().method();
     const json = (body: unknown, status = 200) => route.fulfill({ status, contentType: "application/json", body: JSON.stringify(body) });
+    const complete = Boolean(options.complete);
     const activation = {
-      isComplete: false,
-      remainingSteps: 8,
+      visibility,
+      isComplete: complete,
+      remainingSteps: complete ? 0 : 8,
       publicUrl: null,
       testBookingUrl: "/p/maria-teste",
       milestones: { tenantCreatedAt: "2026-08-21T12:00:00.000Z", publishedAt: null, firstRealBookingAt: null, onboardingCompletedAt: null },
       metrics: { timeToFirstRealBookingMs: null, timeToPublishMs: null, publishToFirstBookingMs: null },
-      items: steps.map(([videoKey, label, href]) => ({ id: videoKey.replaceAll("-", "_"), label, status: "PENDING", reason: `Conclua ${label.toLowerCase()}.`, href, videoKey, completedAt: null })),
+      items: steps.map(([videoKey, label, href]) => ({ id: videoKey.replaceAll("-", "_"), label, status: complete ? "COMPLETED" : "PENDING", reason: complete ? null : `Conclua ${label.toLowerCase()}.`, href, videoKey, completedAt: null })),
     };
     if (url.pathname === "/onboarding/activation") return json(activation);
+    if (url.pathname === "/onboarding/visibility" && method === "PUT") {
+      const body = route.request().postDataJSON() as { visibility?: "VISIBLE" | "DISMISSED" };
+      const nextVisibility = body.visibility === "DISMISSED" ? "DISMISSED" : "VISIBLE";
+      const changed = visibility !== nextVisibility;
+      visibility = nextVisibility;
+      return json({ visibility, changed });
+    }
     if (url.pathname === "/onboarding/publish" && method === "POST") return json({ published: true, publishedAt: "2026-08-21T12:05:00.000Z", publicUrl: "http://localhost:5181/c/tenant-video/catalog" });
     if (url.pathname === "/onboarding/test-session" && method === "POST") return json({ token: "video-demo-token", expiresAt: "2026-08-21T12:35:00.000Z", publicUrl: "http://localhost:5181/c/tenant-video/catalog", bookingUrl: "/p/maria-teste" }, 201);
     if (url.pathname === "/auth/me") return json({ user: { id: "video-user", name: "Video Teste", email: "video@example.test", role: "admin" }, tenant: { id: "video-tenant", name: "Tenant Video", timezone: "America/Sao_Paulo", slug: "tenant-video", logoUrl: null, coverImageUrl: null, publicAddress: "Rua de teste, 100", description: "Agenda de demonstracao", depositModuleEnabled: false, depositPaymentProvider: "MANUAL", depositProviderConfigured: false, mercadoPagoPublicKey: null, depositConvenienceFeeEnabled: false, entitlement: { canAccess: true, accessStatus: "BILLING_EXEMPT", subscriptionStatus: "ACTIVE", isBillingExempt: true } } });
