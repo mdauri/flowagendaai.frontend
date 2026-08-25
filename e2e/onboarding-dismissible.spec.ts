@@ -7,12 +7,12 @@ test.describe("onboarding dispensável", () => {
   });
 
   test("ocultação incompleta persiste e reabre preservando o progresso", async ({ page }) => {
-    await mockOnboardingVideoApi(page);
+    await mockOnboardingVideoApi(page, { completedSteps: 6 });
     await page.goto("/app/dashboard");
 
     const checklist = page.getByTestId("activation-checklist");
     await expect(checklist).toBeVisible();
-    await expect(checklist).toContainText("0/8");
+    await expect(checklist).toContainText("6/8");
     await page.getByRole("button", { name: "Ocultar configuração inicial" }).click();
     await expect(page.getByRole("dialog")).toContainText("Você poderá reabrir este checklist depois");
     await page.getByRole("button", { name: "Ocultar checklist" }).click();
@@ -27,7 +27,7 @@ test.describe("onboarding dispensável", () => {
     await expect(page.getByText("Checklist de configuração reaberto.")).toBeVisible();
 
     await page.goto("/app/dashboard");
-    await expect(page.getByTestId("activation-checklist")).toContainText("0/8");
+    await expect(page.getByTestId("activation-checklist")).toContainText("6/8");
   });
 
   test("ocultação do estado concluído preserva 8/8", async ({ page }) => {

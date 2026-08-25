@@ -13,7 +13,7 @@ const steps = [
 
 export const videoSteps = steps;
 
-export async function mockOnboardingVideoApi(page: Page, options: { complete?: boolean } = {}) {
+export async function mockOnboardingVideoApi(page: Page, options: { complete?: boolean; completedSteps?: number } = {}) {
   let professionalCreated = false;
   let serviceCreated = false;
   let visibility: "VISIBLE" | "DISMISSED" = "VISIBLE";
@@ -22,15 +22,16 @@ export async function mockOnboardingVideoApi(page: Page, options: { complete?: b
     const method = route.request().method();
     const json = (body: unknown, status = 200) => route.fulfill({ status, contentType: "application/json", body: JSON.stringify(body) });
     const complete = Boolean(options.complete);
+    const completedSteps = complete ? 8 : Math.max(0, Math.min(8, options.completedSteps ?? 0));
     const activation = {
       visibility,
       isComplete: complete,
-      remainingSteps: complete ? 0 : 8,
+      remainingSteps: 8 - completedSteps,
       publicUrl: null,
       testBookingUrl: "/p/maria-teste",
       milestones: { tenantCreatedAt: "2026-08-21T12:00:00.000Z", publishedAt: null, firstRealBookingAt: null, onboardingCompletedAt: null },
       metrics: { timeToFirstRealBookingMs: null, timeToPublishMs: null, publishToFirstBookingMs: null },
-      items: steps.map(([videoKey, label, href]) => ({ id: videoKey.replaceAll("-", "_"), label, status: complete ? "COMPLETED" : "PENDING", reason: complete ? null : `Conclua ${label.toLowerCase()}.`, href, videoKey, completedAt: null })),
+      items: steps.map(([videoKey, label, href], index) => ({ id: videoKey.replaceAll("-", "_"), label, status: index < completedSteps ? "COMPLETED" : "PENDING", reason: index < completedSteps ? null : `Conclua ${label.toLowerCase()}.`, href, videoKey, completedAt: null })),
     };
     if (url.pathname === "/onboarding/activation") return json(activation);
     if (url.pathname === "/onboarding/visibility" && method === "PUT") {
