@@ -84,6 +84,8 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run Help Center E2E
+        env:
+          E2E_API_DIR: ${{ github.workspace }}/api
         run: npm run e2e -- e2e/help-center.spec.ts e2e/onboarding-dismissible.spec.ts
 
       - name: Upload E2E screenshots and report
