@@ -1,3 +1,5 @@
+import { captureAcquisitionAttribution } from "@/lib/acquisition-attribution";
+
 export type LandingEventName =
   | "landing_trial_cta_clicked"
   | "landing_pricing_clicked"
@@ -23,6 +25,8 @@ export function trackLandingEvent(
   if (typeof window === "undefined") {
     return;
   }
+
+  captureAcquisitionAttribution();
 
   window.dispatchEvent(
     new CustomEvent("agendoro:landing-event", {
