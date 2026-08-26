@@ -21,39 +21,7 @@
     <meta property="og:image" content="/agendoro-logo.png" />
     <link rel="apple-touch-icon" href="/agendoro-logo.png" />
     <title>Agendoro | Sistema de agendamento online para pequenos negócios</title>
-    <script>
-      (function () {
-        var theme = "dark";
-        var customerAppMatch = window.location.pathname.match(/^\/c\/([^/]+)(?:\/|$)/);
-        var customerAppContextMeta = document.querySelector('meta[name="agendoro-customer-app-context"]');
-
-        try {
-          var storedTheme = window.localStorage.getItem("agendoro-theme");
-          if (storedTheme === "dark" || storedTheme === "light-pastel") {
-            theme = storedTheme;
-          }
-        } catch (error) {
-          theme = "dark";
-        }
-
-        if (window.location.pathname.indexOf("/c/") === 0 || window.location.pathname === "/c") {
-          var manifestLink = document.createElement("link");
-          manifestLink.setAttribute("rel", "manifest");
-          manifestLink.setAttribute("href", "/customer-app.webmanifest");
-          document.head.appendChild(manifestLink);
-
-          if (customerAppContextMeta) {
-            customerAppContextMeta.setAttribute("content", "customer-app");
-          }
-        }
-        if (window.location.pathname.indexOf("/c/") !== 0 && window.location.pathname !== "/c" && customerAppContextMeta) {
-          customerAppContextMeta.setAttribute("content", "browser");
-        }
-
-        document.documentElement.setAttribute("data-theme", theme);
-        document.documentElement.style.colorScheme = theme === "dark" ? "dark" : "light";
-      })();
-    </script>
+    <script src="/theme-init.js"></script>
   </head>
   <body>
     <div id="root"></div>

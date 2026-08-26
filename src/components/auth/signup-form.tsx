@@ -450,9 +450,9 @@ export function SignupForm() {
               <Link className="font-semibold text-secondary" to="/termos-de-uso">
                 Termos de Uso
               </Link>{" "}
-              e a{" "}
+              e declaro que tive acesso à{" "}
               <Link className="font-semibold text-secondary" to="/politica-de-privacidade">
-                Politica de Privacidade
+                Política de Privacidade
               </Link>
               .
             </span>

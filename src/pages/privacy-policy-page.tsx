@@ -10,9 +10,9 @@ const sections = [
     title: "1. Identificação do controlador",
     content: [
       "Esta Política de Privacidade descreve como o Agendoro trata dados pessoais e dados operacionais relacionados ao uso da plataforma de agendamento, automação e gestão de compromissos.",
-      "Controlador responsável: DAURI DESENVOLVIMENTO E TECNOLOGIA LTDA.",
+      "Controlador responsável: BRAGA E FERREIRA CONSULTORIA LTDA.",
       "CNPJ: 46.320.035/0001-09",
-      "Endereço: Rua Dom Afonso, 191 - Jacarei - Sao Paulo",
+      "Endereço: Rua Dom Afonso, 91, Parque dos Príncipes, Jacareí/SP",
       "Contato para privacidade e proteção de dados: privacidade@dauri.com.br",
     ],
   },

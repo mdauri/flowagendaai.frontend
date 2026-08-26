@@ -3,6 +3,7 @@ import { demoClick, demoPause, demoType, highlight, installDemoHarness, showCapt
 import { mockOnboardingVideoApi, videoSteps } from "./helpers/onboarding-video-fixture";
 
 test.use({ video: { mode: "on", size: { width: 1280, height: 720 } } });
+test.setTimeout(120_000);
 
 for (const [videoKey, label] of videoSteps) {
   test(`gera video onboarding ${videoKey}`, async ({ page }) => {
@@ -85,8 +86,9 @@ for (const [videoKey, label] of videoSteps) {
       await showCaption(page, "Escolha o serviço para testar a agenda");
       await demoClick(page, page.getByRole("button", { name: /^Selecionar / }).first());
       await showCaption(page, "Escolha uma data para simular um agendamento");
-      await demoPause(page, 1400);
-      await demoClick(page, page.getByRole("button", { name: "25", exact: true }));
+      const availableDay = page.locator('button:not([disabled])').filter({ hasText: /^31$/ });
+      await expect(availableDay).toBeVisible();
+      await demoClick(page, availableDay);
       await showCaption(page, "Escolha um horário disponível");
       await demoClick(page, page.getByRole("button", { name: "Ver horários" }));
       await expect(page.getByText("Horários disponíveis", { exact: true })).toBeVisible();

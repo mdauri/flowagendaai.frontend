@@ -35,7 +35,7 @@ export function AppShell({
       : "border-sky-300/35 bg-sky-500/10";
 
   return (
-    <div className="min-h-screen px-4 py-4 sm:px-6 md:px-10 lg:px-16">
+    <div className="min-h-screen overflow-x-clip px-4 py-4 sm:px-6 md:px-10 lg:px-16">
       <header className="mx-auto grid max-w-7xl min-w-0 gap-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-start">
         <div className="min-w-0">
           <DemoEnvironmentBanner tenantSlug={tenant.slug} className="mb-4" />

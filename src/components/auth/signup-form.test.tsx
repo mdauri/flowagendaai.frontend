@@ -68,7 +68,7 @@ describe("SignupForm", () => {
     expect(screen.getByLabelText("Nome da empresa")).toBeInTheDocument();
     expect(screen.getByLabelText("CPF ou CNPJ")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Termos de Uso" })).toHaveAttribute("href", "/termos-de-uso");
-    expect(screen.getByRole("link", { name: "Politica de Privacidade" })).toHaveAttribute("href", "/politica-de-privacidade");
+    expect(screen.getByRole("link", { name: "Política de Privacidade" })).toHaveAttribute("href", "/politica-de-privacidade");
     expect(screen.getByRole("link", { name: "Ja tenho conta" })).toHaveAttribute("href", "/login");
   });
 

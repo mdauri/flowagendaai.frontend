@@ -1,0 +1,48 @@
+name: Verify Frontend E2E
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout frontend
+        uses: actions/checkout@v4
+
+      - name: Checkout API test checkout
+        uses: actions/checkout@v4
+        with:
+          repository: mdauri/flowagendaai.api
+          path: api
+          ref: master
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            api/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Install API dependencies
+        working-directory: api
+        run: npm ci
+
+      - name: Install Chromium dependencies
+        run: npx playwright install --with-deps chromium
+
+      - name: Run isolated API-backed E2E
+        env:
+          E2E_API_DIR: ${{ github.workspace }}/api
+          E2E_EMAIL: e2e.system-admin@agendoro.test
+          E2E_PASSWORD: E2E@2026
+        run: npm run e2e:with-api
