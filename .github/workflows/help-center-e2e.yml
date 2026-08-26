@@ -65,6 +65,7 @@ jobs:
           npm ci
           DATABASE_URL=postgresql://postgres:postgres@localhost:5432/agendoro?schema=public npx prisma migrate deploy
           DATABASE_URL=postgresql://postgres:postgres@localhost:5432/agendoro?schema=public npm run prisma:seed
+          DATABASE_URL=postgresql://postgres:postgres@localhost:5432/agendoro?schema=public npm run prisma:seed:e2e
 
       - name: Start API
         working-directory: api
