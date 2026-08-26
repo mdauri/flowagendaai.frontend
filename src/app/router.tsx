@@ -21,6 +21,7 @@ import { BillingPage } from "@/pages/billing-page";
 import { HolidaysPage } from "@/pages/holidays-page";
 import { MeuDiaPage } from "@/pages/meu-dia-page";
 import { SystemAdminTenantProvisionPage } from "@/pages/system-admin-tenant-provision-page";
+import { SystemAdminCommercialFunnelPage } from "@/pages/system-admin-commercial-funnel-page";
 import { SubscriptionPlansPage } from "@/pages/subscription-plans-page";
 import { CustomerSubscriptionsPage } from "@/pages/customer-subscriptions-page";
 import { CustomerAppHomePage } from "@/pages/customer-app-home-page";
@@ -160,6 +161,7 @@ export function AppRouter() {
               </BlockProfessionalRoute>
             }
           />
+          <Route path="system-admin/commercial-funnel" element={<SystemAdminCommercialFunnelPage />} />
           <Route path="system-admin/tenants/central" element={<SystemAdminTenantControlCenterPage />} />
           <Route path="api-tokens" element={<Navigate to="/app/system-admin/tenants/central?tab=api-tokens" replace />} />
           <Route path="system-admin/tenants/deposit-fee" element={<Navigate to="/app/system-admin/tenants/central?tab=deposit-fee" replace />} />
