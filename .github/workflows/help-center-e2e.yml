@@ -47,7 +47,7 @@ jobs:
           repository: mdauri/flowagendaai.api
           ref: master
           path: api
-          token: ${{ secrets.GHCR_PAT }}
+          token: ${{ secrets.API_REPO_READ_TOKEN }}
 
       - name: Setup Node
         uses: actions/setup-node@v4
