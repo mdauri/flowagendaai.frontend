@@ -18,6 +18,7 @@ export async function mockOnboardingVideoApi(page: Page, options: { complete?: b
   let serviceCreated = false;
   let visibility: "VISIBLE" | "DISMISSED" = "VISIBLE";
   const publicOrigin = new URL(process.env.E2E_BASE_URL ?? "http://localhost:5173").origin;
+  const publicCatalogUrl = `${publicOrigin}/c/tenant-video/catalog`;
   await page.addInitScript(() => {
     window.localStorage.setItem("agendoro:token", "video-demo-access-token");
   });
@@ -46,8 +47,8 @@ export async function mockOnboardingVideoApi(page: Page, options: { complete?: b
       visibility = nextVisibility;
       return json({ visibility, changed });
     }
-    if (url.pathname === "/onboarding/publish" && method === "POST") return json({ published: true, publishedAt: "2026-08-21T12:05:00.000Z", publicUrl: "http://localhost:5181/c/tenant-video/catalog" });
-    if (url.pathname === "/onboarding/test-session" && method === "POST") return json({ token: "video-demo-token", expiresAt: "2026-08-21T12:35:00.000Z", publicUrl: "http://localhost:5181/c/tenant-video/catalog", bookingUrl: "/p/maria-teste" }, 201);
+    if (url.pathname === "/onboarding/publish" && method === "POST") return json({ published: true, publishedAt: "2026-08-21T12:05:00.000Z", publicUrl: publicCatalogUrl });
+    if (url.pathname === "/onboarding/test-session" && method === "POST") return json({ token: "video-demo-token", expiresAt: "2026-08-21T12:35:00.000Z", publicUrl: publicCatalogUrl, bookingUrl: "/p/maria-teste" }, 201);
     if (url.pathname === "/auth/me") return json({ user: { id: "video-user", name: "Video Teste", email: "video@example.test", role: "admin" }, tenant: { id: "video-tenant", name: "Tenant Video", timezone: "America/Sao_Paulo", slug: "tenant-video", logoUrl: null, coverImageUrl: null, publicAddress: "Rua de teste, 100", description: "Agenda de demonstracao", depositModuleEnabled: false, depositPaymentProvider: "MANUAL", depositProviderConfigured: false, mercadoPagoPublicKey: null, depositConvenienceFeeEnabled: false, entitlement: { canAccess: true, accessStatus: "BILLING_EXEMPT", subscriptionStatus: "ACTIVE", isBillingExempt: true } } });
     const demoProfessional = { id: "professional-created", name: "Maria Demo", slug: "maria-teste", description: "Atende com hora marcada.", isActive: true, hasSystemAccess: false, createdAt: "2026-08-26T12:00:00.000Z", updatedAt: "2026-08-26T12:00:00.000Z" };
     if (url.pathname === "/professionals" && method === "GET") return json({ professionals: professionalCreated ? [demoProfessional] : [] });

@@ -82,6 +82,7 @@ async function main() {
     cwd: frontendDir,
     env: {
       ...process.env,
+      E2E_API_DIR: apiDir,
       VITE_API_BASE_URL: `http://localhost:${apiPort}`,
       E2E_EMAIL: process.env.E2E_EMAIL ?? "e2e.system-admin@agendoro.test",
       E2E_PASSWORD: process.env.E2E_PASSWORD ?? "E2E@2026",

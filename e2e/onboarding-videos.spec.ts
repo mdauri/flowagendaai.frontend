@@ -14,7 +14,7 @@ for (const [videoKey, label] of videoSteps) {
     const configure = item.getByRole("button", { name: videoKey === "publish" ? "Publicar link" : "Configurar agora" });
     await showCaption(page, "Clique em Configurar agora");
     await highlight(page, configure);
-    await demoClick(page, configure);
+    if (videoKey !== "publish") await demoClick(page, configure);
 
     if (videoKey === "company-data" || videoKey === "appearance") {
       await page.waitForURL("**/app/settings**");
@@ -103,9 +103,10 @@ for (const [videoKey, label] of videoSteps) {
     } else if (videoKey === "publish") {
       await expect(page.getByTestId("activation-checklist")).toBeVisible();
       await showCaption(page, "Publique sua agenda para disponibilizar o link");
-      const popupPromise = page.waitForEvent("popup");
-      await demoClick(page, item.getByRole("button", { name: "Publicar link" }));
-      const popup = await popupPromise;
+      const [popup] = await Promise.all([
+        page.waitForEvent("popup"),
+        demoClick(page, item.getByRole("button", { name: "Publicar link" })),
+      ]);
       await expect(popup).toHaveURL(/\/c\/tenant-video\/catalog/);
       await popup.close();
       await showCaption(page, "Pronto. Copie e compartilhe este link com seus clientes");
