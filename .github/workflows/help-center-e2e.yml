@@ -2,6 +2,7 @@ name: Help Center E2E
 
 on:
   pull_request:
+  workflow_dispatch:
   push:
     branches:
       - master
@@ -47,7 +48,7 @@ jobs:
           repository: mdauri/flowagendaai.api
           ref: master
           path: api
-          token: ${{ secrets.GHCR_PAT }}
+          token: ${{ secrets.API_REPO_READ_TOKEN }}
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -64,6 +65,7 @@ jobs:
           npm ci
           DATABASE_URL=postgresql://postgres:postgres@localhost:5432/agendoro?schema=public npx prisma migrate deploy
           DATABASE_URL=postgresql://postgres:postgres@localhost:5432/agendoro?schema=public npm run prisma:seed
+          DATABASE_URL=postgresql://postgres:postgres@localhost:5432/agendoro?schema=public npm run prisma:seed:e2e
 
       - name: Start API
         working-directory: api
@@ -84,6 +86,9 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run Help Center E2E
+        env:
+          E2E_API_DIR: ${{ github.workspace }}/api
+          VITE_API_BASE_URL: http://localhost:3333
         run: npm run e2e -- e2e/help-center.spec.ts e2e/onboarding-dismissible.spec.ts
 
       - name: Upload E2E screenshots and report

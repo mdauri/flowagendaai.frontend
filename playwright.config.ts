@@ -7,6 +7,8 @@ const authFile = process.env.E2E_AUTH_FILE ?? "playwright/.auth/user.json";
 export default defineConfig({
   testDir: "./e2e",
   fullyParallel: true,
+  // The API-backed harness provides one mutable API/DB/Redis for the whole run.
+  workers: process.env.E2E_API_DIR ? 1 : undefined,
   outputDir: process.env.PLAYWRIGHT_OUTPUT_DIR ?? "test-results",
   reporter: [["html", { open: "never", outputFolder: process.env.PLAYWRIGHT_REPORT_DIR ?? "playwright-report" }]],
   use: {
