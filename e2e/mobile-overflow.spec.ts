@@ -10,8 +10,8 @@ const VIEWPORTS = [
 const ROUTES = [
   { path: "/app/slots", heading: "Consulta de horarios" },
   { path: "/app/settings", heading: "Configuracoes" },
-  { path: "/app/api-tokens", heading: "API Tokens M2M" },
-  { path: "/app/system-admin/tenants/whatsapp", heading: "WhatsApp por tenant" },
+  { path: "/app/system-admin/tenants/central?tab=api-tokens", heading: "API Tokens", selectDemoTenant: true },
+  { path: "/app/system-admin/tenants/central?tab=whatsapp", heading: "WhatsApp Business", selectDemoTenant: true },
   { path: "/app/system-admin/meta-whatsapp", heading: "Dashboard Meta API" },
 ] as const;
 
@@ -24,11 +24,15 @@ test.describe("Mobile overflow regression", () => {
 
       for (const route of ROUTES) {
         await page.goto(route.path, { waitUntil: "commit" });
-        await expect(page.getByRole("heading", { name: route.heading })).toBeVisible({
+        if (route.selectDemoTenant) {
+          await page.locator("#tenant-control-center-tenant").click();
+          await page.getByRole("option", { name: "Agendoro Demo (demo)", exact: true }).click();
+        }
+        await expect(
+          page.getByRole("heading", { name: route.heading }).or(page.getByText(route.heading, { exact: true })).first(),
+        ).toBeVisible({
           timeout: 20_000,
         });
-
-        await page.waitForTimeout(500);
 
         const metrics = await page.evaluate(() => ({
           viewportWidth: window.innerWidth,

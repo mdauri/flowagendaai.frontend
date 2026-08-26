@@ -52,11 +52,17 @@ test.describe("Public mobile smoke", () => {
       });
     });
 
-    await page.route("**/public/services/service-1/professionals", async (route) => {
+    await page.route("**/public/services/**", async (route) => {
+      if (!route.request().url().includes("/public/services/service-1/professionals")) {
+        await route.continue();
+        return;
+      }
       await route.fulfill({
         status: 200,
         contentType: "application/json",
         body: JSON.stringify({
+          serviceId: "service-1",
+          serviceName: "Corte",
           professionals: [
             {
               id: "professional-1",
@@ -141,30 +147,18 @@ test.describe("Public mobile smoke", () => {
     }));
     expect(metrics.scrollWidth).toBeLessThanOrEqual(metrics.viewportWidth);
 
-    await page.getByRole("button", { name: /Agendar Corte/i }).click();
-    await page.waitForURL("**/p/maria-silva?service=service-1");
+    await Promise.all([
+      page.waitForURL(/\/p\/maria-silva\?service=service-1/),
+      page.getByRole("button", { name: /Agendar Corte/i }).click(),
+    ]);
     await expect(page.getByText("Escolha a data")).toBeVisible();
 
     const monthLabel = page.locator("span", { hasText: /\w+ 2026/i }).first();
     const initialMonthText = (await monthLabel.textContent())?.trim() ?? "";
 
-    const dayButtons = await page
-      .locator("button:not([disabled])")
-      .all();
-    let firstAvailableDay = null;
-
-    for (const button of dayButtons) {
-      const label = (await button.textContent())?.trim() ?? "";
-      if (!/^\d+$/.test(label)) {
-        continue;
-      }
-
-      firstAvailableDay = button;
-      break;
-    }
-
-    expect(firstAvailableDay).toBeTruthy();
-    await firstAvailableDay!.click();
+    const firstAvailableDay = page.locator('button:not([disabled])').filter({ hasText: /^31$/ });
+    await expect(firstAvailableDay).toBeVisible();
+    await firstAvailableDay.click();
 
     await expect(page.getByRole("button", { name: /Ver horários/i })).toBeEnabled();
 

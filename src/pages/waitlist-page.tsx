@@ -434,6 +434,9 @@ export function WaitlistPage() {
                 placeholder="Detalhes opcionais para a recepcao"
                 rows={5}
               />
+              <span className="text-xs text-[var(--theme-text-muted)]">
+                Não inclua informações clínicas ou dados pessoais sensíveis desnecessários.
+              </span>
             </label>
 
             <Button type="submit" size="md" disabled={createWaitlistMutation.isPending}>

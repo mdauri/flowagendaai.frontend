@@ -219,7 +219,7 @@ export function SystemAdminTenantControlCenterPage() {
         )}
       </Card>
 
-      <div className="mt-6 flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Modulos do tenant">
+      <div className="mt-6 flex w-full min-w-0 max-w-full gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Modulos do tenant">
         {moduleTabs.map((tab) => {
           const isActive = currentTab === tab.key;
           const isDisabled = !selectedTenantId;

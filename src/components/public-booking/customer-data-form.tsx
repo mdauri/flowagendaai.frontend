@@ -94,7 +94,7 @@ export function CustomerDataForm({
           className="w-full text-sm outline-none transition-all placeholder:text-text-muted/70 focus-visible:[border-color:var(--control-focus-border)] focus-visible:[box-shadow:var(--control-focus-ring)]"
           rows={4}
           maxLength={200}
-          placeholder="Conte para o profissional sobre seu estilo, alergias, etc."
+          placeholder="Informe preferências operacionais para o atendimento."
           style={{
              borderRadius: radius.xl,
              backgroundColor: semanticTokens.surface.glass,
@@ -108,6 +108,9 @@ export function CustomerDataForm({
              "--control-focus-ring": semanticTokens.interaction.focus.ring
           } as React.CSSProperties}
         />
+        <p className="mt-1 text-xs" style={{ color: colors.text.muted }}>
+          Não inclua informações clínicas ou dados pessoais sensíveis desnecessários.
+        </p>
         <div className="mt-1 text-xs text-right" style={{ color: colors.text.muted }} aria-live="polite">
           {notes.length}/200
         </div>

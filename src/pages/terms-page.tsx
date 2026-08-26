@@ -19,10 +19,10 @@ const sections = [
     content: [
       "O Agendoro é uma plataforma voltada à organização de agendas, automações operacionais e gestão de compromissos.",
       "Toda a gestão de agenda e disponibilidade é realizada internamente pela plataforma, sem dependência de serviços externos de calendário.",
-      "Responsável pelo serviço: DAURI DESENVOLVIMENTO E TECNOLOGIA LTDA.",
+      "Responsável pelo serviço: BRAGA E FERREIRA CONSULTORIA LTDA.",
       "CNPJ: 46.320.035/0001-09.",
-      "Endereço: Rua Dom Afonso, 191 - Jacarei - Sao Paulo.",
-      "Contato geral e jurídico: privacidade@dauri.com.br.",
+      "Endereço: Rua Dom Afonso, 91, Parque dos Príncipes, Jacareí/SP.",
+      "Canal para assuntos de privacidade e proteção de dados: privacidade@dauri.com.br.",
     ],
   },
   {

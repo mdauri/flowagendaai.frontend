@@ -49,6 +49,7 @@ function resolveAllowedHosts(mode: string) {
 
 export default defineConfig(({ mode }) => ({
   plugins: [react(), tailwindcss()],
+  cacheDir: process.env.VITE_CACHE_DIR ?? "node_modules/.vite",
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),

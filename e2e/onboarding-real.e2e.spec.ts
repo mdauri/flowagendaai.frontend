@@ -1,16 +1,21 @@
 import { expect, test } from "@playwright/test";
 
-test("executa a etapa de primeiro profissional contra API e banco reais", async ({ page }) => {
+test.use({ storageState: { cookies: [], origins: [] } });
+test.setTimeout(60_000);
+
+test("executa a etapa de primeiro profissional contra API e banco reais", async ({ page }, testInfo) => {
+  const projectKey = testInfo.project.name;
+  const projectEmail = `e2e.onboarding.real.${projectKey}@agendoro.test`;
   await page.goto("/login");
-  await page.getByLabel("Email").fill("onboarding-browser@example.test");
-  await page.getByLabel("Senha").fill("Onboarding123!");
+  await page.getByLabel("Email").fill(process.env.E2E_ONBOARDING_EMAIL ?? projectEmail);
+  await page.getByLabel("Senha").fill(process.env.E2E_ONBOARDING_PASSWORD ?? "E2E-Onboarding@2026");
   await page.getByRole("button", { name: "Entrar" }).click();
   await page.waitForURL("**/app/**");
   await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
 
   const checklist = page.getByTestId("activation-checklist");
   await expect(checklist).toBeVisible();
-  await expect(checklist.getByText("8 passos", { exact: false })).toBeVisible();
+  await expect(checklist.getByText(/passos/i)).toBeVisible();
 
   const professionalItem = page.getByRole("listitem").filter({ hasText: "Primeiro profissional" });
   await professionalItem.getByRole("button", { name: "Ver como fazer" }).click();

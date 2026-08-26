@@ -12,6 +12,7 @@
     "test:coverage:summary": "node -e \"const s=require('./coverage/coverage-summary.json').total; console.log(['Frontend coverage', 'lines='+s.lines.pct+'%', 'statements='+s.statements.pct+'%', 'functions='+s.functions.pct+'%', 'branches='+s.branches.pct+'%'].join(' | '))\"",
     "test:watch": "vitest --passWithNoTests",
     "e2e": "playwright test",
+    "e2e:with-api": "node scripts/run-e2e-with-api.mjs",
     "e2e:ui": "playwright test --ui",
     "e2e:report": "playwright show-report",
     "generate-onboarding-videos": "node scripts/generate-onboarding-videos.mjs",
