@@ -50,6 +50,7 @@ export function SystemAdminCommercialFunnelPage() {
       { label: "Trials criados", value: data.summary.signups.toString(), detail: "coorte do periodo" },
       { label: "Publicaram", value: data.summary.published.toString(), detail: percentage(data.rates.signupToPublish) },
       { label: "1º booking real", value: data.summary.firstRealBooking.toString(), detail: percentage(data.rates.signupToFirstRealBooking) },
+      { label: "Checkout iniciado", value: data.summary.checkoutStarted.toString(), detail: percentage(data.rates.signupToCheckout) },
       { label: "Pagaram", value: data.summary.paid.toString(), detail: percentage(data.rates.signupToPaid) },
       { label: "Trial ativos", value: data.summary.trialing.toString(), detail: "agora" },
       { label: "Expirados/cancelados", value: data.summary.expiredOrCanceled.toString(), detail: "agora" },
@@ -146,7 +147,7 @@ export function SystemAdminCommercialFunnelPage() {
             <CardDescription className="mt-2">
               Quanto tempo os novos tenants levam para chegar ao primeiro valor.
             </CardDescription>
-            <div className="mt-5 grid gap-4 md:grid-cols-3">
+            <div className="mt-5 grid gap-4 md:grid-cols-4">
               <div>
                 <p className="text-xs uppercase tracking-wide text-text-soft">Trial → publicar</p>
                 <p className="mt-2 text-xl font-bold text-[var(--theme-text-primary)]">{duration(query.data.timingsMs.averageTimeToPublish)}</p>
@@ -158,6 +159,10 @@ export function SystemAdminCommercialFunnelPage() {
               <div>
                 <p className="text-xs uppercase tracking-wide text-text-soft">Publicar → 1º booking</p>
                 <p className="mt-2 text-xl font-bold text-[var(--theme-text-primary)]">{duration(query.data.timingsMs.averagePublishToFirstRealBooking)}</p>
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-wide text-text-soft">Trial → pagamento</p>
+                <p className="mt-2 text-xl font-bold text-[var(--theme-text-primary)]">{duration(query.data.timingsMs.averageTimeToPaid)}</p>
               </div>
             </div>
           </Card>
@@ -176,6 +181,7 @@ export function SystemAdminCommercialFunnelPage() {
                     <th className="px-3 py-2 text-right">Trials</th>
                     <th className="px-3 py-2 text-right">Publicaram</th>
                     <th className="px-3 py-2 text-right">1º booking</th>
+                    <th className="px-3 py-2 text-right">Checkout</th>
                     <th className="px-3 py-2 text-right">Pagaram</th>
                     <th className="px-3 py-2 text-right">Conv.</th>
                   </tr>
@@ -188,6 +194,7 @@ export function SystemAdminCommercialFunnelPage() {
                       <td className="px-3 py-3 text-right">{row.signups}</td>
                       <td className="px-3 py-3 text-right">{row.published}</td>
                       <td className="px-3 py-3 text-right">{row.firstRealBooking}</td>
+                      <td className="px-3 py-3 text-right">{row.checkoutStarted}</td>
                       <td className="px-3 py-3 text-right">{row.paid}</td>
                       <td className="px-3 py-3 text-right font-semibold">{percentage(row.signupToPaidRate)}</td>
                     </tr>
@@ -211,7 +218,9 @@ export function SystemAdminCommercialFunnelPage() {
                     <th className="px-3 py-2">Origem</th>
                     <th className="px-3 py-2">Publicou</th>
                     <th className="px-3 py-2">1º booking</th>
+                    <th className="px-3 py-2">Checkout</th>
                     <th className="px-3 py-2">Billing</th>
+                    <th className="px-3 py-2">Proximo passo</th>
                     <th className="px-3 py-2">Fim trial</th>
                   </tr>
                 </thead>
@@ -226,7 +235,9 @@ export function SystemAdminCommercialFunnelPage() {
                       <td className="px-3 py-3 text-text-soft">{tenant.acquisition.source}{tenant.acquisition.campaign ? ` · ${tenant.acquisition.campaign}` : ""}</td>
                       <td className="px-3 py-3 text-text-soft">{dateTime(tenant.publishedAt)}</td>
                       <td className="px-3 py-3 text-text-soft">{dateTime(tenant.firstRealBookingAt)}</td>
+                      <td className="px-3 py-3 text-text-soft">{dateTime(tenant.checkoutStartedAt)}</td>
                       <td className="px-3 py-3 font-semibold text-[var(--theme-text-primary)]">{tenant.subscriptionStatus ?? "—"}</td>
+                      <td className="px-3 py-3 text-text-soft"><span className="font-semibold text-[var(--theme-text-primary)]">{tenant.operationalStatus}</span><br />{tenant.nextStep}</td>
                       <td className="px-3 py-3 text-text-soft">{dateTime(tenant.trialEndsAt)}</td>
                     </tr>
                   ))}

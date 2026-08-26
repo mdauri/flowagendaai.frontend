@@ -2,6 +2,7 @@ export interface CommercialFunnelSummary {
   signups: number;
   published: number;
   firstRealBooking: number;
+  checkoutStarted: number;
   paid: number;
   trialing: number;
   expiredOrCanceled: number;
@@ -11,6 +12,8 @@ export interface CommercialFunnelRates {
   signupToPublish: number;
   signupToFirstRealBooking: number;
   signupToPaid: number;
+  signupToCheckout: number;
+  checkoutToPaid: number;
   publishToFirstRealBooking: number;
 }
 
@@ -18,6 +21,7 @@ export interface CommercialFunnelTimings {
   averageTimeToPublish: number | null;
   averageTimeToFirstRealBooking: number | null;
   averagePublishToFirstRealBooking: number | null;
+  averageTimeToPaid: number | null;
 }
 
 export interface CommercialAttributionRow {
@@ -27,6 +31,7 @@ export interface CommercialAttributionRow {
   signups: number;
   published: number;
   firstRealBooking: number;
+  checkoutStarted: number;
   paid: number;
   signupToPaidRate: number;
 }
@@ -41,6 +46,10 @@ export interface CommercialTenantRow {
   subscriptionStatus: string | null;
   trialEndsAt: string | null;
   billingActivatedAt: string | null;
+  checkoutStartedAt: string | null;
+  paid: boolean;
+  operationalStatus: string;
+  nextStep: string;
   acquisition: {
     source: string;
     medium: string | null;

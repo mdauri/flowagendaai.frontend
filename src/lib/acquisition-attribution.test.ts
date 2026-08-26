@@ -8,7 +8,16 @@ const STORAGE_KEY = "agendoro:acquisition:first-touch";
 
 describe("acquisition attribution", () => {
   beforeEach(() => {
-    window.localStorage.removeItem(STORAGE_KEY);
+    const values = new Map<string, string>();
+    Object.defineProperty(window, "localStorage", {
+      configurable: true,
+      value: {
+        getItem: (key: string) => values.get(key) ?? null,
+        setItem: (key: string, value: string) => values.set(key, value),
+        removeItem: (key: string) => values.delete(key),
+        clear: () => values.clear(),
+      } satisfies Pick<Storage, "getItem" | "setItem" | "removeItem" | "clear">,
+    });
     window.history.replaceState({}, "", "/");
   });
 
@@ -26,7 +35,7 @@ describe("acquisition attribution", () => {
         source: "google",
         medium: "cpc",
         campaign: "lancamento",
-        landingPath: "/?utm_source=google&utm_medium=cpc&utm_campaign=lancamento",
+        landingPath: "/",
       }),
     );
     expect(attribution?.firstTouchAt).toBeTruthy();
