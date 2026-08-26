@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Loader2 } from "lucide-react";
-import { useSearchParams } from "react-router";
+import { NavLink, useSearchParams } from "react-router";
+import { Button } from "@/components/flow/button";
 import { Card, CardDescription, CardTitle } from "@/components/flow/card";
 import { SectionHeading } from "@/components/flow/section-heading";
 import { Select, type SelectOption } from "@/components/flow/select";
@@ -169,6 +170,12 @@ export function SystemAdminTenantControlCenterPage() {
         title="Central do tenant"
         description="Escolha um tenant e ajuste acessos, WhatsApp e modulos."
       />
+
+      <div className="mt-5 flex flex-wrap gap-3">
+        <Button as={NavLink} to="/app/system-admin/commercial-funnel" variant="secondary">
+          Abrir funil comercial
+        </Button>
+      </div>
 
       <Card variant="premium" padding="lg" className="mt-8 min-w-0">
         <CardTitle>Tenant</CardTitle>
