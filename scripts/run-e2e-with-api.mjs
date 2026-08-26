@@ -1,5 +1,5 @@
 import { spawn, spawnSync } from "node:child_process";
-import { existsSync } from "node:fs";
+import { existsSync, rmSync } from "node:fs";
 import { setTimeout as delay } from "node:timers/promises";
 import path from "node:path";
 import process from "node:process";
@@ -29,6 +29,9 @@ const apiEnv = {
 };
 
 let apiProcess;
+let playwrightProcess;
+let cleanupStarted = false;
+let requestedExitCode;
 
 function run(command, args, options = {}) {
   const result = spawnSync(command, args, { stdio: "inherit", ...options });
@@ -49,11 +52,65 @@ async function waitFor(check, label, attempts = 45) {
   throw new Error(`Timed out waiting for ${label}`);
 }
 
-function cleanup() {
-  if (apiProcess && !apiProcess.killed) apiProcess.kill("SIGTERM");
+function killProcessGroup(child, signal) {
+  if (!child || child.exitCode !== null || child.signalCode !== null) return;
+  try {
+    process.kill(-child.pid, signal);
+  } catch (error) {
+    if (error?.code !== "ESRCH") throw error;
+  }
+}
+
+function waitForExit(child, timeoutMs) {
+  if (!child || child.exitCode !== null || child.signalCode !== null) return Promise.resolve();
+  return new Promise((resolve) => {
+    const timer = setTimeout(resolve, timeoutMs);
+    child.once("close", () => {
+      clearTimeout(timer);
+      resolve();
+    });
+  });
+}
+
+async function stopProcess(child, label) {
+  if (!child || child.exitCode !== null || child.signalCode !== null) return;
+  console.log(`[E2E] Stopping ${label}...`);
+  killProcessGroup(child, "SIGTERM");
+  await waitForExit(child, 1500);
+  if (child.exitCode === null && child.signalCode === null) {
+    killProcessGroup(child, "SIGKILL");
+    await waitForExit(child, 1000);
+  }
+  console.log(`[E2E] ${label} stopped`);
+}
+
+async function cleanup() {
+  if (cleanupStarted) return;
+  cleanupStarted = true;
+  await stopProcess(playwrightProcess, "Playwright");
+  await stopProcess(apiProcess, "API");
+  console.log("[E2E] Stopping Redis/Postgres...");
   for (const name of [postgresName, redisName]) {
     spawnSync("docker", ["rm", "-f", name], { stdio: "ignore" });
   }
+  const authFile = process.env.E2E_AUTH_FILE ?? `/tmp/agendoro-e2e-auth-${runId}.json`;
+  rmSync(authFile, { force: true });
+  console.log("[E2E] Cleanup complete");
+}
+
+function cleanupSync() {
+  killProcessGroup(playwrightProcess, "SIGTERM");
+  killProcessGroup(apiProcess, "SIGTERM");
+  for (const name of [postgresName, redisName]) {
+    spawnSync("docker", ["rm", "-f", name], { stdio: "ignore" });
+  }
+}
+
+function runPlaywright(args, options) {
+  return new Promise((resolve) => {
+    playwrightProcess = spawn("npx", args, { ...options, detached: true });
+    playwrightProcess.once("close", (code, signal) => resolve({ code, signal }));
+  });
 }
 
 async function main() {
@@ -61,41 +118,47 @@ async function main() {
     throw new Error(`E2E_API_DIR does not contain the API checkout: ${apiDir}`);
   }
 
-  process.on("SIGINT", () => { cleanup(); process.exit(130); });
-  process.on("SIGTERM", () => { cleanup(); process.exit(143); });
-  process.on("exit", cleanup);
+  process.on("SIGINT", () => { requestedExitCode = 130; killProcessGroup(playwrightProcess, "SIGTERM"); });
+  process.on("SIGTERM", () => { requestedExitCode = 143; killProcessGroup(playwrightProcess, "SIGTERM"); });
+  process.on("exit", cleanupSync);
 
-  docker(["run", "-d", "--name", postgresName, "--network", "host", "-e", "POSTGRES_USER=e2e_user", "-e", "POSTGRES_PASSWORD=e2e_password", "-e", "POSTGRES_DB=agendoro_e2e", "postgres:17", "postgres", "-p", postgresPort]);
-  docker(["run", "-d", "--name", redisName, "--network", "host", "redis:7.4-alpine", "redis-server", "--port", redisPort]);
+  try {
+    docker(["run", "-d", "--name", postgresName, "--network", "host", "-e", "POSTGRES_USER=e2e_user", "-e", "POSTGRES_PASSWORD=e2e_password", "-e", "POSTGRES_DB=agendoro_e2e", "postgres:17", "postgres", "-p", postgresPort]);
+    docker(["run", "-d", "--name", redisName, "--network", "host", "redis:7.4-alpine", "redis-server", "--port", redisPort]);
 
-  await waitFor(() => spawnSync("docker", ["exec", postgresName, "pg_isready", "-U", "e2e_user", "-d", "postgres", "-p", postgresPort], { stdio: "ignore" }).status === 0, "PostgreSQL");
-  await waitFor(() => spawnSync("docker", ["exec", redisName, "redis-cli", "-p", redisPort, "ping"], { stdio: "ignore" }).status === 0, "Redis");
+    await waitFor(() => spawnSync("docker", ["exec", postgresName, "pg_isready", "-U", "e2e_user", "-d", "postgres", "-p", postgresPort], { stdio: "ignore" }).status === 0, "PostgreSQL");
+    await waitFor(() => spawnSync("docker", ["exec", redisName, "redis-cli", "-p", redisPort, "ping"], { stdio: "ignore" }).status === 0, "Redis");
 
-  run("npx", ["prisma", "migrate", "deploy"], { cwd: apiDir, env: apiEnv });
-  run("npm", ["run", "prisma:seed"], { cwd: apiDir, env: apiEnv });
-  run("npm", ["run", "prisma:seed:e2e"], { cwd: apiDir, env: apiEnv });
+    run("npx", ["prisma", "migrate", "deploy"], { cwd: apiDir, env: apiEnv });
+    run("npm", ["run", "prisma:seed"], { cwd: apiDir, env: apiEnv });
+    run("npm", ["run", "prisma:seed:e2e"], { cwd: apiDir, env: apiEnv });
 
-  apiProcess = spawn("npm", ["run", "dev"], { cwd: apiDir, env: apiEnv, stdio: "inherit" });
-  await waitFor(() => spawnSync("curl", ["-fsS", `http://localhost:${apiPort}/health/live`], { stdio: "ignore" }).status === 0, "Agendoro API");
+    apiProcess = spawn("npx", ["tsx", "server.ts"], { cwd: apiDir, env: apiEnv, stdio: "inherit", detached: true });
+    await waitFor(() => spawnSync("curl", ["-fsS", `http://localhost:${apiPort}/health/live`], { stdio: "ignore" }).status === 0, "Agendoro API");
 
-  const result = spawnSync("npx", ["playwright", "test", ...process.argv.slice(2)], {
-    cwd: frontendDir,
-    env: {
-      ...process.env,
-      E2E_API_DIR: apiDir,
-      VITE_API_BASE_URL: `http://localhost:${apiPort}`,
-      E2E_EMAIL: process.env.E2E_EMAIL ?? "e2e.system-admin@agendoro.test",
-      E2E_PASSWORD: process.env.E2E_PASSWORD ?? "E2E@2026",
-      PLAYWRIGHT_OUTPUT_DIR: process.env.PLAYWRIGHT_OUTPUT_DIR ?? `/tmp/agendoro-e2e-results-${runId}`,
-      PLAYWRIGHT_REPORT_DIR: process.env.PLAYWRIGHT_REPORT_DIR ?? `/tmp/agendoro-e2e-report-${runId}`,
-      VITE_CACHE_DIR: process.env.VITE_CACHE_DIR ?? `/tmp/agendoro-vite-cache-${runId}`,
-      E2E_AUTH_FILE: process.env.E2E_AUTH_FILE ?? `/tmp/agendoro-e2e-auth-${runId}.json`,
-      PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS: process.env.PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS ?? "1",
-    },
-    stdio: "inherit",
-  });
-
-  process.exitCode = result.status ?? 1;
+    const result = await runPlaywright(["playwright", "test", ...process.argv.slice(2)], {
+      cwd: frontendDir,
+      env: {
+        ...process.env,
+        E2E_API_DIR: apiDir,
+        VITE_API_BASE_URL: `http://localhost:${apiPort}`,
+        E2E_EMAIL: process.env.E2E_EMAIL ?? "e2e.system-admin@agendoro.test",
+        E2E_PASSWORD: process.env.E2E_PASSWORD ?? "E2E@2026",
+        PLAYWRIGHT_OUTPUT_DIR: process.env.PLAYWRIGHT_OUTPUT_DIR ?? `/tmp/agendoro-e2e-results-${runId}`,
+        PLAYWRIGHT_REPORT_DIR: process.env.PLAYWRIGHT_REPORT_DIR ?? `/tmp/agendoro-e2e-report-${runId}`,
+        VITE_CACHE_DIR: process.env.VITE_CACHE_DIR ?? `/tmp/agendoro-vite-cache-${runId}`,
+        E2E_AUTH_FILE: process.env.E2E_AUTH_FILE ?? `/tmp/agendoro-e2e-auth-${runId}.json`,
+        PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS: process.env.PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS ?? "1",
+      },
+      stdio: "inherit",
+    });
+    const exitCode = requestedExitCode ?? result.code ?? 1;
+    console.log(`[E2E] Playwright finished: exit=${exitCode}`);
+    process.exitCode = exitCode;
+  } finally {
+    await cleanup();
+    console.log(`[E2E] exiting with code ${process.exitCode ?? requestedExitCode ?? 1}`);
+  }
 }
 
 main().catch((error) => {
