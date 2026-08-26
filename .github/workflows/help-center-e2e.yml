@@ -2,6 +2,7 @@ name: Help Center E2E
 
 on:
   pull_request:
+  workflow_dispatch:
   push:
     branches:
       - master
