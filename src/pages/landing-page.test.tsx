@@ -26,6 +26,9 @@ describe("LandingPage", () => {
     );
     expect(document.body).toHaveTextContent("R$ 97");
     expect(document.body).toHaveTextContent("R$ 970/ano");
+    expect(document.body).toHaveTextContent("Até 3 profissionais");
+    expect(document.body).not.toHaveTextContent("ilimitado");
+    expect(document.body).not.toHaveTextContent("Ilimitados");
     expect(document.body).toHaveTextContent("Profissional adicional: R$ 15/mês");
     expect(document.body).toHaveTextContent("+ R$ 100/mês");
     expect(document.body).toHaveTextContent("Implantação assistida: R$ 197");
