@@ -82,7 +82,7 @@ const resourceModules = [
       "Página pública de agendamento",
       "Link próprio",
       "Catálogo de serviços",
-      "Clientes ilimitados",
+      "Clientes organizados",
     ],
   },
   {

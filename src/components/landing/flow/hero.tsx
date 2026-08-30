@@ -34,7 +34,7 @@ const agendaItems = [
 const heroKpis = [
   ["14 dias", "grátis para testar"],
   ["Até 3", "profissionais inclusos"],
-  ["Ilimitados", "agendamentos no mês"],
+  ["Online", "agendamentos pelo seu link"],
 ] as const;
 
 const heroMetrics = [

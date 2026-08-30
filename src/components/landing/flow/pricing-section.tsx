@@ -5,9 +5,9 @@ import { trackLandingEvent } from "@/lib/landing-analytics";
 
 const agendoroFeatures = [
   "Até 3 profissionais",
-  "Agendamentos ilimitados",
-  "Clientes ilimitados",
-  "Serviços ilimitados",
+  "Agendamentos pelo seu link",
+  "Cadastro de clientes",
+  "Catálogo de serviços",
   "Agenda completa desktop e mobile",
   "Página pública e link próprio",
   "PWA do cliente e Meus compromissos",
@@ -32,7 +32,7 @@ export function PricingSection() {
             Comece com agenda online completa por R$ 97/mês
           </h2>
           <p className="mt-4 text-base leading-7 text-text-soft">
-            Inclui até 3 profissionais, agendamentos ilimitados, página pública,
+            Inclui até 3 profissionais, página pública,
             lembretes e área do cliente. Teste por 14 dias sem cartão.
           </p>
           <p className="mt-2 text-sm font-semibold text-success">14 dias grátis, sem cartão.</p>
