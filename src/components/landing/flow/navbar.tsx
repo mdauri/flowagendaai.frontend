@@ -11,22 +11,22 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50 px-4 pt-4 md:px-10 md:pt-6 lg:px-16">
       <div className="mx-auto flex max-w-7xl items-center justify-between rounded-full border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] px-3 py-2.5 shadow-[var(--theme-shadow-card)] backdrop-blur-xl md:px-4 md:py-3">
-        <div className="flex min-w-0 items-center gap-2.5 md:gap-3">
+        <div className="flex min-w-0 items-center gap-2 md:gap-3">
           <Link to="/" className="flex items-center ">
             <img
               src="/agendoro-logo.png"
               alt="Agendoro"
-              className="h-14 w-14 md:h-16 md:w-16"
+              className="h-10 w-10 md:h-16 md:w-16"
             />
           </Link>
           <div className="min-w-0">
-            <p className="text-sm font-semibold tracking-wide text-[var(--theme-text-primary)]">
+            <p className="text-xs font-semibold tracking-wide text-[var(--theme-text-primary)] sm:text-sm">
               Agend
               <span className="bg-linear-to-r from-primary via-secondary to-tertiary bg-clip-text text-transparent">
                 oro
               </span>
             </p>
-            <p className="text-xs text-text-muted">Agendamento inteligente</p>
+            <p className="hidden text-xs text-text-muted sm:block">Agendamento inteligente</p>
           </div>
         </div>
 
@@ -41,8 +41,24 @@ export function Navbar() {
             Preços
           </a>
         </nav>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <ThemeSwitcher compact />
+          <details className="relative md:hidden">
+            <summary className="flex min-h-10 cursor-pointer list-none items-center rounded-full border border-[var(--theme-border-strong)] px-3 text-xs font-semibold text-[var(--theme-text-primary)] [&::-webkit-details-marker]:hidden">
+              Menu
+            </summary>
+            <nav className="absolute right-0 top-12 grid min-w-36 gap-1 rounded-2xl border border-[var(--theme-border-subtle)] bg-[var(--theme-surface)] p-2 text-sm text-[var(--theme-text-primary)] shadow-[var(--theme-shadow-card)]">
+              <a className="rounded-xl px-3 py-2 hover:bg-[var(--theme-surface-glass-hover)]" href="#beneficios">
+                Benefícios
+              </a>
+              <a className="rounded-xl px-3 py-2 hover:bg-[var(--theme-surface-glass-hover)]" href="#recursos">
+                Recursos
+              </a>
+              <a className="rounded-xl px-3 py-2 hover:bg-[var(--theme-surface-glass-hover)]" href="#precos">
+                Preços
+              </a>
+            </nav>
+          </details>
           <Button
             variant="ghost"
             size="sm"
@@ -78,6 +94,22 @@ export function Navbar() {
             className="hidden sm:inline-flex"
           >
             Testar grátis
+          </Button>
+          <Button
+            size="sm"
+            as="a"
+            href="/signup"
+            aria-label="Começar teste grátis"
+            onClick={() =>
+              trackLandingEvent("landing_trial_cta_clicked", {
+                sourceSection: "navbar",
+                target: "/signup",
+                planContext: "agendoro",
+              })
+            }
+            className="px-3 sm:hidden"
+          >
+            Começar
           </Button>
         </div>
       </div>

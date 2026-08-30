@@ -10,7 +10,7 @@ import {
 } from "@/design-system";
 
 const buttonVariants = cva(
-  "inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap border border-transparent text-sm transition-all outline-none focus-visible:[border-color:var(--control-focus-border)] focus-visible:[box-shadow:var(--control-focus-ring)] disabled:pointer-events-none disabled:opacity-[var(--control-disabled-opacity)] disabled:[cursor:var(--control-disabled-cursor)] disabled:[filter:var(--control-disabled-filter)]",
+  "inline-flex max-w-full cursor-pointer items-center justify-center gap-2 whitespace-normal border border-transparent text-center text-sm transition-all outline-none focus-visible:[border-color:var(--control-focus-border)] focus-visible:[box-shadow:var(--control-focus-ring)] disabled:pointer-events-none disabled:opacity-[var(--control-disabled-opacity)] disabled:[cursor:var(--control-disabled-cursor)] disabled:[filter:var(--control-disabled-filter)]",
   {
     variants: {
       variant: {
@@ -19,9 +19,9 @@ const buttonVariants = cva(
         ghost: "hover:[color:var(--control-hover-ghost-text)]",
       },
       size: {
-        sm: "h-10 px-4 py-2",
-        md: "h-12 px-5 py-3",
-        lg: "h-14 px-7 py-4 text-base",
+        sm: "min-h-10 h-auto px-4 py-2",
+        md: "min-h-12 h-auto px-5 py-3",
+        lg: "min-h-14 h-auto px-7 py-4 text-base",
       },
     },
     defaultVariants: {

@@ -52,8 +52,8 @@ const heroMetrics = [
 
 function HeroKpiCard({ title, subtitle }: { title: string; subtitle: string }) {
   return (
-    <Card padding="sm" radiusSize="sm" className="h-full p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--theme-border-strong)] hover:shadow-[var(--theme-shadow-card)]">
-      <div className="text-2xl font-extrabold tracking-tight text-secondary">{title}</div>
+    <Card padding="sm" radiusSize="sm" className="h-full p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--theme-border-strong)] hover:shadow-[var(--theme-shadow-card)] sm:p-5">
+      <div className="text-xl font-extrabold tracking-tight text-secondary sm:text-2xl">{title}</div>
       <p className="mt-2 text-sm text-text-muted">{subtitle}</p>
     </Card>
   );
@@ -72,24 +72,24 @@ function HeroAgendaItem({
 }) {
   return (
     <div
-      className="flex items-center justify-between border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--theme-border-default)] hover:bg-[var(--theme-surface-glass-hover)]"
+      className="flex min-w-0 flex-wrap items-center justify-between gap-3 border border-[var(--theme-border-subtle)] bg-[var(--theme-surface-glass)] p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--theme-border-default)] hover:bg-[var(--theme-surface-glass-hover)]"
       style={{ borderRadius: radius.xs }}
     >
-      <div className="flex items-center gap-4">
+      <div className="flex min-w-0 items-center gap-3 sm:gap-4">
         <div
           className="bg-surface-2 px-3 py-2 text-sm font-bold text-secondary shadow-[inset_0_0_0_1px_var(--theme-border-subtle)]"
           style={{ borderRadius: radius.xs }}
         >
           {time}
         </div>
-        <div>
-          <p className="font-semibold text-[var(--theme-text-primary)]">{title}</p>
+        <div className="min-w-0">
+          <p className="break-words font-semibold text-[var(--theme-text-primary)]">{title}</p>
           <p className="text-sm text-text-muted">
             Agendamento online pelo link
           </p>
         </div>
       </div>
-      <Badge variant={badgeVariant}>{badge}</Badge>
+      <Badge className="max-w-full whitespace-normal text-left" variant={badgeVariant}>{badge}</Badge>
     </div>
   );
 }
@@ -154,9 +154,11 @@ export function Hero() {
             🔒 14 dias grátis · Sem cartão de crédito · Cancele quando quiser
           </p>
 
-          <div className="mt-7 grid gap-3 sm:grid-cols-3">
-            {heroKpis.map(([title, subtitle]) => (
-              <HeroKpiCard key={title} title={title} subtitle={subtitle} />
+          <div className="mt-7 grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {heroKpis.map(([title, subtitle], index) => (
+              <div key={title} className={index === heroKpis.length - 1 ? "col-span-2 sm:col-span-1" : undefined}>
+                <HeroKpiCard title={title} subtitle={subtitle} />
+              </div>
             ))}
           </div>
         </div>
@@ -178,14 +180,14 @@ export function Hero() {
               radiusSize="shell"
               className="p-5"
             >
-              <div className="flex items-center justify-between border-b border-[var(--theme-border-subtle)] pb-4">
-                <div>
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--theme-border-subtle)] pb-4">
+                <div className="min-w-0">
                   <p className="text-sm text-text-muted">Agendoro</p>
                   <h3 className="text-xl font-bold text-[var(--theme-text-primary)]">
                     Agenda do dia
                   </h3>
                 </div>
-                <div className="rounded-full border border-[var(--theme-border-accent)] bg-linear-to-r from-primary to-secondary px-3 py-1.5 text-xs font-bold text-dark shadow-[var(--theme-shadow-card)]">
+                <div className="shrink-0 rounded-full border border-[var(--theme-border-accent)] bg-linear-to-r from-primary to-secondary px-3 py-1.5 text-xs font-bold text-dark shadow-[var(--theme-shadow-card)]">
                   Online
                 </div>
               </div>

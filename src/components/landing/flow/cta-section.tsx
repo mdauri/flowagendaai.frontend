@@ -25,10 +25,11 @@ export function CTASection() {
             </p>
           </div>
 
-          <div className="flex flex-col gap-4 sm:flex-row lg:flex-col">
+          <div className="flex w-full flex-col gap-4 sm:w-auto sm:flex-row lg:flex-col">
             <Button
               as="a"
               href="/signup"
+              className="w-full sm:w-auto"
               onClick={() =>
                 trackLandingEvent("landing_trial_cta_clicked", {
                   sourceSection: "final_cta",
@@ -39,7 +40,7 @@ export function CTASection() {
             >
               Começar teste grátis de 14 dias
             </Button>
-            <Button as="a" href="#precos" variant="secondary">
+            <Button as="a" href="#precos" variant="secondary" className="w-full sm:w-auto">
               Ver preços
             </Button>
           </div>

@@ -205,6 +205,7 @@ export function LandingPage() {
               <Button
                 as="a"
                 href="#precos"
+                className="w-full sm:w-auto"
                 onClick={() =>
                   trackLandingEvent("landing_pricing_clicked", {
                     sourceSection: "pricing",
