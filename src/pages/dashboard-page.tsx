@@ -331,7 +331,7 @@ export function DashboardPage() {
         onCustomerQueryChange={setCustomerQuery}
         onClearFilters={handleClearFilters}
       />
-      <div className="grid min-w-0 gap-6 xl:grid-cols-12">
+      <div className="grid min-w-0 gap-6 xl:grid-cols-12 xl:grid-rows-[max-content_max-content]">
         <div className="min-w-0 xl:col-span-8">
           <DashboardAgendaList
             bookings={summary.todayBookings}
