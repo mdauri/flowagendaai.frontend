@@ -344,7 +344,7 @@ export function DashboardPage() {
           />
         </div>
 
-        <div className="grid min-w-0 gap-6 xl:col-span-4">
+        <div className="grid min-w-0 gap-6 xl:col-span-4 xl:row-span-2">
           <DashboardUpcomingList
             bookings={summary.upcomingBookings}
             tenantTimezone={summary.tenantTimezone}
@@ -356,14 +356,14 @@ export function DashboardPage() {
           />
           <DashboardProfessionalOccupancy items={summary.professionalOccupancy} />
         </div>
-      </div>
 
-      <div className="grid min-w-0 gap-6 xl:grid-cols-12">
-        <div className="min-w-0 xl:col-span-4">
-          <DashboardOccupancyCard occupancy={summary.occupancy} />
-        </div>
-        <div className="min-w-0 xl:col-span-8">
-          <DashboardKpiGrid summary={summary} />
+        <div className="grid min-w-0 gap-6 xl:col-span-8 xl:grid-cols-12">
+          <div className="min-w-0 xl:col-span-4">
+            <DashboardOccupancyCard occupancy={summary.occupancy} />
+          </div>
+          <div className="min-w-0 xl:col-span-8">
+            <DashboardKpiGrid summary={summary} />
+          </div>
         </div>
       </div>
 
