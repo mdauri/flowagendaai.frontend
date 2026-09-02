@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://agenda.dauri.com.br/</loc></url>
   <url><loc>https://agenda.dauri.com.br/ajuda</loc></url>
   <url><loc>https://agenda.dauri.com.br/ajuda/primeiros-passos</loc></url>
   <url><loc>https://agenda.dauri.com.br/ajuda/agenda</loc></url>
@@ -43,4 +44,6 @@
   <url><loc>https://agenda.dauri.com.br/ajuda/solucao-problemas/notificacao-nao-chegou</loc></url>
   <url><loc>https://agenda.dauri.com.br/ajuda/solucao-problemas/problema-login</loc></url>
   <url><loc>https://agenda.dauri.com.br/ajuda/faq/faq-agendoro</loc></url>
+  <url><loc>https://agenda.dauri.com.br/termos-de-uso</loc></url>
+  <url><loc>https://agenda.dauri.com.br/politica-de-privacidade</loc></url>
 </urlset>

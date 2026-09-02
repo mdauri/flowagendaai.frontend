@@ -18,6 +18,7 @@ describe("acquisition attribution", () => {
         clear: () => values.clear(),
       } satisfies Pick<Storage, "getItem" | "setItem" | "removeItem" | "clear">,
     });
+    Object.defineProperty(document, "referrer", { configurable: true, value: "" });
     window.history.replaceState({}, "", "/");
   });
 
@@ -57,5 +58,18 @@ describe("acquisition attribution", () => {
   test("falls back to direct without campaign parameters", () => {
     const attribution = captureAcquisitionAttribution();
     expect(attribution?.source).toBe("direct");
+  });
+
+  test.each([
+    ["https://www.google.com/search?q=agenda", "google"],
+    ["https://www.bing.com/search?q=agenda", "bing"],
+    ["https://duckduckgo.com/?q=agenda", "duckduckgo"],
+    ["https://search.yahoo.com/search?p=agenda", "yahoo"],
+  ])("classifies %s as organic", (referrer, source) => {
+    Object.defineProperty(document, "referrer", { configurable: true, value: referrer });
+
+    const attribution = captureAcquisitionAttribution();
+
+    expect(attribution).toEqual(expect.objectContaining({ source, medium: "organic", referrer: new URL(referrer).origin + new URL(referrer).pathname, landingPath: "/" }));
   });
 });

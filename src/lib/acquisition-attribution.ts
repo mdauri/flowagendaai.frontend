@@ -28,6 +28,23 @@ function safeReferrer(value: string | null): string | undefined {
   }
 }
 
+const SEARCH_ENGINES = new Map([
+  ["google.", "google"],
+  ["bing.com", "bing"],
+  ["duckduckgo.com", "duckduckgo"],
+  ["search.yahoo.com", "yahoo"],
+]);
+
+function organicSource(referrer: string | undefined): string | undefined {
+  if (!referrer) return undefined;
+  try {
+    const hostname = new URL(referrer).hostname.toLowerCase();
+    return [...SEARCH_ENGINES].find(([fragment]) => hostname.includes(fragment))?.[1];
+  } catch {
+    return undefined;
+  }
+}
+
 function createSessionId() {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
     return crypto.randomUUID();
@@ -88,10 +105,11 @@ export function captureAcquisitionAttribution(): AcquisitionAttribution | null {
   const term = safeValue(params.get("utm_term"));
   const content = safeValue(params.get("utm_content"));
   const referrer = safeReferrer(document.referrer);
+  const searchSource = organicSource(referrer);
 
   const attribution: AcquisitionAttribution = {
-    source: source ?? (referrer ? "referral" : "direct"),
-    medium,
+    source: source ?? searchSource ?? (referrer ? "referral" : "direct"),
+    medium: medium ?? (searchSource ? "organic" : undefined),
     campaign,
     term,
     content,
