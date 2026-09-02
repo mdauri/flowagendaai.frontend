@@ -80,6 +80,7 @@ for (const [videoKey, label] of videoSteps) {
       await demoClick(page, save);
       await expect(page.getByText("Servico criado e adicionado na listagem atual.", { exact: true })).toBeVisible();
     } else if (videoKey === "test-booking") {
+      await page.clock.install({ time: new Date("2026-08-30T15:00:00-03:00") });
       await page.waitForURL("**/p/maria-teste**");
       await installDemoHarness(page);
       await expect(page.getByRole("heading", { name: "Escolha o serviço", exact: true })).toBeVisible();

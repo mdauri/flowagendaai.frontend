@@ -44,6 +44,7 @@ test.describe("Public mobile smoke", () => {
   test("validates catalog discovery and public booking flow on mobile viewport", async ({
     page,
   }) => {
+    await page.clock.install({ time: new Date("2026-08-30T15:00:00-03:00") });
     await page.route("**/public/catalog/test-studio", async (route) => {
       await route.fulfill({
         status: 200,
