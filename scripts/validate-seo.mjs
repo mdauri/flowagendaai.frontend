@@ -7,7 +7,9 @@ if (!xml.startsWith("<?xml") || !xml.includes("<urlset") || !xml.includes("</url
 const urls = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(([, url]) => url);
 if (!urls.length || new Set(urls).size !== urls.length) throw new Error("sitemap has no URLs or duplicates");
 for (const url of urls) {
-  const response = await fetch(url.replace("https://agenda.dauri.com.br", baseUrl));
+  const path = new URL(url).pathname;
+  const requestUrl = `${baseUrl}${path === "/" ? "/" : `${path}/`}`;
+  const response = await fetch(requestUrl);
   if (response.status !== 200 || response.url.endsWith("/index.html")) throw new Error(`${url} returned ${response.status}`);
   const html = await response.text();
   if ((html.match(/<h1\b/g) ?? []).length !== 1 || !/<title>[^<]+<\/title>/.test(html) || !/<meta name="description" content="[^"]+"/.test(html)) throw new Error(`${url} is missing indexable body metadata`);
@@ -15,10 +17,10 @@ for (const url of urls) {
   if (html.includes('name="robots" content="noindex')) throw new Error(`${url} is noindex`);
   if (!html.includes(`rel="canonical" href="${url}"`)) throw new Error(`${url} has wrong canonical`);
 }
-for (const path of ["/login", "/signup", "/forgot-password", "/reset-password", "/app/unknown", "/c/example", "/p/example"]) {
-  const response = await fetch(`${baseUrl}${path}`);
+for (const path of ["/login", "/signup", "/forgot-password", "/reset-password", "/app", "/app/unknown", "/manage", "/manage/unknown", "/c/example", "/p/example"]) {
+  const response = await fetch(`${baseUrl}${path}/`);
   const html = await response.text();
-  if (response.status !== 200 || (!html.includes('name="robots" content="noindex,follow"') && !response.headers.get("x-robots-tag")?.includes("noindex"))) throw new Error(`${path} is indexable`);
+  if (response.status !== 200 || !html.includes('name="robots" content="noindex,follow"') || !response.headers.get("x-robots-tag")?.includes("noindex") || html.includes('name="robots" content="index,follow"')) throw new Error(`${path} is not coherently noindex`);
 }
 const missing = await fetch(`${baseUrl}/seo-route-that-does-not-exist`);
 if (missing.status !== 404) throw new Error(`unknown URL returned ${missing.status}`);
