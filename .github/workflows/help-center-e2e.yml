@@ -61,6 +61,11 @@ jobs:
 
       - name: Install API dependencies and migrate
         working-directory: api
+        env:
+          SEED_SYSTEM_ADMIN_NAME: CI Help Center System Admin
+          SEED_SYSTEM_ADMIN_EMAIL: ci-help-center-admin@agendoro.test
+          SEED_SYSTEM_ADMIN_PASSWORD: ${{ secrets.CI_SEED_SYSTEM_ADMIN_PASSWORD }}
+          SEED_SYSTEM_ADMIN_ROLE: system-admin
         run: |
           npm ci
           DATABASE_URL=postgresql://postgres:postgres@localhost:5432/agendoro?schema=public npx prisma migrate deploy
