@@ -1,9 +1,6 @@
 name: Deploy Agendoro Frontend
 
 on:
-  push:
-    branches:
-      - master
   workflow_dispatch:
 
 concurrency:
