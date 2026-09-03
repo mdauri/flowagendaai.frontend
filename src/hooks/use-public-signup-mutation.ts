@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { getAcquisitionAttribution } from "@/lib/acquisition-attribution";
+import { trackFirstPartyEvent } from "@/lib/first-party-analytics";
 import { setStoredToken } from "@/session/session-storage";
 import { acquisitionService } from "@/services/acquisition-service";
 import { signupService } from "@/services/signup-service";
@@ -11,6 +12,12 @@ export function usePublicSignupMutation() {
       const attribution = getAcquisitionAttribution();
       const result = await signupService.signup(payload);
       setStoredToken(result.accessToken);
+
+      trackFirstPartyEvent({
+        eventName: "signup_completed",
+        pagePath: "/signup",
+        landingPath: attribution?.landingPath,
+      });
 
       if (attribution) {
         try {

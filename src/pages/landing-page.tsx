@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import { useEffect } from "react";
 
 import {
   Button,
@@ -106,6 +107,14 @@ const resourceModules = [
 ];
 
 export function LandingPage() {
+  useEffect(() => {
+    trackLandingEvent("landing_page_viewed", {
+      sourceSection: "page_view",
+      target: "/",
+      landingPath: "/",
+    });
+  }, []);
+
   return (
     <main className="min-h-screen overflow-x-hidden bg-background text-[var(--theme-text-primary)]">
       <div

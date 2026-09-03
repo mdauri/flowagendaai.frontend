@@ -1,4 +1,5 @@
 import { captureAcquisitionAttribution } from "@/lib/acquisition-attribution";
+import { trackFirstPartyEvent, type FirstPartyEventName } from "@/lib/first-party-analytics";
 
 export type LandingEventName =
   | "landing_page_viewed"
@@ -25,6 +26,13 @@ export interface LandingEventPayload {
   planContext?: "agendoro" | "whatsapp_addon";
 }
 
+function toFirstPartyEventName(name: LandingEventName): FirstPartyEventName {
+  if (name === "landing_page_viewed") return "page_view";
+  if (name === "landing_demo_clicked") return "demo_click";
+  if (name === "landing_signup_started") return "signup_started";
+  return "cta_click";
+}
+
 export function trackLandingEvent(
   name: LandingEventName,
   payload: LandingEventPayload
@@ -34,6 +42,18 @@ export function trackLandingEvent(
   }
 
   const attribution = captureAcquisitionAttribution();
+
+  trackFirstPartyEvent({
+    eventName: toFirstPartyEventName(name),
+    landingPath: payload.landingPath ?? attribution?.landingPath,
+  });
+
+  if (payload.target === "/signup" && toFirstPartyEventName(name) === "cta_click") {
+    trackFirstPartyEvent({
+      eventName: "signup_started",
+      landingPath: payload.landingPath ?? attribution?.landingPath,
+    });
+  }
 
   window.dispatchEvent(
     new CustomEvent("agendoro:landing-event", {
