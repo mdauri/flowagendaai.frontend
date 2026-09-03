@@ -13,6 +13,7 @@ for (const url of urls) {
   if (response.status !== 200 || response.url.endsWith("/index.html")) throw new Error(`${url} returned ${response.status}`);
   const html = await response.text();
   if ((html.match(/<h1\b/g) ?? []).length !== 1 || !/<title>[^<]+<\/title>/.test(html) || !/<meta name="description" content="[^"]+"/.test(html)) throw new Error(`${url} is missing indexable body metadata`);
+  if (!html.includes('<meta name="viewport" content="width=device-width, initial-scale=1.0"')) throw new Error(`${url} is missing mobile viewport metadata`);
   for (const marker of ['rel="canonical"', 'property="og:title"', 'property="og:description"', 'property="og:type"', 'property="og:url"', 'property="og:image"', 'name="twitter:card"']) if (!html.includes(marker)) throw new Error(`${url} is missing ${marker}`);
   if (html.includes('name="robots" content="noindex')) throw new Error(`${url} is noindex`);
   if (!html.includes(`rel="canonical" href="${url}"`)) throw new Error(`${url} has wrong canonical`);

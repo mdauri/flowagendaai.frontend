@@ -94,6 +94,11 @@ for (const page of Object.values(commercial)) {
 
 const indexTemplate = await readFile(join(dist, "index.html"), "utf8");
 const assetTags = [...indexTemplate.matchAll(/<link\b[^>]*>|<script\b[^>]*src=[^>]*><\/script>/g)].map(([tag]) => tag).join("");
+const baseMetaTags = [
+  '<meta name="viewport" content="width=device-width, initial-scale=1.0" />',
+  '<meta name="theme-color" content="#f59e0b" />',
+  '<meta name="agendoro-customer-app-context" content="browser" />',
+].join("");
 const robots = `<meta name="robots" content="index,follow" />`;
 const twitter = `<meta name="twitter:card" content="summary_large_image" /><meta name="twitter:title" content="%TITLE%" /><meta name="twitter:description" content="%DESCRIPTION%" /><meta name="twitter:image" content="${imageUrl}" />`;
 
@@ -105,7 +110,7 @@ function render(page, noindex = false) {
     ...(page.jsonLd ?? []).map((item) => `<script type="application/ld+json">${escapeJson(item)}</script>`),
   ].join("");
   const body = `<div id="root">${page.bodyHtml ?? `<main><h1>${escapeHtml(page.h1)}</h1><p>${escapeHtml(page.text)}</p></main>`}</div>`;
-  return indexTemplate.replace(/<html[^>]*>/, `<html lang="pt-BR">`).replace(/<head>[\s\S]*?<\/head>/, `<head><meta charset="UTF-8" />${assetTags}${metadata}</head>`).replace(/<div id="root"><\/div>/, body);
+  return indexTemplate.replace(/<html[^>]*>/, `<html lang="pt-BR">`).replace(/<head>[\s\S]*?<\/head>/, `<head><meta charset="UTF-8" />${baseMetaTags}${assetTags}${metadata}</head>`).replace(/<div id="root"><\/div>/, body);
 }
 
 for (const page of pages) {
