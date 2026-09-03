@@ -46,4 +46,5 @@ jobs:
           E2E_API_DIR: ${{ github.workspace }}/api
           E2E_EMAIL: e2e.system-admin@agendoro.test
           E2E_PASSWORD: E2E@2026
+          CI_SEED_SYSTEM_ADMIN_PASSWORD: ${{ secrets.CI_SEED_SYSTEM_ADMIN_PASSWORD }}
         run: npm run e2e:with-api
