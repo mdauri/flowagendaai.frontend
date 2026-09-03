@@ -7,6 +7,7 @@ import { DashboardPage } from "@/pages/dashboard-page";
 import { LoginPage } from "@/pages/login-page";
 import { SignupPage } from "@/pages/signup-page";
 import { LandingPage } from "@/pages/landing-page";
+import { CommercialSeoPage } from "@/pages/commercial-seo-page";
 import { ProfessionalsPage } from "@/pages/professionals-page";
 import { ProfessionalRemovalPage } from "@/pages/professional-removal-page";
 import { PrivacyPolicyPage } from "@/pages/privacy-policy-page";
@@ -100,6 +101,9 @@ export function AppRouter() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/sistema-agendamento-online" element={<CommercialSeoPage pageKey="system" />} />
+        <Route path="/agenda-online-estetica-automotiva" element={<CommercialSeoPage pageKey="automotive" />} />
+        <Route path="/agenda-online-salao-beleza" element={<CommercialSeoPage pageKey="salon" />} />
         <Route path="/termos-de-uso" element={<TermsPage />} />
         <Route path="/politica-de-privacidade" element={<PrivacyPolicyPage />} />
         <Route path="/login" element={<LoginPage />} />
