@@ -27,7 +27,7 @@ type SeoPage = {
 };
 
 function Action({ page, target, children, secondary = false }: { page: SeoPage; target: string; children: React.ReactNode; secondary?: boolean }) {
-  return <Button as="a" href={target} variant={secondary ? "secondary" : "primary"} onClick={() => { trackLandingEvent(target === page.demo?.to ? "landing_demo_clicked" : secondary ? "landing_secondary_cta_clicked" : "landing_trial_cta_clicked", { sourceSection: secondary ? "secondary_cta" : "hero", target, landingPath: page.path }); if (target === "/signup") trackLandingEvent("landing_signup_started", { sourceSection: secondary ? "secondary_cta" : "hero", target, landingPath: page.path }); }}>{children}</Button>;
+  return <Button as="a" href={target} variant={secondary ? "secondary" : "primary"} onClick={() => trackLandingEvent(target === page.demo?.to ? "landing_demo_clicked" : secondary ? "landing_secondary_cta_clicked" : "landing_trial_cta_clicked", { sourceSection: secondary ? "secondary_cta" : "hero", target, landingPath: page.path })}>{children}</Button>;
 }
 
 function ListSection({ title, items, eyebrow }: { title: string; items: string[]; eyebrow: string }) {
