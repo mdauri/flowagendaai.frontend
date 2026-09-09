@@ -61,4 +61,17 @@ describe("first-party analytics", () => {
     expect(() => trackFirstPartyEvent({ eventName: "cta_click", landingPath: "/" })).not.toThrow();
     await Promise.resolve();
   });
+  test("keeps first landing path and prospect in every event after navigation", () => {
+    const prospectId = "49d52765-1f72-4bdf-9015-4bdf7bbfa8de";
+    window.localStorage.clear();
+    window.history.replaceState({}, "", `/?utm_source=outbound&utm_medium=whatsapp&utm_campaign=barbearias-jacarei-v1&prospect_id=${prospectId}`);
+    const first = buildFirstPartyEvent({ eventName: "page_view" });
+    window.history.replaceState({}, "", "/signup");
+    for (const eventName of ["page_view", "demo_click", "cta_click", "signup_started", "signup_completed"] as const) {
+      expect(buildFirstPartyEvent({ eventName, landingPath: "/signup" })).toMatchObject({
+        prospectId, landingPath: "/", source: "outbound", medium: "whatsapp", campaign: "barbearias-jacarei-v1", sessionId: first?.sessionId, firstTouchAt: first?.firstTouchAt,
+      });
+    }
+  });
+
 });

@@ -1,4 +1,5 @@
 export interface AcquisitionAttribution {
+  prospectId?: string;
   source: string;
   medium?: string;
   campaign?: string;
@@ -9,6 +10,14 @@ export interface AcquisitionAttribution {
   firstTouchAt: string;
   sessionId: string;
 }
+
+const PROSPECT_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function safeProspectId(value: unknown): string | undefined {
+  return typeof value === "string" && PROSPECT_ID.test(value) ? value.toLowerCase() : undefined;
+}
+
+let memoryAttribution: AcquisitionAttribution | null = null;
 
 const STORAGE_KEY = "agendoro:acquisition:first-touch";
 
@@ -70,9 +79,9 @@ function readStored(): AcquisitionAttribution | null {
     ) {
       return null;
     }
-    return parsed as AcquisitionAttribution;
+    return { ...parsed, prospectId: safeProspectId(parsed.prospectId) } as AcquisitionAttribution;
   } catch {
-    return null;
+    return memoryAttribution;
   }
 }
 
@@ -81,6 +90,7 @@ function writeStored(value: AcquisitionAttribution) {
     return;
   }
 
+  memoryAttribution = value;
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(value));
   } catch {
@@ -108,6 +118,7 @@ export function captureAcquisitionAttribution(): AcquisitionAttribution | null {
   const searchSource = organicSource(referrer);
 
   const attribution: AcquisitionAttribution = {
+    prospectId: params.getAll("prospect_id").length === 1 ? safeProspectId(params.get("prospect_id")) : undefined,
     source: source ?? searchSource ?? (referrer ? "referral" : "direct"),
     medium: medium ?? (searchSource ? "organic" : undefined),
     campaign,

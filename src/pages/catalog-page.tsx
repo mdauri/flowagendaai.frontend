@@ -1,3 +1,4 @@
+import { trackFirstPartyEvent } from "@/lib/first-party-analytics";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -15,6 +16,9 @@ import { useProfessionalsByServiceQuery } from "@/hooks/use-professionals-by-ser
 import { ApiError } from "@/types/api";
 
 export function CatalogPage() {
+  useEffect(() => {
+    trackFirstPartyEvent({ eventName: "page_view" });
+  }, []);
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const catalogQuery = usePublicCatalogQuery(slug);

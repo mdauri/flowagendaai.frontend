@@ -15,6 +15,7 @@ export interface FirstPartyEventInput {
 }
 
 export interface FirstPartyEventPayload {
+  prospectId?: string;
   eventId: string;
   eventName: FirstPartyEventName;
   eventAt: string;
@@ -63,7 +64,8 @@ export function buildFirstPartyEvent(input: FirstPartyEventInput): FirstPartyEve
     eventName: input.eventName,
     eventAt: new Date().toISOString(),
     pagePath: input.pagePath ?? window.location.pathname,
-    landingPath: input.landingPath ?? attribution.landingPath ?? window.location.pathname,
+    landingPath: attribution.landingPath ?? input.landingPath ?? window.location.pathname,
+    prospectId: attribution.prospectId,
     source: attribution.source,
     medium: attribution.medium ?? null,
     campaign: attribution.campaign ?? null,

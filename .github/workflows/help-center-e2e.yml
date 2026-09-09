@@ -96,6 +96,28 @@ jobs:
           VITE_API_BASE_URL: http://localhost:3333
         run: npm run e2e -- e2e/help-center.spec.ts e2e/onboarding-dismissible.spec.ts
 
+      - name: Configure barbershop demo in isolated database
+        working-directory: api
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/agendoro?schema=public
+          REDIS_URL: redis://localhost:6379
+          FRONTEND_APP_URL: http://localhost:5173
+        run: npx tsx prisma/seed-barbershop-demo.ts
+
+      - name: Validate barbershop booking and outbound attribution
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/agendoro?schema=public
+          E2E_API_DIR: ${{ github.workspace }}/api
+          E2E_BASE_URL: http://localhost:5173
+          E2E_API_BASE_URL: http://localhost:3333
+          VITE_API_BASE_URL: http://localhost:3333
+          PLAYWRIGHT_OUTPUT_DIR: /tmp/agendoro-barbershop-results
+          PLAYWRIGHT_REPORT_DIR: /tmp/agendoro-barbershop-report
+        run: |
+          node node_modules/vite/bin/vite.js --host 127.0.0.1 --port 5173 > /tmp/agendoro-barbershop-vite.log 2>&1 &
+          for i in {1..30}; do curl -fsS http://localhost:5173/ > /dev/null && break; sleep 1; done
+          npx playwright test --config playwright.barbershop.config.ts
+
       - name: Upload E2E screenshots and report
         if: always()
         uses: actions/upload-artifact@v4
@@ -104,4 +126,6 @@ jobs:
           path: |
             test-results/
             playwright-report/
+            /tmp/agendoro-barbershop-results/
+            /tmp/agendoro-barbershop-report/
           if-no-files-found: ignore

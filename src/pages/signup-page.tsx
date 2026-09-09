@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { trackFirstPartyEvent } from "@/lib/first-party-analytics";
 import { Navigate } from "react-router";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { SignupForm } from "@/components/auth/signup-form";
@@ -5,6 +7,10 @@ import { PageState } from "@/components/shared/page-state";
 import { useAuth } from "@/hooks/use-auth";
 
 export function SignupPage() {
+  useEffect(() => {
+    trackFirstPartyEvent({ eventName: "page_view" });
+    trackFirstPartyEvent({ eventName: "signup_started" });
+  }, []);
   const auth = useAuth();
 
   if (auth.isBootstrapping && auth.token) {
