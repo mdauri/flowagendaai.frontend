@@ -1,3 +1,4 @@
+import { trackFirstPartyEvent } from "@/lib/first-party-analytics";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { colors, typography } from "@/design-system";
 import { DateTime } from "luxon";
@@ -139,6 +140,9 @@ type BookingNotification =
     };
 
 export function PublicBookingPage() {
+  useEffect(() => {
+    trackFirstPartyEvent({ eventName: "page_view" });
+  }, []);
   const { slug } = useParams<{ slug: string }>();
   const [searchParams] = useSearchParams();
   const preselectedServiceId = searchParams.get("service");

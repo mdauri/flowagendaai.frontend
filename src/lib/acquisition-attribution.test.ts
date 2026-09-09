@@ -72,4 +72,35 @@ describe("acquisition attribution", () => {
 
     expect(attribution).toEqual(expect.objectContaining({ source, medium: "organic", referrer: new URL(referrer).origin + new URL(referrer).pathname, landingPath: "/" }));
   });
+  test("preserves opaque outbound prospect across booking, reload reads and another campaign", () => {
+    const prospectId = "49d52765-1f72-4bdf-9015-4bdf7bbfa8de";
+    window.history.replaceState({}, "", `/c/barbearia-dom-pedro/catalog?utm_source=outbound&utm_medium=whatsapp&utm_campaign=barbearias-jacarei-v1&prospect_id=${prospectId}`);
+    const first = captureAcquisitionAttribution();
+    window.history.replaceState({}, "", "/p/barbearia-dom-pedro-joao?service=dom-pedro-corte");
+    expect(getAcquisitionAttribution()).toEqual(first);
+    window.history.replaceState({}, "", "/signup?utm_source=other&prospect_id=425e36d2-0ee9-44e3-83c6-42f3e8b0c1fa");
+    expect(getAcquisitionAttribution()).toEqual(first);
+    expect(first).toMatchObject({ prospectId, source: "outbound", medium: "whatsapp", campaign: "barbearias-jacarei-v1" });
+  });
+
+  test.each(["Joao", "11999999999", "joao@example.com", "49d52765-1f72-1bdf-9015-4bdf7bbfa8de", "49d52765-1f72-4bdf-9015-4bdf7bbfa8de&prospect_id=duplicate"])("discards invalid or ambiguous prospect %s", (value) => {
+    window.history.replaceState({}, "", `/?utm_source=outbound&prospect_id=${value}`);
+    expect(captureAcquisitionAttribution()?.prospectId).toBeUndefined();
+    expect(window.localStorage.getItem(STORAGE_KEY)).not.toContain(value);
+  });
+
+  test("discards an invalid prospect from stored attribution", () => {
+    const first = captureAcquisitionAttribution();
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...first, prospectId: "customer@example.com" }));
+    expect(getAcquisitionAttribution()?.prospectId).toBeUndefined();
+  });
+
+  test("storage failure never blocks navigation and keeps first touch in memory within this page", () => {
+    window.history.replaceState({}, "", "/?utm_source=outbound");
+    const first = captureAcquisitionAttribution();
+    Object.defineProperty(window, "localStorage", { configurable: true, get: () => { throw new Error("storage blocked"); } });
+    window.history.replaceState({}, "", "/signup");
+    expect(getAcquisitionAttribution()).toEqual(first);
+  });
+
 });

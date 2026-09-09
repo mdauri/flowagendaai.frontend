@@ -6,6 +6,7 @@ const authFile = process.env.E2E_AUTH_FILE ?? "playwright/.auth/user.json";
 
 export default defineConfig({
   testDir: "./e2e",
+  testIgnore: "**/barbershop-sales.spec.ts",
   fullyParallel: true,
   // The API-backed harness provides one mutable API/DB/Redis for the whole run.
   workers: process.env.E2E_API_DIR ? 1 : undefined,

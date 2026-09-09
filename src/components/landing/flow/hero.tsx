@@ -145,8 +145,8 @@ export function Hero() {
             >
               Começar teste grátis de 14 dias
             </Button>
-            <Button as="a" href="#como-funciona" variant="secondary">
-              Ver como funciona
+            <Button as="a" href="/c/barbearia-dom-pedro/catalog" variant="secondary" onClick={() => trackLandingEvent("landing_demo_clicked", { sourceSection: "hero", target: "/c/barbearia-dom-pedro/catalog" })}>
+              Testar demo de barbearia
             </Button>
           </div>
 
